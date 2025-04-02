@@ -1,12 +1,13 @@
 import { ProductBrand } from './product-brand.model';
-import { ProductCategory } from './product-category.model';
+import { ProductCategory, SubCategoryEnriched } from './product-category.model';
 
 export interface Product {
-  productId: number | null;
+  productId: number;
   productName: string;
   brand: ProductBrand;
-  productCategory: ProductCategory;
+  productSubCategory: SubCategoryEnriched;
   productDescription: string | null;
+  dateModified: Date;
   productPrice: number;
   productQuantity: number;
   productImage: string;
@@ -29,4 +30,15 @@ export interface ProductRequest {
   productWeight: number | null;
   productDimensions: string;
   productCondition: string;
+}
+
+export interface ProductFilters {
+  categoryId?: number | null;
+  subCategoryId?: number | null;
+  brandId?: number | null;
+  searchValue?: string | null;
+  offset: number;
+  currentPage: number;
+  sortField?: string;
+  sortDirection?: 'asc' | 'desc';
 }

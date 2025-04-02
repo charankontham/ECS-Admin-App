@@ -3,24 +3,31 @@ import { HomeComponent } from './features/home/home.component';
 import { LoginComponent } from './features/auth/login/login.component';
 import { DashboardComponent } from './features/dashboard/dashboard.component';
 import { AuthGuard } from './core/guards/auth.guard';
-import { InventoryAdminComponent } from './features/inventory-admin/inventory-admin.component';
+import { InventoryAdminComponent } from './features/inventory/inventory-admin.component';
 import { RoleGuard } from './core/guards/role.guard';
 import { LogisticsAdminComponent } from './features/logistics-admin/logistics-admin.component';
 import { MarketingAdminComponent } from './features/marketing-admin/marketing-admin.component';
+import { INVENTORY_ROUTES } from '../app/features/inventory/routes/inventory.routes';
 
 export const routes: Routes = [
-  { path: '', component: HomeComponent },
   { path: 'login', component: LoginComponent },
   {
-    path: 'dashboard',
-    component: DashboardComponent,
-    canActivate: [AuthGuard],
+    path: '',
+    component: HomeComponent,
+    canActivate: [AuthGuard, RoleGuard],
+    data: { role: 'admin', subRoles: ['inventory'] },
   },
   {
     path: 'inventory',
     component: InventoryAdminComponent,
     canActivate: [AuthGuard, RoleGuard],
-    data: { role: 'inventory-admin' },
+    data: { role: 'admin', subRoles: ['inventory'] },
+    children: INVENTORY_ROUTES,
+
+    // () =>
+    //   import('../app/features/inventory/routes/inventory.routes').then(
+    //     (m) => { return m.INVENTORY_ROUTES }
+    //   ),
   },
   {
     path: 'logistics',
@@ -29,7 +36,7 @@ export const routes: Routes = [
     data: { role: 'logistics-admin' },
   },
   {
-    path: 'marketing',
+    path: 'marketing-dashboard',
     component: MarketingAdminComponent,
     canActivate: [AuthGuard, RoleGuard],
     data: { role: 'marketing-admin' },

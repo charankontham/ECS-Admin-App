@@ -1,6 +1,6 @@
 import { inject, Injectable, NgZone } from '@angular/core';
 import { BaseService } from './base.service';
-import { ProductCategory } from '../models/product-category.model';
+import { ProductBrand } from '../models/product-brand.model';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { AuthService } from './auth.service';
 import { Observable } from 'rxjs';
@@ -8,16 +8,16 @@ import { Observable } from 'rxjs';
 @Injectable({
   providedIn: 'root',
 })
-export class ProductCategoryService extends BaseService<ProductCategory> {
+export class ProductBrandService extends BaseService<ProductBrand> {
   private headers: HttpHeaders | null = null;
   constructor(ngZone: NgZone, private authService: AuthService) {
-    super(inject(HttpClient), 'ecs-product/api/productCategory', ngZone);
+    super(inject(HttpClient), 'ecs-product/api/productBrand', ngZone);
     // this.headers = new HttpHeaders({
-    //   Authorization: 'Bearer ' + localStorage.getItem('userToken'),
+    //   Authorization: 'Bearer ' + authService.decryptData(localStorage.getItem('userToken') || ""),
     // });
   }
 
-  getAllProducts(): Observable<ProductCategory[]> {
+  getAllProducts(): Observable<ProductBrand[]> {
     return this.getAll();
   }
 }

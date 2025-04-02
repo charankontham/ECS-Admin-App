@@ -1,0 +1,30 @@
+<!-- inventory.component.html -->
+
+<div class="sidebar">
+    <h2>Inventory Admin</h2>
+    <ul>
+        <li><a routerLink="/inventory/dashboard" routerLinkActive="active"
+                [routerLinkActiveOptions]="{exact: true}">Dashboard</a></li>
+        <li><a routerLink="/inventory/products" routerLinkActive="active">Products</a></li>
+        <li><a routerLink="/inventory/brands" routerLinkActive="active">Brands</a></li>
+        <li><a routerLink="/inventory/categories" routerLinkActive="active">Categories</a></li>
+        <li><a routerLink="/inventory/analytics" routerLinkActive="active">Analytics</a></li>
+    </ul>
+</div>
+
+<div class="main-content">
+    <header>
+        <h1>{{currentPageTitle}}</h1>
+        <div class="user-wrapper">
+            <div class="user-icon"><fa-icon [icon]="faUser" size="lg"></fa-icon></div>
+            <div class="name-role">
+                <div>{{adminData?.adminName}}</div>
+                <small>{{adminData?.adminRole?.subRole + " " + adminData?.adminRole?.roleName}}</small>
+            </div>
+        </div>
+    </header>
+
+    <main>
+        <router-outlet></router-outlet>
+    </main>
+</div>

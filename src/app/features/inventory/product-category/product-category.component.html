@@ -1,0 +1,32 @@
+<div class="container">
+    <h2>Product Categories</h2>
+
+    <form [formGroup]="categoryForm" (ngSubmit)="submitForm()">
+        <input type="text" formControlName="name" placeholder="Category Name" required />
+        <textarea formControlName="description" placeholder="Description"></textarea>
+        <button type="submit">{{ isEditing() ? 'Update' : 'Add' }} Category</button>
+        <button type="button" (click)="resetForm()">Reset</button>
+    </form>
+
+    <table>
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Name</th>
+                <th>Description</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr *ngFor="let category of categories()">
+                <td>{{ category.id }}</td>
+                <td>{{ category.name }}</td>
+                <td>{{ category.description }}</td>
+                <td>
+                    <button (click)="editCategory(category)">Edit</button>
+                    <button (click)="deleteCategory(category.id)" class="delete">Delete</button>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+</div>

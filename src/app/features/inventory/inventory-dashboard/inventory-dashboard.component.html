@@ -1,0 +1,64 @@
+<!-- Recently Added Products -->
+<section id="recent-products" class="card">
+    <h2>Recently Added Products</h2>
+    <table>
+        <thead>
+            <tr>
+                <th>Product Name</th>
+                <th>Category</th>
+                <th>Date Added</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr *ngFor="let product of recentProducts">
+                <td>{{ product.productName }}</td>
+                <td>{{ product.productSubCategory.productCategory.categoryName }}</td>
+                <td>{{ product.dateModified }}</td>
+            </tr>
+        </tbody>
+    </table>
+</section>
+
+<!-- Out of Stock Products -->
+<section id="out-of-stock" class="card">
+    <h2>Out of Stock Products</h2>
+    <table>
+        <thead>
+            <tr>
+                <th>Product Name</th>
+                <th>Category</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr *ngFor="let product of outOfStockProducts">
+                <td>{{ product.name }}</td>
+                <td>{{ product.category }}</td>
+            </tr>
+        </tbody>
+    </table>
+</section>
+
+<!-- High Selling Products -->
+<section id="high-selling" class="card">
+    <h2>High Selling Products</h2>
+    <table>
+        <thead>
+            <tr>
+                <th>Product Name</th>
+                <th>Units Sold</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr *ngFor="let product of highSellingProducts">
+                <td>{{ product.name }}</td>
+                <td>{{ product.unitsSold }}</td>
+            </tr>
+        </tbody>
+    </table>
+</section>
+
+<!-- Analytics Section -->
+<section id="analytics" class="card">
+    <h2>Sales Trends</h2>
+    <canvas id="salesTrendsChart" width="400" height="200"></canvas>
+</section>
