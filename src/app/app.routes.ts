@@ -8,6 +8,7 @@ import { RoleGuard } from './core/guards/role.guard';
 import { LogisticsAdminComponent } from './features/logistics-admin/logistics-admin.component';
 import { MarketingAdminComponent } from './features/marketing-admin/marketing-admin.component';
 import { INVENTORY_ROUTES } from '../app/features/inventory/routes/inventory.routes';
+import { ImageUploaderComponent } from './features/images/image-uploader/image-uploader.component';
 
 export const routes: Routes = [
   { path: 'login', component: LoginComponent },
@@ -40,6 +41,12 @@ export const routes: Routes = [
     component: MarketingAdminComponent,
     canActivate: [AuthGuard, RoleGuard],
     data: { role: 'marketing-admin' },
+  },
+  {
+    path: 'images',
+    component: ImageUploaderComponent,
+    canActivate: [AuthGuard, RoleGuard],
+    data: { role: 'admin' },
   },
   { path: '**', redirectTo: 'login' },
 ];

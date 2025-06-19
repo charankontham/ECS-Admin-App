@@ -1,0 +1,151 @@
+<div class="gallery-container">
+    <!-- Header with Add Button -->
+    <mat-card class="header-card">
+        <mat-card-content>
+            <div class="header-content">
+                <div class="page-title">
+                    <h1>Image Gallery</h1>
+                    <p class="subtitle">Browse and manage product images</p>
+                </div>
+                <div class="header-actions">
+                    <button mat-flat-button color="primary" (click)="navigateToAddImage()">
+                        <mat-icon>add</mat-icon>
+                        Add New Image
+                    </button>
+                </div>
+            </div>
+        </mat-card-content>
+    </mat-card>
+
+    <!-- Loading State -->
+    <div *ngIf="loading" class="loading-container">
+        <mat-progress-bar mode="indeterminate"></mat-progress-bar>
+    </div>
+
+    <!-- Main Content -->
+    <div class="gallery-content" *ngIf="!loading">
+        <!-- Left Panel: Image List -->
+        <mat-card class="list-card">
+            <mat-card-content>
+                <div class="list-header">
+                    <h2>All Images</h2>
+                    <span class="image-count">{{ totalImages }} images</span>
+                </div>
+
+                <div class="image-list-container">
+                    <div *ngIf="images.length === 0" class="no-images">
+                        <mat-icon>image_not_supported</mat-icon>
+                        <p>No images found</p>
+                        <button mat-flat-button color="primary" (click)="navigateToAddImage()">
+                            Upload Your First Image
+                        </button>
+                    </div>
+
+                    <div *ngIf="images.length > 0" class="image-list">
+                        <div *ngFor="let image of images" class="image-item"
+                            [class.selected]="selectedImage?.id === image.id" (click)="selectImage(image)">
+                            <div class="image-thumbnail">
+                                <img [src]="'data:'+ image.contentType + ';base64,' + image.image"
+                                    [alt]="image.imageName" width="300" (error)="handleImageError($event)">
+                            </div>
+                            <div class="image-info">
+                                <div class="image-name">{{ image.imageName }}</div>
+                                <div class="image-id">ID: {{ image.id }}</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Pagination -->
+                <mat-paginator *ngIf="totalImages > offset" [length]="totalImages" [pageSize]="offset"
+                    [pageSizeOptions]="[5, 10, 25, 50]" (page)="onPageChange($event)"
+                    aria-label="Select page of images">
+                </mat-paginator>
+            </mat-card-content>
+        </mat-card>
+
+        <!-- Right Panel: Image Details -->
+        <mat-card class="details-card">
+            <mat-card-content>
+                <div *ngIf="!selectedImage" class="no-selection">
+                    <mat-icon>image_search</mat-icon>
+                    <p>Select an image to view details</p>
+                </div>
+
+                <div *ngIf="selectedImage" class="image-details">
+                    <div class="details-header">
+                        <h2>Image Details</h2>
+                        <div class="details-actions">
+                            <button mat-icon-button color="warn" matTooltip="Delete Image" (click)="confirmDelete()">
+                                <mat-icon>delete</mat-icon>
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="details-content">
+                        <div class="image-preview">
+                            <img [src]="'data:' + selectedImage.contentType + ';base64,' + selectedImage.image"
+                                [alt]="selectedImage.imageName" width="300" (error)="handleImageError($event)">
+                        </div>
+
+                        <mat-divider></mat-divider>
+
+                        <div class="details-info">
+                            <div class="info-grid">
+                                <div class="info-item">
+                                    <div class="info-label">Name</div>
+                                    <div class="info-value">{{ selectedImage.imageName }}</div>
+                                </div>
+                                <div class="info-item">
+                                    <div class="info-label">Image ID</div>
+                                    <div class="info-value">{{ selectedImage.id }}</div>
+                                </div>
+                                <div class="info-item">
+                                    <div class="info-label">Upload Date</div>
+                                    <div class="info-value">{{ selectedImage.uploadedDate | date:'medium' }}</div>
+                                </div>
+                                <div class="info-item" *ngIf="selectedImage.size">
+                                    <div class="info-label">File Size</div>
+                                    <div class="info-value">{{ selectedImage.size > 1000000 ? (selectedImage.size /
+                                        1000000 )
+                                        + " MB" : selectedImage.size / 1000 + " KB"}} </div>
+                                </div>
+                                <div class="info-item" *ngIf="selectedImage.contentType">
+                                    <div class="info-label">File Type</div>
+                                    <div class="info-value">{{ selectedImage.contentType }}</div>
+                                </div>
+                                <div class="info-item" *ngIf="selectedImage.dimensions">
+                                    <div class="info-label">Dimensions</div>
+                                    <!-- <div class="info-value">
+                                        {{ selectedImage.dimensions.width }} × {{ selectedImage.dimensions.height }} px
+                                    </div> -->
+
+                                    <div class="info-value">
+                                        {{ selectedImage.dimensions }}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- <mat-divider></mat-divider> -->
+
+                        <div class="details-actions-footer">
+                            <button mat-stroked-button (click)="copyImageId()">
+                                <mat-icon>content_copy</mat-icon>
+                                Copy Image ID
+                            </button>
+                            <!-- <button mat-stroked-button (click)="copyImageUrl()">
+                                <mat-icon>link</mat-icon>
+                                Copy Image URL
+                            </button> -->
+                            <button mat-flat-button color="warn" (click)="confirmDelete()">
+                                <mat-icon>delete</mat-icon>
+                                Delete Image
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </mat-card-content>
+        </mat-card>
+    </div>
+</div>

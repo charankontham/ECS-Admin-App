@@ -1,10 +1,14 @@
 <div class="products-container">
-    <!-- Filters Section -->
+    <div class="action-button-container">
+        <button mat-flat-button color="primary" routerLink="/inventory/products/new" class="add-product-button">
+            <mat-icon>add</mat-icon>
+            Add New Product
+        </button>
+    </div>
     <mat-card class="filter-card">
         <mat-card-content>
             <form [formGroup]="filterForm" class="filter-form">
                 <div class="filter-row">
-
                     <mat-form-field appearance="outline">
                         <mat-label>Category</mat-label>
                         <mat-select formControlName="category">
@@ -14,7 +18,6 @@
                             </mat-option>
                         </mat-select>
                     </mat-form-field>
-
                     <mat-form-field appearance="outline">
                         <mat-label>Sub Category</mat-label>
                         <mat-select formControlName="subCategory" [disabled]="(!filterForm.get('category')?.value)">
@@ -24,7 +27,6 @@
                             </mat-option>
                         </mat-select>
                     </mat-form-field>
-
                     <mat-form-field appearance="outline">
                         <mat-label>Brand</mat-label>
                         <mat-select formControlName="brand">
@@ -34,14 +36,12 @@
                             </mat-option>
                         </mat-select>
                     </mat-form-field>
-
                     <mat-form-field appearance="outline">
                         <mat-label>Search</mat-label>
                         <input matInput formControlName="search" placeholder="Search products...">
                         <mat-icon matSuffix>search</mat-icon>
                     </mat-form-field>
                 </div>
-
                 <div class="filter-actions">
                     <mat-chip-listbox>
                         <mat-chip *ngIf="filterForm.get('category')?.value">
@@ -77,8 +77,6 @@
             </form>
         </mat-card-content>
     </mat-card>
-
-    <!-- Table Section -->
     <mat-card class="table-card">
         <mat-card-content>
             <div class="table-container">
@@ -88,19 +86,19 @@
 
                 <table mat-table [dataSource]="dataSource" matSort (matSortChange)="sortData($event)"
                     class="products-table">
-                    <!-- Product ID Column -->
                     <ng-container matColumnDef="id">
                         <th mat-header-cell *matHeaderCellDef mat-sort-header>ID</th>
                         <td mat-cell *matCellDef="let product">{{ product.productId }}</td>
                     </ng-container>
 
-                    <!-- Product Name Column -->
                     <ng-container matColumnDef="name">
                         <th mat-header-cell *matHeaderCellDef mat-sort-header>Product Name</th>
-                        <td mat-cell *matCellDef="let product">{{ product.productName }}</td>
+                        <td mat-cell *matCellDef="let product">
+                            <a [routerLink]="[product.productId]">{{
+                                product.productName }}</a>
+                        </td>
                     </ng-container>
 
-                    <!-- Quantity Column -->
                     <ng-container matColumnDef="quantity">
                         <th mat-header-cell *matHeaderCellDef mat-sort-header>Quantity</th>
                         <td mat-cell *matCellDef="let product">
@@ -110,36 +108,31 @@
                         </td>
                     </ng-container>
 
-                    <!-- Price Column -->
                     <ng-container matColumnDef="price">
                         <th mat-header-cell *matHeaderCellDef mat-sort-header>Price</th>
                         <td mat-cell *matCellDef="let product">{{ product.productPrice | currency }}</td>
                     </ng-container>
 
-                    <!-- Category Column (Conditional) -->
                     <ng-container matColumnDef="category" *ngIf="showColumn('category')">
                         <th mat-header-cell *matHeaderCellDef mat-sort-header>Category</th>
                         <td mat-cell *matCellDef="let product">{{
                             product.productSubCategory.productCategory.categoryName }}</td>
                     </ng-container>
 
-                    <!-- Sub Category Column (Conditional) -->
                     <ng-container matColumnDef="subCategory" *ngIf="showColumn('subCategory')">
                         <th mat-header-cell *matHeaderCellDef mat-sort-header>Sub Category</th>
                         <td mat-cell *matCellDef="let product">{{ product.productSubCategory.subCategoryName }}</td>
                     </ng-container>
 
-                    <!-- Brand Column (Conditional) -->
                     <ng-container matColumnDef="brand" *ngIf="showColumn('brand')">
                         <th mat-header-cell *matHeaderCellDef mat-sort-header>Brand</th>
                         <td mat-cell *matCellDef="let product">{{ product.brand.brandName }}</td>
                     </ng-container>
 
-                    <!-- Actions Column -->
-                    <!-- <ng-container matColumnDef="actions">
+                    <ng-container matColumnDef="actions">
                         <th mat-header-cell *matHeaderCellDef>Actions</th>
                         <td mat-cell *matCellDef="let product">
-                            <button mat-icon-button color="primary" matTooltip="View Details">
+                            <!-- <button mat-icon-button color="primary" matTooltip="View Details">
                                 <mat-icon>visibility</mat-icon>
                             </button>
                             <button mat-icon-button color="accent" matTooltip="Edit Product">
@@ -148,14 +141,15 @@
                             <button mat-icon-button color="warn" matTooltip="Delete Product"
                                 (click)="deleteProduct(product)">
                                 <mat-icon>delete</mat-icon>
-                            </button>
+                            </button> -->
+
+                            <a [routerLink]="['new']">New product link</a>
                         </td>
-                    </ng-container> -->
+                    </ng-container>
 
                     <tr mat-header-row *matHeaderRowDef="displayedColumns; sticky: true"></tr>
                     <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
 
-                    <!-- No Data Row -->
                     <tr class="mat-row" *matNoDataRow>
                         <td class="mat-cell no-data" [attr.colspan]="displayedColumns.length">
                             No products found matching the filters
@@ -169,4 +163,5 @@
             </div>
         </mat-card-content>
     </mat-card>
+
 </div>

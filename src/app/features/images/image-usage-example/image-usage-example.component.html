@@ -1,0 +1,122 @@
+<div class="image-management-container">
+    <mat-card class="header-card">
+        <mat-card-content>
+            <div class="header-content">
+                <div class="page-title">
+                    <h1>Image Management</h1>
+                    <p class="subtitle">Upload and manage product images</p>
+                </div>
+            </div>
+        </mat-card-content>
+    </mat-card>
+
+    <div class="content-grid">
+        <!-- Upload Section -->
+        <mat-card class="upload-card">
+            <mat-card-header>
+                <mat-card-title>Upload New Image</mat-card-title>
+                <mat-card-subtitle>Upload a new product image to the system</mat-card-subtitle>
+            </mat-card-header>
+            <mat-card-content>
+                <!-- <app-image-uploader [placeholderText]="'Click to upload a product image'"
+                    (imageUploaded)="onImageUploaded($event)" (imageRemoved)="onImageRemoved()"
+                    (uploadError)="onUploadError($event)"
+                    ></app-image-uploader> -->
+                <app-image-uploader [placeholderText]="'Click to upload a product image'"></app-image-uploader>
+
+                <div *ngIf="lastUploadedImage" class="upload-info">
+                    <h3>Last Uploaded Image</h3>
+                    <div class="info-grid">
+                        <div class="info-item">
+                            <div class="info-label">Image ID</div>
+                            <div class="info-value">{{ lastUploadedImage.id }}</div>
+                        </div>
+                        <div class="info-item">
+                            <div class="info-label">File Name</div>
+                            <div class="info-value">{{ lastUploadedImage.imageName }}</div>
+                        </div>
+                        <div class="info-item">
+                            <div class="info-label">File Type</div>
+                            <div class="info-value">{{ lastUploadedImage.contentType }}</div>
+                        </div>
+                    </div>
+                </div>
+            </mat-card-content>
+        </mat-card>
+
+        <!-- Usage Examples -->
+        <mat-card class="examples-card">
+            <mat-card-header>
+                <mat-card-title>Component Usage Examples</mat-card-title>
+                <mat-card-subtitle>Different configurations of the image uploader component</mat-card-subtitle>
+            </mat-card-header>
+            <mat-card-content>
+                <mat-tab-group>
+                    <mat-tab label="Standard">
+                        <div class="tab-content">
+                            <!-- <app-image-uploader [currentImageId]="exampleImageId"
+                                (imageUploaded)="onExampleImageUploaded($event)"
+                                (imageRemoved)="exampleImageId = ''">
+                            </app-image-uploader> -->
+
+                            <app-image-uploader
+                                [placeholderText]="'Click to upload a example image'"></app-image-uploader>
+                        </div>
+                    </mat-tab>
+                    <mat-tab label="Compact">
+                        <div class="tab-content">
+                            <div class="compact-examples">
+                                <!-- <app-image-uploader [compact]="true" [placeholderText]="'Thumbnail'"
+                                    [placeholderIcon]="'photo_size_select_actual'"
+                                    (imageUploaded)="onExampleImageUploaded($event)"></app-image-uploader> -->
+
+                                <app-image-uploader [placeholderText]="'Thumbnail'"></app-image-uploader>
+
+                                <!-- <app-image-uploader [compact]="true" [placeholderText]="'Product'"
+                                    [placeholderIcon]="'inventory_2'"
+                                    (imageUploaded)="onExampleImageUploaded($event)"></app-image-uploader> -->
+
+                                <app-image-uploader [placeholderText]="'product'"></app-image-uploader>
+
+                                <!-- <app-image-uploader [compact]="true" [placeholderText]="'Banner'"
+                                    [placeholderIcon]="'panorama'"
+                                    (imageUploaded)="onExampleImageUploaded($event)">
+                                </app-image-uploader> -->
+                                <app-image-uploader [placeholderText]="'Banner'"></app-image-uploader>
+                            </div>
+                        </div>
+                    </mat-tab>
+                    <mat-tab label="Integration">
+                        <div class="tab-content">
+                            <h3>How to Use in Your Components</h3>
+                            <p>Add the ImageUploaderComponent to your template:</p>
+                            <!-- <pre><code> -->
+                            <!-- <app-image-uploader 
+                                    [currentImageId]="product.imageId" 
+                                    (imageUploaded)="onImageUploaded($event)"
+                                    (imageRemoved)="onImageRemoved()">
+                                </app-image-uploader> -->
+                            <app-image-uploader></app-image-uploader>
+                            <!-- </code></pre>
+
+                                <p>Handle the events in your component:</p>
+                                <pre>
+                                    <code>
+                                    onImageUploaded(image: UploadedImage): void 
+                                    { this.product.imageId = image.imageId;
+                                    // Save the product with the new image ID }
+                                    </code>
+                                </pre>      
+
+                                onImageRemoved(): void '{'
+                                this.product.imageId = '';
+                                // Save the product without an image
+                                '   }'
+                            </code></pre> -->
+                        </div>
+                    </mat-tab>
+                </mat-tab-group>
+            </mat-card-content>
+        </mat-card>
+    </div>
+</div>

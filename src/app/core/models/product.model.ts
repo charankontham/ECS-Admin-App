@@ -7,12 +7,13 @@ export interface Product {
   brand: ProductBrand;
   productSubCategory: SubCategoryEnriched;
   productDescription: string | null;
-  dateModified: Date;
   productPrice: number;
   productQuantity: number;
   productImage: string;
   productColor: string | null;
   productWeight: number | null;
+  dateAdded: Date;
+  dateModified: Date;
   productDimensions: string | null;
   productCondition: string | null;
 }

@@ -1,5 +1,10 @@
 import { Routes } from '@angular/router';
 import { InventoryDashboardComponent } from '../inventory-dashboard/inventory-dashboard.component';
+import { AuthGuard } from '../../../core/guards/auth.guard';
+import { RoleGuard } from '../../../core/guards/role.guard';
+import { ImageUsageExampleComponent } from '../../images/image-usage-example/image-usage-example.component';
+import { ImageGalleryComponent } from '../../images/image-gallery/image-gallery.component';
+import { ImageUploaderComponent } from '../../images/image-uploader/image-uploader.component';
 
 export const INVENTORY_ROUTES: Routes = [
   {
@@ -12,6 +17,8 @@ export const INVENTORY_ROUTES: Routes = [
   },
   {
     path: 'products',
+    canActivate: [AuthGuard, RoleGuard],
+    data: { role: 'admin', subRoles: ['inventory'] },
     loadChildren: () =>
       import('../products/products.routes').then((m) => m.PRODUCTS_ROUTES),
   },
@@ -33,5 +40,11 @@ export const INVENTORY_ROUTES: Routes = [
     path: 'analytics',
     loadChildren: () =>
       import('../analytics/analytics.routes').then((m) => m.ANALYTICS_ROUTES),
+  },
+  {
+    path: 'images',
+    // component: ImageGalleryComponent,
+    loadChildren: () =>
+      import('../../images/images.routes').then((m) => m.IMAGES_ROUTES),
   },
 ];

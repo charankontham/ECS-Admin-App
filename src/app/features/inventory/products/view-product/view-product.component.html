@@ -1,0 +1,331 @@
+<div class="product-details-container">
+    <!-- Loading State -->
+    <div *ngIf="loading" class="loading-container">
+        <mat-progress-bar mode="indeterminate"></mat-progress-bar>
+    </div>
+
+    <!-- Error State -->
+    <mat-card *ngIf="error" class="error-card">
+        <mat-card-content>
+            <div class="error-message">
+                <mat-icon>error</mat-icon>
+                <p>{{ error }}</p>
+            </div>
+            <button mat-flat-button color="primary" routerLink="/inventory/products">
+                Back to Products
+            </button>
+        </mat-card-content>
+    </mat-card>
+
+    <!-- Product Details -->
+    <ng-container *ngIf="!loading && !error && product">
+        <!-- Header Card -->
+        <mat-card class="header-card">
+            <mat-card-content>
+                <div class="header-content">
+                    <div class="product-title">
+                        <h1>{{ isNewProduct ? 'Add New Product' : (isEditMode ? 'Edit Product' : product.productName) }}
+                        </h1>
+                        <div class="product-id" *ngIf="!isNewProduct">ID: {{ product.productId }}</div>
+                    </div>
+                    <div class="header-actions">
+                        <button *ngIf="!isEditMode  && !isNewProduct" mat-flat-button color="primary"
+                            (click)="toggleEditMode()">
+                            <mat-icon>edit</mat-icon>
+                            Edit Product
+                        </button>
+                        <ng-container *ngIf="isEditMode">
+                            <button mat-flat-button color="primary" (click)="saveProduct()"
+                                [disabled]="productForm.invalid || productForm.pristine">
+                                <mat-icon>save</mat-icon>
+                                {{ isNewProduct ? 'Create Product' : 'Save Changes' }}
+                            </button>
+                            <button mat-stroked-button (click)="cancelEdit()">
+                                Cancel
+                            </button>
+                        </ng-container>
+                    </div>
+                </div>
+            </mat-card-content>
+        </mat-card>
+
+        <!-- View Mode -->
+        <ng-container *ngIf="!isEditMode">
+            <div class="details-grid">
+                <!-- Product Image Card -->
+                <mat-card class="image-card">
+                    <mat-card-content>
+                        <div class="product-image-container">
+                            <img [src]="product.productImage || '/assets/images/product-placeholder.png'"
+                                [alt]="product.productName" class="product-image">
+                        </div>
+                        <div class="product-status"
+                            [ngClass]="{'in-stock': product.productQuantity > 0, 'out-of-stock': product.productQuantity <= 0}">
+                            {{ product.productQuantity > 0 ? 'In Stock' : 'Out of Stock' }}
+                        </div>
+                    </mat-card-content>
+                </mat-card>
+
+                <!-- Product Info Card -->
+                <mat-card class="info-card">
+                    <mat-card-content>
+                        <mat-tab-group>
+                            <mat-tab label="Basic Info">
+                                <div class="tab-content">
+                                    <div class="info-grid">
+                                        <div class="info-item">
+                                            <div class="info-label">Name</div>
+                                            <div class="info-value">{{ product.productName }}</div>
+                                        </div>
+                                        <div class="info-item">
+                                            <div class="info-label">Price</div>
+                                            <div class="info-value">{{ product.productPrice | currency }}</div>
+                                        </div>
+                                        <div class="info-item">
+                                            <div class="info-label">Quantity</div>
+                                            <div class="info-value"
+                                                [ngClass]="{'low-stock': product.productQuantity < 10}">
+                                                {{ product.productQuantity }}
+                                            </div>
+                                        </div>
+                                        <div class="info-item">
+                                            <div class="info-label">Category</div>
+                                            <div class="info-value">{{
+                                                product.productSubCategory.productCategory.categoryName }}</div>
+                                        </div>
+                                        <div class="info-item">
+                                            <div class="info-label">Sub Category</div>
+                                            <div class="info-value">{{ product.productSubCategory.subCategoryName }}
+                                            </div>
+                                        </div>
+                                        <div class="info-item">
+                                            <div class="info-label">Brand</div>
+                                            <div class="info-value">{{ product.brand.brandName }}</div>
+                                        </div>
+                                        <!-- <div class="info-item">
+                        <div class="info-label">Status</div>
+                        <div class="info-value">
+                          <mat-chip [color]="product.isActive ? 'primary' : 'warn'" selected>
+                            {{ product.isActive ? 'Active' : 'Inactive' }}
+                          </mat-chip>
+                        </div>
+                      </div> -->
+                                    </div>
+                                </div>
+                            </mat-tab>
+                            <mat-tab label="Description">
+                                <div class="tab-content">
+                                    <p class="product-description">
+                                        {{ product.productDescription || "No description available" }}
+                                    </p>
+                                </div>
+                            </mat-tab>
+                            <mat-tab label="Additional Details">
+                                <div class="tab-content">
+                                    <div class="info-grid">
+                                        <!-- <div class="info-item">
+                        <div class="info-label">Barcode</div>
+                        <div class="info-value">{{ product.barcode || 'N/A' }}</div>
+                      </div> -->
+                                        <div class="info-item">
+                                            <div class="info-label">Weight</div>
+                                            <div class="info-value">{{ product.productWeight ? (product.productWeight +
+                                                ' kg') : 'N/A' }}</div>
+                                        </div>
+                                        <div class="info-item" *ngIf="product.productDimensions">
+                                            <div class="info-label">Dimensions</div>
+                                            <div class="info-value">
+                                                {{ product.productDimensions ? (product.productDimensions + ' × ' +
+                                                product.productDimensions + ' × ' + product.productDimensions + ' cm') :
+                                                'N/A' }}
+                                            </div>
+                                        </div>
+                                        <div class="info-item">
+                                            <div class="info-label">Created At</div>
+                                            <div class="info-value">{{ product.dateAdded | date:'medium' }}</div>
+                                        </div>
+                                        <div class="info-item">
+                                            <div class="info-label">Last Updated</div>
+                                            <div class="info-value">{{ product.dateModified | date:'medium' }}</div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </mat-tab>
+                        </mat-tab-group>
+                    </mat-card-content>
+                </mat-card>
+            </div>
+        </ng-container>
+
+        <!-- Edit Mode -->
+        <ng-container *ngIf="isEditMode">
+            <form [formGroup]="productForm" class="edit-form">
+                <div class="form-grid">
+                    <!-- Basic Information -->
+                    <mat-card class="form-card">
+                        <mat-card-header>
+                            <mat-card-title>Basic Information</mat-card-title>
+                        </mat-card-header>
+                        <mat-card-content>
+                            <div class="form-row">
+                                <mat-form-field appearance="outline">
+                                    <mat-label>Product Name</mat-label>
+                                    <input matInput formControlName="productName" required>
+                                    <mat-error *ngIf="productForm.get('productName')?.hasError('required')">
+                                        Product name is required
+                                    </mat-error>
+                                </mat-form-field>
+                            </div>
+
+                            <div class="form-row">
+                                <mat-form-field appearance="outline">
+                                    <mat-label>Price</mat-label>
+                                    <input matInput type="number" formControlName="productPrice" required>
+                                    <span matTextPrefix>$&nbsp;</span>
+                                    <mat-error *ngIf="productForm.get('productPrice')?.hasError('required')">
+                                        Price is required
+                                    </mat-error>
+                                    <mat-error *ngIf="productForm.get('productPrice')?.hasError('min')">
+                                        Price must be greater than 0
+                                    </mat-error>
+                                </mat-form-field>
+                            </div>
+
+                            <div class="form-row">
+                                <mat-form-field appearance="outline">
+                                    <mat-label>Quantity</mat-label>
+                                    <input matInput type="number" formControlName="productQuantity" required>
+                                    <mat-error *ngIf="productForm.get('productQuantity')?.hasError('required')">
+                                        Quantity is required
+                                    </mat-error>
+                                    <mat-error *ngIf="productForm.get('productQuantity')?.hasError('min')">
+                                        Quantity must be 0 or greater
+                                    </mat-error>
+                                </mat-form-field>
+                            </div>
+
+                            <div class="form-row">
+                                <mat-form-field appearance="outline">
+                                    <mat-label>Category</mat-label>
+                                    <mat-select formControlName="productCategory">
+                                        <mat-option [value]="">None</mat-option>
+                                        <mat-option *ngFor="let category of categories" [value]="category">
+                                            {{ category.categoryName }}
+                                        </mat-option>
+                                    </mat-select>
+                                </mat-form-field>
+                            </div>
+
+                            <div class="form-row">
+                                <mat-form-field appearance="outline">
+                                    <mat-label>Sub Category</mat-label>
+                                    <mat-select formControlName="productSubCategory"
+                                        [disabled]="!productForm.get('category')?.value">
+                                        <mat-option [value]="">None</mat-option>
+                                        <mat-option *ngFor="let subCategory of subCategories" [value]="subCategory">
+                                            {{ subCategory.subCategoryName }}
+                                        </mat-option>
+                                    </mat-select>
+                                </mat-form-field>
+                            </div>
+
+                            <div class="form-row">
+                                <mat-form-field appearance="outline">
+                                    <mat-label>Brand</mat-label>
+                                    <mat-select formControlName="productBrand">
+                                        <mat-option [value]="">None</mat-option>
+                                        <mat-option *ngFor="let brand of brands" [value]="brand">
+                                            {{ brand }}
+                                        </mat-option>
+                                    </mat-select>
+                                </mat-form-field>
+                            </div>
+                        </mat-card-content>
+                    </mat-card>
+
+                    <mat-card class="form-card">
+                        <mat-card-header>
+                            <mat-card-title>Description & Additional Details</mat-card-title>
+                        </mat-card-header>
+                        <mat-card-content>
+                            <div class="form-row">
+                                <mat-form-field appearance="outline">
+                                    <mat-label>Description</mat-label>
+                                    <textarea matInput formControlName="productDescription" rows="5"></textarea>
+                                </mat-form-field>
+                            </div>
+
+                            <!-- <div class="form-row">
+                                <mat-form-field appearance="outline">
+                                    <mat-label>Barcode</mat-label>
+                                    <input matInput formControlName="barcode">
+                                </mat-form-field>
+                            </div> -->
+
+                            <div class="form-row">
+                                <mat-form-field appearance="outline">
+                                    <mat-label>Weight (kg)</mat-label>
+                                    <input matInput type="number" formControlName="productWeight">
+                                </mat-form-field>
+                            </div>
+
+                            <div class="form-row dimensions-row">
+                                <div class="dimensions-label">Dimensions (cm)</div>
+                                <div class="dimensions-fields">
+                                    <mat-form-field appearance="outline">
+                                        <mat-label>Length</mat-label>
+                                        <input matInput type="number" formControlName="length">
+                                    </mat-form-field>
+
+                                    <mat-form-field appearance="outline">
+                                        <mat-label>Width</mat-label>
+                                        <input matInput type="number" formControlName="width">
+                                    </mat-form-field>
+
+                                    <mat-form-field appearance="outline">
+                                        <mat-label>Height</mat-label>
+                                        <input matInput type="number" formControlName="height">
+                                    </mat-form-field>
+                                </div>
+                            </div>
+
+                            <div class="form-row">
+                                <div class="image-upload-container">
+                                    <div class="image-preview-container">
+                                        <div class="image-preview"
+                                            [style.background-image]="'url(' + getProductImageUrl() + ')'"
+                                            [class.has-image]="!!getProductImageUrl()">
+                                            <div class="image-upload-placeholder" *ngIf="!getProductImageUrl()">
+                                                <mat-icon>image</mat-icon>
+                                                <span>No image selected</span>
+                                            </div>
+                                            <div class="image-upload-overlay" *ngIf="imageUploading">
+                                                <mat-spinner diameter="40"></mat-spinner>
+                                                <span>Uploading...</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="image-upload-actions">
+                                        <input type="file" #fileInput style="display: none" accept="image/*"
+                                            (change)="onFileSelected($event)">
+                                        <button mat-flat-button color="primary" type="button"
+                                            (click)="fileInput.click()" [disabled]="imageUploading">
+                                            <mat-icon>upload</mat-icon>
+                                            {{ productForm.get('imageId')?.value ? 'Change Image' : 'Upload Image' }}
+                                        </button>
+                                        <button mat-stroked-button type="button"
+                                            *ngIf="productForm.get('imageId')?.value" (click)="removeImage()"
+                                            [disabled]="imageUploading">
+                                            <mat-icon>delete</mat-icon>
+                                            Remove Image
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </mat-card-content>
+                    </mat-card>
+                </div>
+            </form>
+        </ng-container>
+    </ng-container>
+</div>

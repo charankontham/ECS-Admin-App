@@ -5,6 +5,7 @@ import { isPlatformBrowser } from '@angular/common';
 import { environment } from '../../../../environment';
 import * as CryptoJS from 'crypto-js';
 import { ProductFilters } from '../models/product.model';
+import { ImageFilters } from '../models/image.model';
 
 @Injectable({
   providedIn: 'root',
@@ -70,17 +71,30 @@ export class BaseService<T> {
   }
 
   getAllByPagination(
-    filters: ProductFilters,
+    filters: ProductFilters | ImageFilters,
     resource: string,
     headers?: HttpHeaders
   ): Observable<any> {
-    let params = new HttpParams()
-      .set('currentPage', filters.currentPage)
-      .set('offset', filters.offset)
-      .set('categoryId', filters.categoryId || '')
-      .set('subCategoryId', filters.subCategoryId || '')
-      .set('brandId', filters.brandId || '')
-      .set('searchValue', filters.searchValue || '');
+    var params: HttpParams;
+    if (
+      typeof filters === 'object' &&
+      filters !== null &&
+      'currentPage' in filters &&
+      'offset' in filters
+    ) {
+      params = new HttpParams()
+        .set('currentPage', (filters as ProductFilters).currentPage)
+        .set('offset', (filters as ProductFilters).offset)
+        .set('categoryId', (filters as ProductFilters).categoryId || '')
+        .set('subCategoryId', (filters as ProductFilters).subCategoryId || '')
+        .set('brandId', (filters as ProductFilters).brandId || '')
+        .set('searchValue', (filters as ProductFilters).searchValue || '');
+    } else {
+      params = new HttpParams()
+        .set('currentPage', (filters as ImageFilters).currentPage)
+        .set('offset', (filters as ImageFilters).offset)
+        .set('searchValue', (filters as ImageFilters).searchValue || '');
+    }
 
     return this.http.get<Object>(
       `${this.baseUrl}/${this.endpoint}/${resource}`,
@@ -95,6 +109,19 @@ export class BaseService<T> {
     return this.http.get<T>(`${this.baseUrl}/${this.endpoint}/${id}`, {
       headers: this.mergeHeaders(headers),
     });
+  }
+
+  getByPathParam(
+    pathParam: number | string,
+    path: string,
+    headers?: HttpHeaders
+  ): Observable<T> {
+    return this.http.get<T>(
+      `${this.baseUrl}/${this.endpoint}/${path}/${pathParam}`,
+      {
+        headers: this.mergeHeaders(headers),
+      }
+    );
   }
 
   getByUsername(
@@ -160,11 +187,13 @@ export class BaseService<T> {
   }
 
   deleteWithStringResponse(
-    id: number,
+    id: number | string,
     headers?: HttpHeaders
   ): Observable<string> {
+    console.log(this.mergeHeaders(headers));
     return this.http.delete<string>(`${this.baseUrl}/${this.endpoint}/${id}`, {
       headers: this.mergeHeaders(headers),
+      responseType: 'text' as 'json',
     });
   }
 }

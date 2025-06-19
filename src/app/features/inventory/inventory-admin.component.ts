@@ -32,8 +32,12 @@ export class InventoryAdminComponent implements OnInit, OnDestroy {
             route = route.firstChild;
           }
           const urlSegments = this.router.url.split('/');
-          const lastSegment = urlSegments[urlSegments.length - 1];
-
+          const lastSegment =
+            urlSegments.length <= 3
+              ? urlSegments[urlSegments.length - 1]
+              : urlSegments[2];
+          console.log('lastSegment', lastSegment);
+          console.log('urlsegments', urlSegments);
           if (this.router.url === '/inventory') {
             return 'Dashboard';
           }

@@ -1,0 +1,51 @@
+<div class="image-uploader-container" [class.compact]="compact">
+    <!-- Image Preview Area -->
+    <div class="image-preview-area" [class.has-image]="!!currentImageId" [class.dragging]="isDragging"
+        (dragover)="onDragOver($event)" (dragleave)="onDragLeave($event)" (drop)="onDrop($event)">
+
+        <!-- Image Preview -->
+        <div *ngIf="currentImageId" class="image-preview">
+            <img [src]="currentImageUrl" [alt]="imageAltText" width="300" (error)="handleImageError($event)">
+        </div>
+
+        <!-- Placeholder -->
+        <div *ngIf="!currentImageId && !uploading" class="custom-placeholder">
+            <mat-icon>{{ placeholderIcon }}</mat-icon>
+            <span>{{ placeholderText }}</span>
+            <span class="drag-hint">or drag and drop</span>
+        </div>
+
+        <!-- Upload Progress -->
+        <div *ngIf="uploading" class="upload-progress">
+            <mat-spinner [diameter]="48"></mat-spinner>
+            <span>Uploading...</span>
+        </div>
+    </div>
+
+    <!-- Action Buttons -->
+    <div class="action-buttons" [class.hidden]="uploading">
+        <!-- Upload Button -->
+        <input type="file" #fileInput style="display: none" [accept]="acceptedFileTypes"
+            (change)="onFileSelected($event)" [multiple]="allowMultiple" />
+
+        <div *ngIf="this.currentImageId">
+            <button mat-flat-button type="button" (click)="copyImageId()" [matTooltip]="'Copy Image ID'">
+                <mat-icon>content_copy</mat-icon>
+                Copy Image ID
+            </button>
+        </div>
+
+        <button mat-flat-button color="primary" type="button" (click)="fileInput.click()" [disabled]="uploading"
+            [matTooltip]="currentImageId ? 'Change image' : 'Upload image'">
+            <mat-icon>{{ currentImageId ? 'refresh' : 'upload' }}</mat-icon>
+            <span *ngIf="!compact">{{ currentImageId ? 'Change' : 'Upload' }}</span>
+        </button>
+
+        <!-- Remove Button -->
+        <button mat-stroked-button type="button" *ngIf="currentImageId" (click)="removeImage()" [disabled]="uploading"
+            [matTooltip]="'Remove image'">
+            <mat-icon>delete</mat-icon>
+            <span *ngIf="!compact">Remove</span>
+        </button>
+    </div>
+</div>

@@ -38,6 +38,8 @@ import {
 } from '../../../core/models/product-category.model';
 import { ProductBrand } from '../../../core/models/product-brand.model';
 import { ProductSubCategoryService } from '../../../core/services/product-subcategory.service';
+import { RouterModule } from '@angular/router';
+import { ImageUploaderComponent } from '../../images/image-uploader/image-uploader.component';
 
 @Component({
   selector: 'app-products',
@@ -47,6 +49,7 @@ import { ProductSubCategoryService } from '../../../core/services/product-subcat
     NgIf,
     NgFor,
     CommonModule,
+    RouterModule,
     FormsModule,
     MatTableModule,
     MatPaginatorModule,
@@ -60,6 +63,7 @@ import { ProductSubCategoryService } from '../../../core/services/product-subcat
     MatProgressBarModule,
     MatChipsModule,
     MatTooltipModule,
+    // ImageUploaderComponent,
   ],
   templateUrl: './products.component.html',
   styleUrl: './products.component.css',
@@ -76,8 +80,8 @@ export class ProductsComponent implements OnInit, AfterViewInit {
   useClientSideSorting = true;
   dataSource = new MatTableDataSource<Product>([]);
   allLoadedProducts: Product[] = [];
-  displayedColumns: string[] = ['id', 'name', 'quantity', 'price'];
-  baseColumns: string[] = ['id', 'name', 'quantity', 'price'];
+  displayedColumns: string[] = ['id', 'name', 'quantity', 'price', 'actions'];
+  baseColumns: string[] = ['id', 'name', 'quantity', 'price', 'actions'];
   filters: ProductFilters = {
     currentPage: 0,
     offset: 5,
@@ -197,23 +201,21 @@ export class ProductsComponent implements OnInit, AfterViewInit {
 
   loadProducts(): void {
     this.isLoading = true;
-    this.productService
-      .getAllByPagination(this.filters, 'getProductsByPagination')
-      .subscribe({
-        next: (response) => {
-          this.allLoadedProducts = response.content;
-          this.dataSource.data = response.content;
-          this.totalProducts = response.totalElements;
-          if (this.useClientSideSorting && this.sort) {
-            this.dataSource.sort = this.sort;
-          }
-          this.isLoading = false;
-        },
-        error: (error) => {
-          console.error('Error loading products', error);
-          this.isLoading = false;
-        },
-      });
+    this.productService.getAllProductsBypagination(this.filters).subscribe({
+      next: (response) => {
+        this.allLoadedProducts = response.content;
+        this.dataSource.data = response.content;
+        this.totalProducts = response.totalElements;
+        if (this.useClientSideSorting && this.sort) {
+          this.dataSource.sort = this.sort;
+        }
+        this.isLoading = false;
+      },
+      error: (error) => {
+        console.error('Error loading products', error);
+        this.isLoading = false;
+      },
+    });
   }
 
   delay(ms: number) {
