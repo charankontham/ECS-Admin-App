@@ -1,7 +1,11 @@
 import { inject, Injectable, NgZone } from '@angular/core';
 import { BaseService } from './base.service';
-import { Product, ProductFilters } from '../models/product.model';
-import { HttpClient, HttpHeaders } from '@angular/common/http';
+import {
+  Product,
+  ProductFilters,
+  ProductRequest,
+} from '../models/product.model';
+import { HttpClient, HttpHeaders, HttpResponse } from '@angular/common/http';
 import { Router } from '@angular/router';
 import { filter, Observable } from 'rxjs';
 import { AuthService } from './auth.service';
@@ -14,9 +18,6 @@ export class ProductService extends BaseService<Product> {
   private headers: HttpHeaders | null = null;
   constructor(ngZone: NgZone, private authService: AuthService) {
     super(inject(HttpClient), 'ecs-product/api/product', ngZone);
-    // this.headers = new HttpHeaders({
-    //   Authorization: 'Bearer ' + localStorage.getItem('userToken'),
-    // });
   }
 
   getAllProducts(): Observable<Product[]> {
@@ -39,19 +40,17 @@ export class ProductService extends BaseService<Product> {
     return this.getById(productId);
   }
 
-  addProduct(product: Product): Observable<Product | string> {
+  addProduct(product: ProductRequest): Observable<Product | string> {
     return this.post(product, '');
   }
 
-  updateProduct(product: Product): Observable<Product[]> {
-    var products: Product[] = [];
+  updateProduct(product: ProductRequest): Observable<Product[]> {
+    var products: ProductRequest[] = [];
     products.push(product);
     return this.updateAll(products);
   }
 
-  deleteProducts(productIds: number[]): void {
-    productIds.forEach((productId: number) => {
-      this.deleteWithStringResponse(productId);
-    });
+  deleteProduct(productId: number): Observable<HttpResponse<string>> {
+    return this.deleteWithStringResponse(productId);
   }
 }

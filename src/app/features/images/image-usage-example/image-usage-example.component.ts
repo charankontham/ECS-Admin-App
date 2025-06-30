@@ -33,13 +33,9 @@ export class ImageUsageExampleComponent {
   lastUploadedImage: ImageDoc | null = null;
   exampleImageId = '';
 
-  constructor(
-    private imageService: ImageService,
-    private snackBar: MatSnackBar
-  ) {}
+  constructor(private snackBar: MatSnackBar) {}
 
   onImageUploaded(image: ImageDoc): void {
-    // const input = event.target as HTMLInputElement;
     this.lastUploadedImage = {
       id: image.id,
       imageName: image.imageName,

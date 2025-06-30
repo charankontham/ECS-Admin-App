@@ -5,10 +5,11 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 import { MatTooltipModule } from '@angular/material/tooltip';
-// import { EventEmitter } from 'stream';
 import { ImageService } from '../../../core/services/image.service';
 import { ImageDoc } from '../../../core/models/image.model';
 import { finalize } from 'rxjs';
+import { EventEmitter } from '@angular/core';
+import { HttpResponse } from '@angular/common/http';
 
 @Component({
   selector: 'app-image-uploader',
@@ -25,21 +26,18 @@ import { finalize } from 'rxjs';
   styleUrl: './image-uploader.component.css',
 })
 export class ImageUploaderComponent {
-  @Input() currentImageId = '';
-  @Input() placeholderText = 'Upload an image';
+  @Input() currentImageId: string = '';
+  @Input() placeholderText: string = 'Upload an image';
   @Input() placeholderIcon = 'image';
   @Input() imageAltText = 'Product image';
   @Input() acceptedFileTypes = 'image/*';
-  @Input() allowMultiple = false;
-  @Input() compact = false;
+  @Input() allowMultiple: boolean = false;
+  @Input() compact: boolean = false;
   @Input() maxFileSizeMB = 5;
-  currentImageUrl = 'assets/images/image-placeholder.jpg';
-
-  // @Output() imageUploaded = new EventEmitter<any>();
-  // @Output() imageRemoved = new EventEmitter<any>();
-  // @Output() uploadError = new EventEmitter<any>();
-
+  @Input() currentImageUrl = 'assets/images/image-placeholder.jpg';
   @ViewChild('fileInput') fileInput!: ElementRef<HTMLInputElement>;
+
+  @Output() dataEmitter = new EventEmitter<string>();
 
   uploading = false;
   isDragging = false;
@@ -70,7 +68,7 @@ export class ImageUploaderComponent {
           image: base64Data,
         };
         if (this.currentImageId) {
-          imageDoc.id = this.currentImageId; // Set the ID if updating an existing image
+          imageDoc.id = this.currentImageId;
         }
         this.uploadImage(imageDoc);
       };
@@ -151,6 +149,7 @@ export class ImageUploaderComponent {
                 duration: 3000,
               }
             );
+            this.dataEmitter.emit(response.id);
           } else {
             this.snackBar.open(response || 'Failed to upload image', 'Close', {
               duration: 5000,
@@ -169,9 +168,8 @@ export class ImageUploaderComponent {
 
   removeImage(): void {
     this.imageService.deleteImage(this.currentImageId).subscribe({
-      next: (response: string) => {
-        console.log(response.includes('successfully'));
-        if (response.includes('successfully')) {
+      next: (response: HttpResponse<string>) => {
+        if (response.status == 200 && response.body?.includes('successfully')) {
           this.currentImageId = '';
           this.snackBar.open('Image removed successfully', 'Close', {
             duration: 3000,
@@ -179,6 +177,7 @@ export class ImageUploaderComponent {
             verticalPosition: 'top',
             panelClass: ['success-snackbar'],
           });
+          this.dataEmitter.emit('');
         } else {
           this.handleError('Failed to remove image. Please try again.');
         }
@@ -189,6 +188,24 @@ export class ImageUploaderComponent {
           'Failed to remove image. Please check console for error.'
         );
       },
+    });
+  }
+
+  refresh(): void {
+    this.currentImageUrl = 'assets/images/image-placeholder.jpg';
+    this.currentImageId = '';
+    this.selectedFile = null;
+    if (this.fileInput) {
+      this.fileInput.nativeElement.value = '';
+    }
+    this.isDragging = false;
+    this.uploading = false;
+    console.log('Image uploader refreshed');
+    this.snackBar.open('Image uploader refreshed', 'Close', {
+      duration: 2000,
+      horizontalPosition: 'end',
+      verticalPosition: 'top',
+      panelClass: ['info-snackbar'],
     });
   }
 

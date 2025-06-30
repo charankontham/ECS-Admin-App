@@ -80,8 +80,8 @@ export class ProductsComponent implements OnInit, AfterViewInit {
   useClientSideSorting = true;
   dataSource = new MatTableDataSource<Product>([]);
   allLoadedProducts: Product[] = [];
-  displayedColumns: string[] = ['id', 'name', 'quantity', 'price', 'actions'];
-  baseColumns: string[] = ['id', 'name', 'quantity', 'price', 'actions'];
+  displayedColumns: string[] = ['id', 'name', 'quantity', 'price'];
+  baseColumns: string[] = ['id', 'name', 'quantity', 'price'];
   filters: ProductFilters = {
     currentPage: 0,
     offset: 5,

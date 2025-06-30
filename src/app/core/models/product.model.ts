@@ -19,18 +19,21 @@ export interface Product {
 }
 
 export interface ProductRequest {
-  productId: number | null;
-  productCategoryId: number | null;
-  productBrandId: number | null;
+  productId?: number;
+  productCategoryId: number;
+  subCategoryId: number;
+  productBrandId: number;
   productName: string;
   productDescription: string;
-  productPrice: number | null;
+  productPrice: number;
   productQuantity: number | null;
-  productImage: string;
-  productColor: string;
+  productImage: string | null;
+  productColor: string | null;
   productWeight: number | null;
-  productDimensions: string;
+  productDimensions: string | null;
   productCondition: string;
+  dateAdded: Date;
+  dateModified: Date;
 }
 
 export interface ProductFilters {

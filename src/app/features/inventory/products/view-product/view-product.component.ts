@@ -22,8 +22,7 @@ import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 import { MatChipsModule } from '@angular/material/chips';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { MatSlideToggleModule } from '@angular/material/slide-toggle';
-import { finalize } from 'rxjs/operators';
-import { Product } from '../../../../core/models/product.model';
+import { Product, ProductRequest } from '../../../../core/models/product.model';
 import { ProductService } from '../../../../core/services/product.service';
 import { ProductSubCategoryService } from '../../../../core/services/product-subcategory.service';
 import {
@@ -33,8 +32,10 @@ import {
 import { ProductCategoryService } from '../../../../core/services/product-category.service';
 import { ProductBrandService } from '../../../../core/services/product-brand.service';
 import { ProductBrand } from '../../../../core/models/product-brand.model';
-import { ImageService } from '../../../../core/services/image.service';
-import { ImageDoc } from '../../../../core/models/image.model';
+import { ImageUploaderComponent } from '../../../images/image-uploader/image-uploader.component';
+import { ConfirmationDialogComponent } from '../../../../shared/components/confirmation-dialog/confirmation-dialog.component';
+import { MatDialog } from '@angular/material/dialog';
+import { HttpResponse } from '@angular/common/http';
 
 @Component({
   selector: 'app-view-product',
@@ -57,6 +58,7 @@ import { ImageDoc } from '../../../../core/models/image.model';
     MatChipsModule,
     MatTooltipModule,
     MatSlideToggleModule,
+    ImageUploaderComponent,
   ],
   templateUrl: './view-product.component.html',
   styleUrl: './view-product.component.css',
@@ -69,33 +71,31 @@ export class ViewProductComponent {
   productForm: FormGroup;
   isNewProduct = false;
   imageUploading = false;
-
-  @ViewChild('fileInput') fileInput!: ElementRef<HTMLInputElement>;
   selectedFile: File | null = null;
-
   categories: ProductCategory[] = [];
   subCategories: SubCategory[] = [];
   brands: ProductBrand[] = [];
+  // @ViewChild('fileInput') fileInput!: ElementRef<HTMLInputElement>;
 
   constructor(
     private route: ActivatedRoute,
     private router: Router,
     private productService: ProductService,
-    private imageService: ImageService,
     private fb: FormBuilder,
     private snackBar: MatSnackBar,
     private categoryService: ProductCategoryService,
     private brandService: ProductBrandService,
-    private subCategoryService: ProductSubCategoryService
+    private subCategoryService: ProductSubCategoryService,
+    private dialog: MatDialog
   ) {
-    // Initialize the form with empty values
     this.productForm = this.createProductForm();
     this.initializeForm();
   }
+
   ngOnInit(): void {
     this.loadFilterOptions();
-
     // Get product ID from route params
+    console.log('Initializing ViewProductComponent with time : ', new Date());
     this.route.paramMap.subscribe((params) => {
       const productId = params.get('productId');
       console.log('Product ID:', productId);
@@ -113,6 +113,15 @@ export class ViewProductComponent {
         this.loading = false;
       }
     });
+
+    this.productForm
+      .get('productCategory')
+      ?.valueChanges.subscribe((category: ProductCategory) => {
+        this.loadSubCategories(category.categoryId || 0);
+        if (!category) {
+          this.productForm.get('subCategory')?.setValue('');
+        }
+      });
   }
 
   loadFilterOptions(): void {
@@ -155,11 +164,13 @@ export class ViewProductComponent {
     return this.fb.group({
       productName: ['', Validators.required],
       productPrice: [0, [Validators.required, Validators.min(0.01)]],
-      productQuantity: [0, [Validators.required, Validators.min(0)]],
-      productCategory: [''],
-      productSubCategory: [''],
-      productBrand: [''],
+      productQuantity: [0, [Validators.required, Validators.min(1)]],
+      productCategory: ['', [Validators.required, Validators.minLength(1)]],
+      productSubCategory: ['', [Validators.required, Validators.minLength(1)]],
+      productBrand: ['', [Validators.required, Validators.minLength(1)]],
       productDescription: [''],
+      productColor: [''],
+      productCondition: ['', [Validators.required, Validators.minLength(1)]],
       productWeight: [null],
       length: [null],
       width: [null],
@@ -174,8 +185,6 @@ export class ViewProductComponent {
       productName: '',
       productPrice: 0,
       productQuantity: 0,
-      productColor: '',
-      productCondition: '',
       productSubCategory: {
         subCategoryId: 0,
         subCategoryName: '',
@@ -192,6 +201,8 @@ export class ViewProductComponent {
         brandName: '',
         brandDescription: '',
       },
+      productColor: null,
+      productCondition: '',
       productDescription: '',
       productWeight: null,
       productDimensions: null,
@@ -219,11 +230,13 @@ export class ViewProductComponent {
         productSubCategory: this.product.productSubCategory || '',
         productBrand: this.product.brand || '',
         productDescription: this.product.productDescription || '',
-        productWeight: this.product.productWeight || null,
-        length: this.product.productDimensions || null,
-        width: this.product.productDimensions || null,
-        height: this.product.productDimensions || null,
+        productWeight: this.product.productWeight,
+        length: this.product.productDimensions?.split('x')[0],
+        width: this.product.productDimensions?.split('x')[1],
+        height: this.product.productDimensions?.split('x')[2],
         productImage: this.product.productImage || '',
+        productColor: this.product.productColor || '',
+        productCondition: this.product.productCondition || '',
       });
       this.productForm
         .get('category')
@@ -233,6 +246,26 @@ export class ViewProductComponent {
             this.productForm.get('subCategory')?.setValue('');
           }
         });
+    }
+  }
+
+  setImageId(imageId: string): void {
+    if (imageId === null || imageId === undefined || imageId.trim() === '') {
+      this.productForm.patchValue({
+        productImage: '',
+      });
+      if (this.product) {
+        this.product.productImage = '';
+      }
+      return;
+    } else {
+      this.productForm.patchValue({
+        productImage: imageId,
+      });
+      if (this.product) {
+        this.product.productImage = imageId;
+      }
+      return;
     }
   }
 
@@ -246,53 +279,68 @@ export class ViewProductComponent {
   }
 
   saveProduct(): void {
-    if (this.productForm.invalid) {
+    if (this.productForm.invalid || this.productForm.pristine) {
+      this.snackBar.open('Fill all required fields', 'Close', {
+        duration: 3000,
+        horizontalPosition: 'end',
+        verticalPosition: 'top',
+      });
       return;
     }
 
     const formValues = this.productForm.value;
-
     // Prepare dimensions object if any dimension is provided
-    let dimensions: string | null = null;
+    let dimensions: string = '';
     if (formValues.length || formValues.width || formValues.height) {
       dimensions =
         formValues.length + 'x' + formValues.width + 'x' + formValues.height;
     }
 
     // Create updated product object
-    const productData: Product = {
-      ...this.product!,
-      productName: formValues.name,
-      // sku: formValues.sku,
-      productPrice: formValues.price,
-      productQuantity: formValues.quantity,
-      productSubCategory: formValues.subCategory,
-      brand: formValues.brand,
-      productDescription: formValues.description,
-      // barcode: formValues.barcode,
-      productWeight: formValues.weight,
+    const productData: ProductRequest = {
+      productName: formValues.productName,
+      productCategoryId: formValues.productCategory.categoryId,
+      subCategoryId: formValues.productSubCategory.subCategoryId,
+      productBrandId: formValues.productBrand.brandId,
+      productPrice: formValues.productPrice,
+      productQuantity: formValues.productQuantity,
+      productDescription: formValues.productDescription,
+      productCondition: formValues.productCondition,
+      productWeight: formValues.productWeight,
       productDimensions: dimensions,
-      productImage: formValues.imageUrl,
-      dateAdded: formValues.dateAdded,
+      productImage: formValues.productImage,
       dateModified: new Date(),
+      dateAdded: this.isNewProduct
+        ? new Date()
+        : this.product?.dateAdded || new Date(),
+      productId: this.isNewProduct ? undefined : this.product?.productId || 0,
+      productColor: formValues.productColor || null,
     };
 
     this.loading = true;
-
     if (this.isNewProduct) {
+      console.log('Adding new product', productData);
       this.productService.addProduct(productData).subscribe({
         next: (response) => {
           if (typeof response !== 'string') {
+            this.loading = false;
             this.product = response;
             this.isEditMode = false;
-            this.loading = false;
+            this.isNewProduct = false;
             this.snackBar.open('Product added successfully', 'Close', {
               duration: 3000,
               horizontalPosition: 'end',
               verticalPosition: 'top',
             });
+            this.router.navigate(['/inventory/products', response.productId]);
           } else {
             console.log('Error adding product', response);
+            this.snackBar.open('Failed to add product!', 'Close', {
+              duration: 3000,
+              horizontalPosition: 'end',
+              panelClass: ['error-snackbar'],
+              verticalPosition: 'top',
+            });
           }
         },
         error: (error) => {
@@ -340,114 +388,80 @@ export class ViewProductComponent {
     }
   }
 
-  onFileSelected(event: Event): void {
-    const input = event.target as HTMLInputElement;
-    if (input.files && input.files.length > 0) {
-      this.selectedFile = input.files[0];
-      const reader = new FileReader();
-      reader.readAsDataURL(this.selectedFile);
-      var imageDoc!: ImageDoc;
-      reader.onload = () => {
-        const base64Data = (reader.result as string).split(',')[1]; // Remove "data:image/png;base64,"
-        imageDoc = {
-          id: '',
-          imageName: this.selectedFile?.name || '',
-          contentType: this.selectedFile?.type || '',
-          uploadedDate: new Date(),
-          size: this.selectedFile?.size || 0,
-          dimensions: '', // You can calculate dimensions if needed
-          comments: '',
-          image: base64Data,
-        };
-      };
-      this.uploadImage(imageDoc);
-    }
-  }
-
-  uploadImage(imageDoc: ImageDoc): void {
-    if (!imageDoc) {
+  confirmDelete(): void {
+    if (!this.product || !this.product.productId) {
+      this.snackBar.open('No product to delete!', 'Close', {
+        duration: 3000,
+        horizontalPosition: 'end',
+        verticalPosition: 'top',
+      });
       return;
     }
+    this.loading = true;
+    const dialogRef = this.dialog.open(ConfirmationDialogComponent, {
+      width: '400px',
+      data: {
+        title: 'Delete Product',
+        message: `Are you sure you want to delete the product "${this.product.productName}" ? This action cannot be undone.`,
+        confirmText: 'Delete',
+        cancelText: 'Cancel',
+        confirmColor: 'warn',
+      },
+    });
 
-    this.imageUploading = true;
-
-    this.imageService
-      .addImage(imageDoc)
-      .pipe(
-        finalize(() => {
-          this.imageUploading = false;
-          this.selectedFile = null;
-          if (this.fileInput) {
-            this.fileInput.nativeElement.value = '';
-          }
-        })
-      )
-      .subscribe({
-        next: (response: ImageDoc) => {
-          if (response) {
-            this.productForm.patchValue({
-              imageId: response.id,
-            });
-            this.snackBar.open('Image uploaded successfully', 'Close', {
-              duration: 3000,
-              horizontalPosition: 'end',
-              verticalPosition: 'top',
-            });
-          } else {
-            this.snackBar.open(response || 'Failed to upload image', 'Close', {
-              duration: 5000,
-              horizontalPosition: 'end',
-              verticalPosition: 'top',
-              panelClass: ['error-snackbar'],
-            });
-          }
-        },
-        error: (error) => {
-          console.error('Error uploading image', error);
-          this.snackBar.open(
-            'Failed to upload image. Please try again.',
-            'Close',
-            {
-              duration: 5000,
-              horizontalPosition: 'end',
-              verticalPosition: 'top',
-              panelClass: ['error-snackbar'],
-            }
-          );
-        },
-      });
-  }
-
-  removeImage(): void {
-    this.productForm.patchValue({
-      imageId: '',
+    dialogRef.afterClosed().subscribe((result) => {
+      if (result) {
+        this.deleteProduct();
+      }
     });
   }
 
-  getProductImageUrl(): string {
-    // var imageDoc: ImageDoc;
-    if (this.isEditMode) {
-      const imageId = this.productForm.get('imageId')?.value;
-      if (imageId) {
-        this.imageService.getImageById(imageId).subscribe((imageDoc) => {
-          console.log('Image url 1 : ', this.mapToImageURL(imageDoc));
-          return this.mapToImageURL(imageDoc);
-        });
-      }
-    }
-    // In view mode, use the product's imageId
-    else if (this.product?.productImage) {
-      this.imageService
-        .getImageById(this.product.productImage)
-        .subscribe((imageDoc) => {
-          console.log('Image url 2 : ', this.mapToImageURL(imageDoc));
-          return this.mapToImageURL(imageDoc);
-        });
-    }
-    return '/assets/images/product-placeholder.png';
+  deleteProduct(): void {
+    this.productService.deleteProduct(this.product?.productId || 0).subscribe({
+      next: (response: HttpResponse<string>) => {
+        if (response.status == 200 && response.body?.includes('successfully')) {
+          this.snackBar.open('Product deleted successfully!', 'Close', {
+            duration: 3000,
+            horizontalPosition: 'end',
+            verticalPosition: 'top',
+            panelClass: ['success-snackbar'],
+          });
+          this.loading = false;
+          this.router.navigate(['/inventory/products']);
+        } else {
+          console.error('Error deleting product', response);
+          this.snackBar.open('Failed to delete product!', 'Close', {
+            duration: 3000,
+            horizontalPosition: 'end',
+            verticalPosition: 'top',
+            panelClass: ['error-snackbar'],
+          });
+          this.loading = false;
+        }
+      },
+      error: (error) => {
+        console.error('Failed to delete product', error);
+        this.snackBar.open(
+          'Failed to delete product. Please try again.',
+          'Close',
+          {
+            duration: 5000,
+            horizontalPosition: 'end',
+            verticalPosition: 'top',
+            panelClass: ['error-snackbar'],
+          }
+        );
+        this.loading = false;
+      },
+    });
   }
 
-  mapToImageURL(imageDoc: ImageDoc): string {
-    return `data:${imageDoc.contentType};base64,${imageDoc.image}`;
-  }
+  compareBrands = (b1: ProductBrand, b2: ProductBrand) =>
+    b1 && b2 && b1.brandId === b2.brandId;
+
+  compareCategories = (c1: ProductCategory, c2: ProductCategory) =>
+    c1 && c2 && c1.categoryId === c2.categoryId;
+
+  compareSubCategories = (sc1: SubCategory, sc2: SubCategory) =>
+    sc1 && sc2 && sc1.subCategoryId === sc2.subCategoryId;
 }

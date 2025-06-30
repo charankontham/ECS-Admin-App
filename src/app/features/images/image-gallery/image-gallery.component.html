@@ -1,5 +1,4 @@
 <div class="gallery-container">
-    <!-- Header with Add Button -->
     <mat-card class="header-card">
         <mat-card-content>
             <div class="header-content">
@@ -8,6 +7,10 @@
                     <p class="subtitle">Browse and manage product images</p>
                 </div>
                 <div class="header-actions">
+                    <button mat-icon-button color="primary" matTooltip="Refresh Images" (click)="refreshImages()"
+                        [disabled]="loading">
+                        <mat-icon>refresh</mat-icon>
+                    </button>
                     <button mat-flat-button color="primary" (click)="navigateToAddImage()">
                         <mat-icon>add</mat-icon>
                         Add New Image
@@ -17,14 +20,11 @@
         </mat-card-content>
     </mat-card>
 
-    <!-- Loading State -->
     <div *ngIf="loading" class="loading-container">
         <mat-progress-bar mode="indeterminate"></mat-progress-bar>
     </div>
 
-    <!-- Main Content -->
     <div class="gallery-content" *ngIf="!loading">
-        <!-- Left Panel: Image List -->
         <mat-card class="list-card">
             <mat-card-content>
                 <div class="list-header">
@@ -64,7 +64,6 @@
             </mat-card-content>
         </mat-card>
 
-        <!-- Right Panel: Image Details -->
         <mat-card class="details-card">
             <mat-card-content>
                 <div *ngIf="!selectedImage" class="no-selection">
@@ -76,8 +75,9 @@
                     <div class="details-header">
                         <h2>Image Details</h2>
                         <div class="details-actions">
-                            <button mat-icon-button color="warn" matTooltip="Delete Image" (click)="confirmDelete()">
-                                <mat-icon>delete</mat-icon>
+                            <button mat-icon-button color="primary" matTooltip="Edit Image Details"
+                                (click)="toggleEditMode()" [disabled]="saveInProgress">
+                                <mat-icon>{{ editMode ? 'close' : 'edit' }}</mat-icon>
                             </button>
                         </div>
                     </div>
@@ -87,14 +87,15 @@
                             <img [src]="'data:' + selectedImage.contentType + ';base64,' + selectedImage.image"
                                 [alt]="selectedImage.imageName" width="300" (error)="handleImageError($event)">
                         </div>
-
                         <mat-divider></mat-divider>
-
                         <div class="details-info">
                             <div class="info-grid">
                                 <div class="info-item">
                                     <div class="info-label">Name</div>
-                                    <div class="info-value">{{ selectedImage.imageName }}</div>
+                                    <div class="info-value" *ngIf="!editMode">{{ selectedImage.imageName }}</div>
+                                    <mat-form-field appearance="outline" *ngIf="editMode" class="edit-field">
+                                        <input matInput [(ngModel)]="editImageName" placeholder="Enter image name">
+                                    </mat-form-field>
                                 </div>
                                 <div class="info-item">
                                     <div class="info-label">Image ID</div>
@@ -130,18 +131,27 @@
                         <!-- <mat-divider></mat-divider> -->
 
                         <div class="details-actions-footer">
-                            <button mat-stroked-button (click)="copyImageId()">
-                                <mat-icon>content_copy</mat-icon>
-                                Copy Image ID
-                            </button>
-                            <!-- <button mat-stroked-button (click)="copyImageUrl()">
-                                <mat-icon>link</mat-icon>
-                                Copy Image URL
-                            </button> -->
-                            <button mat-flat-button color="warn" (click)="confirmDelete()">
-                                <mat-icon>delete</mat-icon>
-                                Delete Image
-                            </button>
+                            <ng-container *ngIf="!editMode">
+                                <button mat-stroked-button (click)="copyImageId()">
+                                    <mat-icon>content_copy</mat-icon>
+                                    Copy Image ID
+                                </button>
+                                <button mat-flat-button color="warn" (click)="confirmDelete()">
+                                    <mat-icon>delete</mat-icon>
+                                    Delete Image
+                                </button>
+                            </ng-container>
+                            <ng-container *ngIf="editMode">
+                                <button mat-stroked-button (click)="cancelEdit()" [disabled]="saveInProgress">
+                                    <mat-icon>cancel</mat-icon>
+                                    Cancel
+                                </button>
+                                <button mat-flat-button color="primary" (click)="updateImageChanges()"
+                                    [disabled]="!editImageName.trim() || saveInProgress">
+                                    <mat-icon>save</mat-icon>
+                                    {{ saveInProgress ? 'Saving...' : 'Save Changes' }}
+                                </button>
+                            </ng-container>
                         </div>
                     </div>
                 </div>

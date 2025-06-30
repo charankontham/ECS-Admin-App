@@ -18,6 +18,10 @@ import { MatChipsModule } from '@angular/material/chips';
 import { ImageService } from '../../../core/services/image.service';
 import { ImageDoc, ImageFilters } from '../../../core/models/image.model';
 import { ConfirmationDialogComponent } from '../../../shared/components/confirmation-dialog/confirmation-dialog.component';
+import { FormsModule } from '@angular/forms';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatInputModule } from '@angular/material/input';
+import { HttpResponse } from '@angular/common/http';
 
 @Component({
   selector: 'app-image-gallery',
@@ -26,6 +30,7 @@ import { ConfirmationDialogComponent } from '../../../shared/components/confirma
     CommonModule,
     RouterModule,
     MatCardModule,
+    FormsModule,
     MatButtonModule,
     MatIconModule,
     MatDividerModule,
@@ -36,6 +41,8 @@ import { ConfirmationDialogComponent } from '../../../shared/components/confirma
     MatDialogModule,
     MatTooltipModule,
     MatChipsModule,
+    MatFormFieldModule,
+    MatInputModule,
   ],
   templateUrl: './image-gallery.component.html',
   styleUrl: './image-gallery.component.css',
@@ -48,6 +55,9 @@ export class ImageGalleryComponent {
   currentPage = 0;
   offset = 10;
   deleteInProgress = false;
+  editMode = false;
+  editImageName = '';
+  saveInProgress = false;
 
   constructor(
     private imageService: ImageService,
@@ -87,6 +97,15 @@ export class ImageGalleryComponent {
     }, 800);
   }
 
+  refreshImages(): void {
+    this.selectedImage = null;
+    this.currentPage = 0;
+    this.loadImages();
+    this.snackBar.open('Images refreshed', 'Close', {
+      duration: 2000,
+    });
+  }
+
   selectImage(image: ImageDoc): void {
     this.selectedImage = image;
   }
@@ -109,7 +128,7 @@ export class ImageGalleryComponent {
       width: '400px',
       data: {
         title: 'Delete Image',
-        message: `Are you sure you want to delete the image "${this.selectedImage.imageName}"? This action cannot be undone.`,
+        message: `Are you sure you want to delete the image "${this.selectedImage.imageName}" ? This action cannot be undone.`,
         confirmText: 'Delete',
         cancelText: 'Cancel',
         confirmColor: 'warn',
@@ -127,23 +146,34 @@ export class ImageGalleryComponent {
     if (!this.selectedImage) return;
 
     this.deleteInProgress = true;
-    const imageId = this.selectedImage.id;
+    const imageId = this.selectedImage.id || '';
 
-    // In a real application, you would call your image service to delete the image
-    // For this example, we'll simulate the API call
-    setTimeout(() => {
-      // Remove the image from the list
-      this.images = this.images.filter((img) => img.id !== imageId);
-      this.totalImages--;
-
-      // Clear selection
-      this.selectedImage = null;
-      this.deleteInProgress = false;
-
-      this.snackBar.open('Image deleted successfully', 'Close', {
-        duration: 3000,
-      });
-    }, 1000);
+    this.imageService.deleteImage(imageId).subscribe({
+      next: (response: HttpResponse<string>) => {
+        if (response.status == 200 && response.body?.includes('successfully')) {
+          setTimeout(() => {
+            this.images = this.images.filter((img) => img.id !== imageId);
+            this.totalImages--;
+            this.selectedImage = null;
+            this.deleteInProgress = false;
+            this.snackBar.open('Image deleted successfully', 'Close', {
+              duration: 3000,
+              horizontalPosition: 'end',
+              verticalPosition: 'top',
+              panelClass: ['success-snackbar'],
+            });
+          }, 1000);
+        } else {
+          this.handleError('Failed to remove image. Please try again.');
+        }
+      },
+      error: (error) => {
+        console.error('Error deleting image', error);
+        this.handleError(
+          'Failed to delete image. Please check console for error.'
+        );
+      },
+    });
   }
 
   copyImageId(): void {
@@ -171,31 +201,71 @@ export class ImageGalleryComponent {
     img.src = 'assets/images/image-placeholder.jpg';
   }
 
-  // Helper method to generate mock data for the example
-  private generateMockImages(page: number, pageSize: number): ImageDoc[] {
-    const startIndex = page * pageSize;
-    const images: ImageDoc[] = [];
+  toggleEditMode(): void {
+    if (!this.selectedImage) return;
 
-    for (let i = 0; i < pageSize; i++) {
-      const index = startIndex + i;
-      if (index >= 100) break; // Limit to 100 mock images
+    this.editMode = !this.editMode;
 
-      const id = `IMG${(index + 1).toString().padStart(4, '0')}`;
-      images.push({
-        id: id,
-        imageName: `Product Image ${index + 1}`,
-        // url: `https://picsum.photos/id/${(index % 30) + 1}/400/400`,
-        // uploadDate: new Date(Date.now() - Math.random() * 30 * 24 * 60 * 60 * 1000),
-        size: Math.floor(Math.random() * 900) + 100,
-        image: 'https://picsum.photos/id/' + ((index % 30) + 1) + '/400/400',
-        contentType: Math.random() > 0.5 ? 'image/jpeg' : 'image/png',
-        // dimensions: {
-        //   width: Math.floor(Math.random() * 1000) + 500,
-        //   height: Math.floor(Math.random() * 1000) + 500,
-        // },
-      });
+    if (this.editMode) {
+      this.editImageName = this.selectedImage.imageName || '';
+    } else {
+      this.editImageName = '';
     }
+  }
 
-    return images;
+  updateImageChanges(): void {
+    if (
+      !this.selectedImage ||
+      !this.editImageName.trim() ||
+      this.saveInProgress
+    ) {
+      return;
+    }
+    this.saveInProgress = true;
+    this.imageService
+      .updateImageField(this.selectedImage.id || '', this.editImageName.trim())
+      .subscribe({
+        next: (updatedImage) => {
+          setTimeout(() => {
+            if (updatedImage) {
+              const imageIndex = this.images.findIndex(
+                (img) => img.id === updatedImage!.id
+              );
+              if (imageIndex !== -1) {
+                this.images[imageIndex] = updatedImage;
+                this.selectedImage = updatedImage;
+              }
+            }
+
+            this.editMode = false;
+            this.editImageName = '';
+            this.saveInProgress = false;
+
+            this.snackBar.open('Image name updated successfully', 'Close', {
+              duration: 3000,
+            });
+          }, 1000);
+        },
+        error: (error) => {
+          console.error('Error updating image name', error);
+          this.snackBar.open('Failed to update image name', 'Close', {
+            duration: 3000,
+          });
+          this.saveInProgress = false;
+        },
+      });
+  }
+
+  cancelEdit(): void {
+    this.editMode = false;
+    this.editImageName = '';
+  }
+
+  private handleError(message: string): void {
+    console.error(message);
+    this.snackBar.open(message, 'Close', {
+      duration: 5000,
+      panelClass: ['error-snackbar'],
+    });
   }
 }

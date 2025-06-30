@@ -34,6 +34,11 @@
                             <mat-icon>edit</mat-icon>
                             Edit Product
                         </button>
+                        <button *ngIf="!isEditMode  && !isNewProduct" mat-flat-button color="primary"
+                            (click)="deleteProduct()">
+                            <mat-icon>delete</mat-icon>
+                            Delete Product
+                        </button>
                         <ng-container *ngIf="isEditMode">
                             <button mat-flat-button color="primary" (click)="saveProduct()"
                                 [disabled]="productForm.invalid || productForm.pristine">
@@ -102,14 +107,6 @@
                                             <div class="info-label">Brand</div>
                                             <div class="info-value">{{ product.brand.brandName }}</div>
                                         </div>
-                                        <!-- <div class="info-item">
-                        <div class="info-label">Status</div>
-                        <div class="info-value">
-                          <mat-chip [color]="product.isActive ? 'primary' : 'warn'" selected>
-                            {{ product.isActive ? 'Active' : 'Inactive' }}
-                          </mat-chip>
-                        </div>
-                      </div> -->
                                     </div>
                                 </div>
                             </mat-tab>
@@ -123,20 +120,15 @@
                             <mat-tab label="Additional Details">
                                 <div class="tab-content">
                                     <div class="info-grid">
-                                        <!-- <div class="info-item">
-                        <div class="info-label">Barcode</div>
-                        <div class="info-value">{{ product.barcode || 'N/A' }}</div>
-                      </div> -->
                                         <div class="info-item">
                                             <div class="info-label">Weight</div>
                                             <div class="info-value">{{ product.productWeight ? (product.productWeight +
-                                                ' kg') : 'N/A' }}</div>
+                                                ' gram(s)') : 'N/A' }}</div>
                                         </div>
                                         <div class="info-item" *ngIf="product.productDimensions">
                                             <div class="info-label">Dimensions</div>
                                             <div class="info-value">
-                                                {{ product.productDimensions ? (product.productDimensions + ' × ' +
-                                                product.productDimensions + ' × ' + product.productDimensions + ' cm') :
+                                                {{ product.productDimensions ? product.productDimensions + ' cm' :
                                                 'N/A' }}
                                             </div>
                                         </div>
@@ -181,7 +173,7 @@
                                 <mat-form-field appearance="outline">
                                     <mat-label>Price</mat-label>
                                     <input matInput type="number" formControlName="productPrice" required>
-                                    <span matTextPrefix>$&nbsp;</span>
+                                    <span matTextPrefix [style]="'color:white'">$&nbsp;</span>
                                     <mat-error *ngIf="productForm.get('productPrice')?.hasError('required')">
                                         Price is required
                                     </mat-error>
@@ -207,7 +199,8 @@
                             <div class="form-row">
                                 <mat-form-field appearance="outline">
                                     <mat-label>Category</mat-label>
-                                    <mat-select formControlName="productCategory">
+                                    <mat-select formControlName="productCategory" [compareWith]="compareCategories"
+                                        required>
                                         <mat-option [value]="">None</mat-option>
                                         <mat-option *ngFor="let category of categories" [value]="category">
                                             {{ category.categoryName }}
@@ -220,7 +213,8 @@
                                 <mat-form-field appearance="outline">
                                     <mat-label>Sub Category</mat-label>
                                     <mat-select formControlName="productSubCategory"
-                                        [disabled]="!productForm.get('category')?.value">
+                                        [disabled]="!productForm.get('category')?.value"
+                                        [compareWith]="compareSubCategories" required>
                                         <mat-option [value]="">None</mat-option>
                                         <mat-option *ngFor="let subCategory of subCategories" [value]="subCategory">
                                             {{ subCategory.subCategoryName }}
@@ -232,10 +226,10 @@
                             <div class="form-row">
                                 <mat-form-field appearance="outline">
                                     <mat-label>Brand</mat-label>
-                                    <mat-select formControlName="productBrand">
+                                    <mat-select formControlName="productBrand" [compareWith]="compareBrands" required>
                                         <mat-option [value]="">None</mat-option>
                                         <mat-option *ngFor="let brand of brands" [value]="brand">
-                                            {{ brand }}
+                                            {{ brand.brandName }}
                                         </mat-option>
                                     </mat-select>
                                 </mat-form-field>
@@ -255,16 +249,29 @@
                                 </mat-form-field>
                             </div>
 
-                            <!-- <div class="form-row">
+                            <div class="form-row">
                                 <mat-form-field appearance="outline">
-                                    <mat-label>Barcode</mat-label>
-                                    <input matInput formControlName="barcode">
+                                    <mat-label>Color</mat-label>
+                                    <input matInput formControlName="productColor" placeholder="e.g. Red, Blue, etc.">
                                 </mat-form-field>
-                            </div> -->
+                            </div>
 
                             <div class="form-row">
                                 <mat-form-field appearance="outline">
-                                    <mat-label>Weight (kg)</mat-label>
+                                    <mat-label>Product Condition</mat-label>
+                                    <mat-select formControlName="productCondition" required>
+                                        <mat-option [value]="">None</mat-option>
+                                        <mat-option [value]="'new'">New</mat-option>
+                                        <mat-option [value]="'openbox'">Open Box</mat-option>
+                                        <mat-option [value]="'refurbished'">Refurbished</mat-option>
+                                        <mat-option [value]="'used'">Used</mat-option>
+                                    </mat-select>
+                                </mat-form-field>
+                            </div>
+
+                            <div class="form-row">
+                                <mat-form-field appearance="outline">
+                                    <mat-label>Weight (grams)</mat-label>
                                     <input matInput type="number" formControlName="productWeight">
                                 </mat-form-field>
                             </div>
@@ -289,39 +296,7 @@
                                 </div>
                             </div>
 
-                            <div class="form-row">
-                                <div class="image-upload-container">
-                                    <div class="image-preview-container">
-                                        <div class="image-preview"
-                                            [style.background-image]="'url(' + getProductImageUrl() + ')'"
-                                            [class.has-image]="!!getProductImageUrl()">
-                                            <div class="image-upload-placeholder" *ngIf="!getProductImageUrl()">
-                                                <mat-icon>image</mat-icon>
-                                                <span>No image selected</span>
-                                            </div>
-                                            <div class="image-upload-overlay" *ngIf="imageUploading">
-                                                <mat-spinner diameter="40"></mat-spinner>
-                                                <span>Uploading...</span>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div class="image-upload-actions">
-                                        <input type="file" #fileInput style="display: none" accept="image/*"
-                                            (change)="onFileSelected($event)">
-                                        <button mat-flat-button color="primary" type="button"
-                                            (click)="fileInput.click()" [disabled]="imageUploading">
-                                            <mat-icon>upload</mat-icon>
-                                            {{ productForm.get('imageId')?.value ? 'Change Image' : 'Upload Image' }}
-                                        </button>
-                                        <button mat-stroked-button type="button"
-                                            *ngIf="productForm.get('imageId')?.value" (click)="removeImage()"
-                                            [disabled]="imageUploading">
-                                            <mat-icon>delete</mat-icon>
-                                            Remove Image
-                                        </button>
-                                    </div>
-                                </div>
-                            </div>
+                            <app-image-uploader (dataEmitter)="setImageId($event)"></app-image-uploader>
                         </mat-card-content>
                     </mat-card>
                 </div>

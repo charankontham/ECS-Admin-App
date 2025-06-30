@@ -1,6 +1,11 @@
-import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
+import {
+  HttpClient,
+  HttpHeaders,
+  HttpParams,
+  HttpResponse,
+} from '@angular/common/http';
 import { inject, Inject, Injectable, NgZone, PLATFORM_ID } from '@angular/core';
-import { Observable } from 'rxjs';
+import { map, Observable } from 'rxjs';
 import { isPlatformBrowser } from '@angular/common';
 import { environment } from '../../../../environment';
 import * as CryptoJS from 'crypto-js';
@@ -48,19 +53,18 @@ export class BaseService<T> {
     }
   }
 
-  private predefinedHeaders: HttpHeaders = new HttpHeaders({
-    'Content-Type': 'application/json',
-    Authorization: this.authValue,
-  });
-
   private mergeHeaders(headers?: HttpHeaders): HttpHeaders {
+    const predefinedHeaders: HttpHeaders = new HttpHeaders({
+      'Content-Type': 'application/json',
+      Authorization: this.authValue,
+    });
     if (!headers) {
-      return this.predefinedHeaders;
+      return predefinedHeaders;
     }
-    return this.predefinedHeaders.keys().reduce((mergedHeaders, key) => {
+    return predefinedHeaders.keys().reduce((mergedHeaders, key) => {
       return mergedHeaders.has(key)
         ? mergedHeaders
-        : mergedHeaders.set(key, this.predefinedHeaders.get(key) as string);
+        : mergedHeaders.set(key, predefinedHeaders.get(key) as string);
     }, headers);
   }
 
@@ -158,7 +162,7 @@ export class BaseService<T> {
     });
   }
 
-  post(data: T, resource: string, headers?: HttpHeaders): Observable<T> {
+  post(data: T | any, resource: string, headers?: HttpHeaders): Observable<T> {
     var apiURL =
       !!resource && resource != ''
         ? `${this.baseUrl}/${this.endpoint}/${resource}`
@@ -168,16 +172,54 @@ export class BaseService<T> {
     });
   }
 
+  postWithBooleanResponse(
+    data1: string,
+    data2: string,
+    resource: string,
+    headers?: HttpHeaders
+  ): Observable<string> {
+    console.log(this.mergeHeaders(headers));
+    return this.http.post(
+      `${this.baseUrl}/${this.endpoint}/${resource}`,
+      {
+        imageName: data1,
+        imageId: data2,
+      },
+      {
+        headers: this.mergeHeaders(headers),
+        responseType: 'text',
+      }
+    );
+    // .pipe(
+    //   map((response: string) => {
+    //     return response === 'true';
+    //   })
+    // );
+  }
+
   update(data: T, headers?: HttpHeaders): Observable<T> {
     return this.http.put<T>(`${this.baseUrl}/${this.endpoint}`, data, {
       headers: this.mergeHeaders(headers),
     });
   }
 
-  updateAll(data: T[], headers?: HttpHeaders): Observable<T[]> {
+  updateAll(data: T[] | any[], headers?: HttpHeaders): Observable<T[]> {
     return this.http.put<T[]>(`${this.baseUrl}/${this.endpoint}`, data, {
       headers: this.mergeHeaders(headers),
     });
+  }
+
+  patch(
+    id: string | number,
+    fieldValue: string,
+    headers?: HttpHeaders
+  ): Observable<T> {
+    return this.http.patch<T>(
+      `${this.baseUrl}/${this.endpoint}/${id}?imageName=${fieldValue}`,
+      {
+        headers: this.mergeHeaders(headers),
+      }
+    );
   }
 
   delete(id: number, headers?: HttpHeaders): Observable<void> {
@@ -189,11 +231,12 @@ export class BaseService<T> {
   deleteWithStringResponse(
     id: number | string,
     headers?: HttpHeaders
-  ): Observable<string> {
+  ): Observable<HttpResponse<string>> {
     console.log(this.mergeHeaders(headers));
     return this.http.delete<string>(`${this.baseUrl}/${this.endpoint}/${id}`, {
       headers: this.mergeHeaders(headers),
       responseType: 'text' as 'json',
+      observe: 'response',
     });
   }
 }

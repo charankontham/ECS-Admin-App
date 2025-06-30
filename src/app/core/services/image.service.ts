@@ -1,7 +1,7 @@
 import { inject, Injectable, NgZone } from '@angular/core';
 import { BaseService } from './base.service';
 import { Product, ProductFilters } from '../models/product.model';
-import { HttpClient, HttpHeaders } from '@angular/common/http';
+import { HttpClient, HttpHeaders, HttpResponse } from '@angular/common/http';
 import { Router } from '@angular/router';
 import { filter, Observable } from 'rxjs';
 import { AuthService } from './auth.service';
@@ -15,9 +15,6 @@ export class ImageService extends BaseService<ImageDoc> {
   private headers: HttpHeaders | null = null;
   constructor(ngZone: NgZone, private authService: AuthService) {
     super(inject(HttpClient), 'ecs-inventory-admin/api/public/images', ngZone);
-    // this.headers = new HttpHeaders({
-    //   Authorization: 'Bearer ' + localStorage.getItem('userToken'),
-    // });
   }
 
   getAllImagesByPagination(imageFilters: ImageFilters): Observable<any> {
@@ -40,7 +37,11 @@ export class ImageService extends BaseService<ImageDoc> {
     return this.update(image);
   }
 
-  deleteImage(imageId: string): Observable<string> {
+  updateImageField(imageId: string, imageName: string): Observable<ImageDoc> {
+    return this.patch(imageId, imageName);
+  }
+
+  deleteImage(imageId: string): Observable<HttpResponse<string>> {
     return this.deleteWithStringResponse(imageId);
   }
 }

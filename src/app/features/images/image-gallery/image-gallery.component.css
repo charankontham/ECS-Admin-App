@@ -200,8 +200,28 @@
   margin-top: 2%;
 }
 
+.header-actions {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+}
+
 @media (max-width: 992px) {
   .gallery-content {
     grid-template-columns: 1fr;
+  }
+  .header-actions {
+    display: flex;
+    gap: 12px;
+    align-items: center;
+  }
+
+  .edit-field {
+    width: 100%;
+    margin-top: 4px;
+  }
+
+  .edit-field mat-form-field {
+    font-size: 14px;
   }
 }
