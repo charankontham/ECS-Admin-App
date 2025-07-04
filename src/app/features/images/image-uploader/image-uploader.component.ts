@@ -34,6 +34,7 @@ export class ImageUploaderComponent {
   @Input() allowMultiple: boolean = false;
   @Input() compact: boolean = false;
   @Input() maxFileSizeMB = 5;
+  @Input() disableUploadNewButton = false;
   @Input() currentImageUrl = 'assets/images/image-placeholder.jpg';
   @ViewChild('fileInput') fileInput!: ElementRef<HTMLInputElement>;
 
@@ -47,6 +48,12 @@ export class ImageUploaderComponent {
     private imageService: ImageService,
     private snackBar: MatSnackBar
   ) {}
+
+  ngOnInit(): void {
+    if (this.currentImageId) {
+      this.getImageUrl();
+    }
+  }
 
   onFileSelected(event: Event): void {
     const input = event.target as HTMLInputElement;
@@ -98,6 +105,7 @@ export class ImageUploaderComponent {
               this.currentImageId = response.id || '';
               console.log('Image updated successfully : ', response);
               this.getImageUrl();
+              this.dataEmitter.emit(response.id);
               this.snackBar.open(
                 'Image updated successfully : ' + response.id,
                 'Close',

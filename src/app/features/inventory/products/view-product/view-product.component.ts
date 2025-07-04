@@ -1,5 +1,5 @@
 import { Component, ElementRef, ViewChild, type OnInit } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { CommonModule, Location } from '@angular/common';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import {
   FormBuilder,
@@ -36,6 +36,8 @@ import { ImageUploaderComponent } from '../../../images/image-uploader/image-upl
 import { ConfirmationDialogComponent } from '../../../../shared/components/confirmation-dialog/confirmation-dialog.component';
 import { MatDialog } from '@angular/material/dialog';
 import { HttpResponse } from '@angular/common/http';
+import { ImageService } from '../../../../core/services/image.service';
+import { ImageDoc } from '../../../../core/models/image.model';
 
 @Component({
   selector: 'app-view-product',
@@ -75,7 +77,7 @@ export class ViewProductComponent {
   categories: ProductCategory[] = [];
   subCategories: SubCategory[] = [];
   brands: ProductBrand[] = [];
-  // @ViewChild('fileInput') fileInput!: ElementRef<HTMLInputElement>;
+  currentImageUrl: string = '';
 
   constructor(
     private route: ActivatedRoute,
@@ -86,7 +88,9 @@ export class ViewProductComponent {
     private categoryService: ProductCategoryService,
     private brandService: ProductBrandService,
     private subCategoryService: ProductSubCategoryService,
-    private dialog: MatDialog
+    private dialog: MatDialog,
+    private imageService: ImageService,
+    private location: Location
   ) {
     this.productForm = this.createProductForm();
     this.initializeForm();
@@ -94,14 +98,10 @@ export class ViewProductComponent {
 
   ngOnInit(): void {
     this.loadFilterOptions();
-    // Get product ID from route params
-    console.log('Initializing ViewProductComponent with time : ', new Date());
     this.route.paramMap.subscribe((params) => {
       const productId = params.get('productId');
-      console.log('Product ID:', productId);
       this.loading = true;
       if (productId == 'new') {
-        console.log('Creating new product');
         this.isNewProduct = true;
         this.isEditMode = true;
         this.product = this.createEmptyProduct();
@@ -122,6 +122,10 @@ export class ViewProductComponent {
           this.productForm.get('subCategory')?.setValue('');
         }
       });
+
+    this.productForm.valueChanges.subscribe((formValues) => {
+      this.updateProductFromForm(formValues);
+    });
   }
 
   loadFilterOptions(): void {
@@ -147,9 +151,7 @@ export class ViewProductComponent {
     this.productService.getProductById(productId).subscribe({
       next: (product) => {
         this.product = product;
-        if (product.productSubCategory.productCategory) {
-          this.loadSubCategories(product.productSubCategory.subCategoryId);
-        }
+        this.setImageUrl(product.productImage);
         this.loading = false;
       },
       error: (error) => {
@@ -271,7 +273,7 @@ export class ViewProductComponent {
 
   cancelEdit(): void {
     if (this.isNewProduct) {
-      this.router.navigate(['/inventory/products']);
+      this.goBack();
     } else {
       this.isEditMode = false;
       this.productForm.reset();
@@ -279,7 +281,7 @@ export class ViewProductComponent {
   }
 
   saveProduct(): void {
-    if (this.productForm.invalid || this.productForm.pristine) {
+    if (this.productForm.invalid && this.productForm.pristine) {
       this.snackBar.open('Fill all required fields', 'Close', {
         duration: 3000,
         horizontalPosition: 'end',
@@ -289,14 +291,12 @@ export class ViewProductComponent {
     }
 
     const formValues = this.productForm.value;
-    // Prepare dimensions object if any dimension is provided
     let dimensions: string = '';
     if (formValues.length || formValues.width || formValues.height) {
       dimensions =
         formValues.length + 'x' + formValues.width + 'x' + formValues.height;
     }
 
-    // Create updated product object
     const productData: ProductRequest = {
       productName: formValues.productName,
       productCategoryId: formValues.productCategory.categoryId,
@@ -319,7 +319,6 @@ export class ViewProductComponent {
 
     this.loading = true;
     if (this.isNewProduct) {
-      console.log('Adding new product', productData);
       this.productService.addProduct(productData).subscribe({
         next: (response) => {
           if (typeof response !== 'string') {
@@ -358,8 +357,8 @@ export class ViewProductComponent {
           );
         },
       });
-    } else {
-      this.productService.updateProduct(productData).subscribe({
+    } else if (this.product) {
+      this.productService.updateProduct(this.product).subscribe({
         next: (products) => {
           this.product = products[0];
           this.isEditMode = false;
@@ -369,6 +368,7 @@ export class ViewProductComponent {
             horizontalPosition: 'end',
             verticalPosition: 'top',
           });
+          window.location.reload();
         },
         error: (error) => {
           console.error('Error updating product', error);
@@ -456,6 +456,22 @@ export class ViewProductComponent {
     });
   }
 
+  setImageUrl(imageId: string): void {
+    if (!imageId) {
+      this.currentImageUrl = '/assets/images/image-placeholder.jpg';
+      return;
+    }
+    this.imageService.getImageById(imageId).subscribe({
+      next: (image: ImageDoc) => {
+        this.currentImageUrl = `data:${image.contentType};base64,${image.image}`;
+      },
+      error: (error) => {
+        console.log('error');
+        this.currentImageUrl = '/assets/images/image-placeholder.jpg';
+      },
+    });
+  }
+
   compareBrands = (b1: ProductBrand, b2: ProductBrand) =>
     b1 && b2 && b1.brandId === b2.brandId;
 
@@ -464,4 +480,65 @@ export class ViewProductComponent {
 
   compareSubCategories = (sc1: SubCategory, sc2: SubCategory) =>
     sc1 && sc2 && sc1.subCategoryId === sc2.subCategoryId;
+
+  goBack(): void {
+    const referrer = document.referrer;
+    if (
+      referrer.includes('/inventory/products') &&
+      !referrer.includes('/inventory/products/')
+    ) {
+      this.location.back();
+    } else {
+      this.router.navigate(['/inventory/products']);
+    }
+  }
+
+  updateProductFromForm(formValues: any): void {
+    if (this.product) {
+      this.product.productName = formValues.productName;
+      this.product.productPrice = formValues.productPrice;
+      this.product.productQuantity = formValues.productQuantity;
+      this.product.productDescription = formValues.productDescription;
+      this.product.productColor = formValues.productColor;
+      this.product.productCondition = formValues.productCondition;
+      this.product.productWeight = formValues.productWeight;
+      this.product.productImage = formValues.productImage;
+      this.product.dateModified = new Date();
+
+      if (formValues.productCategory?.categoryId) {
+        this.product.productSubCategory.productCategory = {
+          categoryId: formValues.productCategory.categoryId,
+          categoryName: formValues.productCategory.categoryName,
+          categoryImage: formValues.productCategory.categoryImage,
+        };
+      }
+
+      if (formValues.productSubCategory?.subCategoryId) {
+        this.product.productSubCategory = {
+          ...this.product.productSubCategory,
+          subCategoryId: formValues.productSubCategory.subCategoryId,
+          subCategoryName: formValues.productSubCategory.subCategoryName,
+          subCategoryDescription:
+            formValues.productSubCategory.subCategoryDescription,
+          subCategoryImage: formValues.productSubCategory.subCategoryImage,
+          productCategory: this.product.productSubCategory.productCategory,
+        };
+      }
+
+      if (formValues.productBrand?.brandId) {
+        this.product.brand = {
+          brandId: formValues.productBrand.brandId,
+          brandName: formValues.productBrand.brandName,
+          brandDescription: formValues.productBrand.brandDescription,
+        };
+      }
+
+      let dimensions: string = '';
+      if (formValues.length || formValues.width || formValues.height) {
+        dimensions =
+          formValues.length + 'x' + formValues.width + 'x' + formValues.height;
+      }
+      this.product.productDimensions = dimensions;
+    }
+  }
 }

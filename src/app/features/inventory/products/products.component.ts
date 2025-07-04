@@ -8,7 +8,14 @@ import {
   FormsModule,
   ReactiveFormsModule,
 } from '@angular/forms';
-import { catchError, debounceTime, distinctUntilChanged, of } from 'rxjs';
+import {
+  catchError,
+  debounceTime,
+  distinctUntilChanged,
+  forkJoin,
+  Observable,
+  of,
+} from 'rxjs';
 import {
   MatTableModule,
   MatTable,
@@ -34,12 +41,15 @@ import { ProductBrandService } from '../../../core/services/product-brand.servic
 import {
   ProductCategory,
   SubCategory,
-  SubCategoryEnriched,
 } from '../../../core/models/product-category.model';
 import { ProductBrand } from '../../../core/models/product-brand.model';
 import { ProductSubCategoryService } from '../../../core/services/product-subcategory.service';
-import { RouterModule } from '@angular/router';
+import { Router, RouterModule } from '@angular/router';
 import { ImageUploaderComponent } from '../../images/image-uploader/image-uploader.component';
+import {
+  NavigationStateService,
+  ProductsPageState,
+} from '../../../core/services/navigation-state.service';
 
 @Component({
   selector: 'app-products',
@@ -63,7 +73,6 @@ import { ImageUploaderComponent } from '../../images/image-uploader/image-upload
     MatProgressBarModule,
     MatChipsModule,
     MatTooltipModule,
-    // ImageUploaderComponent,
   ],
   templateUrl: './products.component.html',
   styleUrl: './products.component.css',
@@ -96,7 +105,9 @@ export class ProductsComponent implements OnInit, AfterViewInit {
     private categoryService: ProductCategoryService,
     private subCategoryService: ProductSubCategoryService,
     private brandService: ProductBrandService,
-    private fb: FormBuilder
+    private fb: FormBuilder,
+    private navigationStateService: NavigationStateService,
+    private router: Router
   ) {
     this.filterForm = this.fb.group({
       category: null,
@@ -106,29 +117,28 @@ export class ProductsComponent implements OnInit, AfterViewInit {
     });
   }
 
-  fetchProducts() {
-    // this.isLoading = true;
-    // const apiUrl = `https://your-backend-api.com/products?page=${this.currentPage}&size=${this.itemsPerPage}`;
-    // this.productService
-    //   .getAllProductsBypagination(this.currentPage, this.itemsPerPage)
-    //   .pipe(
-    //     catchError((error) => {
-    //       console.error('Error fetching products', error);
-    //       this.isLoading = false;
-    //       return of([]);
-    //     })
-    //   )
-    //   .subscribe((response) => {
-    //     console.log('Resp = ', response);
-    //     this.products = response.content;
-    //     this.totalPages = response.totalPages;
-    //     this.totalPages = response.totalPages;
-    //     this.isLoading = false;
-    //   });
-  }
-
   ngOnInit(): void {
-    this.loadFilterOptions();
+    this.isLoading = true;
+    this.loadFilterOptions().subscribe({
+      next: (data) => {
+        this.categories = data.categories;
+        this.brands = data.brands;
+
+        this.navigationStateService
+          .getProductsPageState()
+          .subscribe((currentState) => {
+            if (currentState) {
+              this.restorePageState(currentState);
+            } else {
+              this.loadProducts();
+            }
+          });
+      },
+      error: (error) => {
+        console.error('Error loading filter options', error);
+        this.isLoading = false;
+      },
+    });
     this.filterForm.valueChanges
       .pipe(
         debounceTime(600),
@@ -138,7 +148,6 @@ export class ProductsComponent implements OnInit, AfterViewInit {
         catchError(() => of({}))
       )
       .subscribe((values) => {
-        console.log('Values : ', values);
         this.filters = {
           ...this.filters,
           categoryId: values.category ? values.category.categoryId : null,
@@ -149,7 +158,6 @@ export class ProductsComponent implements OnInit, AfterViewInit {
           searchValue: values.search.trim() != '' ? values.search : null,
           currentPage: 0,
         };
-        console.log('Filters : ', this.filters);
         this.updateDisplayedColumns();
         this.loadProducts();
         if (this.paginator) {
@@ -164,7 +172,6 @@ export class ProductsComponent implements OnInit, AfterViewInit {
         this.loadSubCategories(category.categoryId);
       }
     });
-    this.loadProducts();
   }
 
   ngAfterViewInit(): void {
@@ -173,30 +180,50 @@ export class ProductsComponent implements OnInit, AfterViewInit {
         this.dataSource.sort = this.sort;
       } else {
         this.sort.sortChange.subscribe((sort: Sort) => {
-          console.log('Sort : ', sort);
           this.filters.sortField = sort.active;
           this.filters.sortDirection = sort.direction as 'asc' | 'desc';
         });
       }
     }
+
+    this.paginator._intl.getRangeLabel = (
+      page: number,
+      pageSize: number,
+      length: number
+    ) => {
+      if (length === 0 || pageSize === 0) {
+        return `Page 1 (0 of ${length})`;
+      }
+
+      const startIndex = page * pageSize;
+      const endIndex =
+        startIndex < length
+          ? Math.min(startIndex + pageSize, length)
+          : startIndex + pageSize;
+      const currentPage = page + 1;
+
+      return `Page ${currentPage} (${
+        startIndex + 1
+      } - ${endIndex} of ${length})`;
+    };
   }
 
-  loadFilterOptions(): void {
-    this.categoryService.getAll().subscribe((categories) => {
-      this.categories = categories;
-    });
-
-    this.brandService.getAll().subscribe((brands) => {
-      this.brands = brands;
+  loadFilterOptions(): Observable<any> {
+    return forkJoin({
+      categories: this.categoryService.getAll(),
+      brands: this.brandService.getAll(),
     });
   }
 
-  loadSubCategories(categoryId: number): void {
-    this.subCategoryService
-      .getSubCategoriesByCategoryId('getByCategoryId', categoryId)
-      .subscribe((subCategories) => {
-        this.subCategories = subCategories;
-      });
+  loadSubCategories(categoryId: number): Promise<void> {
+    return new Promise((resolve) => {
+      this.subCategoryService
+        .getSubCategoriesByCategoryId('getByCategoryId', categoryId)
+        .subscribe((subCategories) => {
+          this.subCategories = subCategories;
+          resolve();
+        });
+    });
   }
 
   loadProducts(): void {
@@ -344,5 +371,84 @@ export class ProductsComponent implements OnInit, AfterViewInit {
     if (confirm(`Are you sure you want to delete ${product.productName}?`)) {
       console.log('Deleting product:', product);
     }
+  }
+
+  saveCurrentState(): void {
+    const state: ProductsPageState = {
+      filters: this.filters,
+      currentPage: this.filters.currentPage,
+      pageSize: this.filters.offset,
+      sortField: this.filters.sortField,
+      sortDirection: this.filters.sortDirection,
+      scrollPosition: window.pageYOffset || document.documentElement.scrollTop,
+    };
+    this.navigationStateService.setProductsPageState(state);
+  }
+
+  private async restorePageState(state: ProductsPageState): Promise<void> {
+    this.filters = state.filters;
+    const categoryToRestore = this.categories.find(
+      (c) => c.categoryId == state.filters.categoryId
+    );
+
+    if (categoryToRestore) {
+      await this.loadSubCategories(categoryToRestore.categoryId || 0);
+    }
+
+    const brandToRestore = this.brands.find(
+      (b) => b.brandId == state.filters.brandId
+    );
+
+    if (categoryToRestore) {
+      this.loadSubCategories(categoryToRestore.categoryId || 0);
+    }
+
+    const subCategoryToRestore = this.subCategories.find(
+      (sc) => sc.subCategoryId == state.filters.subCategoryId
+    );
+
+    this.filterForm.patchValue(
+      {
+        category: categoryToRestore || null,
+        subCategory: subCategoryToRestore || null,
+        brand: brandToRestore || null,
+        search: state.filters.searchValue || '',
+      },
+      { emitEvent: false }
+    );
+    this.updateDisplayedColumns();
+    this.loadProducts();
+    setTimeout(() => {
+      this.paginator.pageIndex = state.currentPage;
+      this.paginator.pageSize = state.pageSize;
+      this.paginator._changePageSize(state.pageSize);
+      if (state.scrollPosition) {
+        window.scrollTo(0, state.scrollPosition);
+      }
+    }, 300);
+  }
+
+  onProductClick(event: Event, product: Product): void {
+    this.saveCurrentState();
+    this.router.navigate(['/inventory/products', product.productId]);
+    event.preventDefault();
+  }
+
+  compareBrands = (b1: ProductBrand, b2: ProductBrand) =>
+    b1 && b2 && b1.brandId === b2.brandId;
+
+  compareCategories = (c1: ProductCategory, c2: ProductCategory) =>
+    c1 && c2 && c1.categoryId === c2.categoryId;
+
+  compareSubCategories = (sc1: SubCategory, sc2: SubCategory) =>
+    sc1 && sc2 && sc1.subCategoryId === sc2.subCategoryId;
+
+  checkIsDefaultFilterForm(): boolean {
+    return !(
+      this.filterForm.get('category')?.value ||
+      this.filterForm.get('subCategory')?.value ||
+      this.filterForm.get('brand')?.value ||
+      this.filterForm.get('search')?.value
+    );
   }
 }

@@ -29,6 +29,10 @@
                         <div class="product-id" *ngIf="!isNewProduct">ID: {{ product.productId }}</div>
                     </div>
                     <div class="header-actions">
+                        <button mat-stroked-button (click)="this.goBack()" class="back-button">
+                            <mat-icon>arrow_back</mat-icon>
+                            Back to Products
+                        </button>
                         <button *ngIf="!isEditMode  && !isNewProduct" mat-flat-button color="primary"
                             (click)="toggleEditMode()">
                             <mat-icon>edit</mat-icon>
@@ -41,7 +45,7 @@
                         </button>
                         <ng-container *ngIf="isEditMode">
                             <button mat-flat-button color="primary" (click)="saveProduct()"
-                                [disabled]="productForm.invalid || productForm.pristine">
+                                [disabled]="productForm.invalid && productForm.pristine">
                                 <mat-icon>save</mat-icon>
                                 {{ isNewProduct ? 'Create Product' : 'Save Changes' }}
                             </button>
@@ -61,7 +65,7 @@
                 <mat-card class="image-card">
                     <mat-card-content>
                         <div class="product-image-container">
-                            <img [src]="product.productImage || '/assets/images/product-placeholder.png'"
+                            <img [src]="currentImageUrl || '/assets/images/image-placeholder.jpg'"
                                 [alt]="product.productName" class="product-image">
                         </div>
                         <div class="product-status"
@@ -296,7 +300,9 @@
                                 </div>
                             </div>
 
-                            <app-image-uploader (dataEmitter)="setImageId($event)"></app-image-uploader>
+                            <app-image-uploader (dataEmitter)="setImageId($event)"
+                                [currentImageId]="product.productImage"
+                                [disableUploadNewButton]="true"></app-image-uploader>
                         </mat-card-content>
                     </mat-card>
                 </div>

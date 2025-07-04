@@ -35,8 +35,8 @@
             </button>
         </div>
 
-        <button mat-flat-button type="button" *ngIf="currentImageId" (click)="refresh()" [disabled]="uploading"
-            [matTooltip]="'Refresh the Uploader'">
+        <button mat-flat-button type="button" *ngIf="currentImageId && !disableUploadNewButton" (click)="refresh()"
+            [disabled]="uploading" [matTooltip]="'Refresh the Uploader'">
             <mat-icon>refresh</mat-icon>
             <span *ngIf="!compact">Upload New</span>
         </button>

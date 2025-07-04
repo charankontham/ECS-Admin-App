@@ -31,7 +31,6 @@ export class LoginComponent {
     if (this.loginForm.valid) {
       this.authService.loginUser(this.loginForm.value).subscribe({
         next: (user) => {
-          console.log('User after login: ', user?.adminRole);
           if (user?.adminRole?.roleName === 'admin') {
             switch (user?.adminRole?.subRole) {
               case 'inventory':

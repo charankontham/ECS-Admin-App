@@ -137,7 +137,6 @@ export class AuthService extends BaseService<Admin> {
   }
 
   isLoggedIn(): boolean {
-    console.log('Checking isLogged in!');
     return !this.isTokenExpired();
   }
 

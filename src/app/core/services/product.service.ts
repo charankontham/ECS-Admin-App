@@ -44,8 +44,8 @@ export class ProductService extends BaseService<Product> {
     return this.post(product, '');
   }
 
-  updateProduct(product: ProductRequest): Observable<Product[]> {
-    var products: ProductRequest[] = [];
+  updateProduct(product: Product): Observable<Product[]> {
+    var products: Product[] = [];
     products.push(product);
     return this.updateAll(products);
   }
