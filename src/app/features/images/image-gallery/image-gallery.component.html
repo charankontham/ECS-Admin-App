@@ -31,7 +31,6 @@
                     <h2>All Images</h2>
                     <span class="image-count">{{ totalImages }} images</span>
                 </div>
-
                 <div class="image-list-container">
                     <div *ngIf="images.length === 0" class="no-images">
                         <mat-icon>image_not_supported</mat-icon>
@@ -40,7 +39,6 @@
                             Upload Your First Image
                         </button>
                     </div>
-
                     <div *ngIf="images.length > 0" class="image-list">
                         <div *ngFor="let image of images" class="image-item"
                             [class.selected]="selectedImage?.id === image.id" (click)="selectImage(image)">
@@ -55,11 +53,8 @@
                         </div>
                     </div>
                 </div>
-
-                <!-- Pagination -->
-                <mat-paginator *ngIf="totalImages > offset" [length]="totalImages" [pageSize]="offset"
-                    [pageSizeOptions]="[5, 10, 25, 50]" (page)="onPageChange($event)"
-                    aria-label="Select page of images">
+                <mat-paginator [length]="totalImages" [pageSize]="offset" [pageSizeOptions]="[5, 10, 25, 50]"
+                    (page)="onPageChange($event)" showFirstLastButtons>
                 </mat-paginator>
             </mat-card-content>
         </mat-card>
@@ -117,18 +112,12 @@
                                 </div>
                                 <div class="info-item" *ngIf="selectedImage.dimensions">
                                     <div class="info-label">Dimensions</div>
-                                    <!-- <div class="info-value">
-                                        {{ selectedImage.dimensions.width }} × {{ selectedImage.dimensions.height }} px
-                                    </div> -->
-
                                     <div class="info-value">
                                         {{ selectedImage.dimensions }}
                                     </div>
                                 </div>
                             </div>
                         </div>
-
-                        <!-- <mat-divider></mat-divider> -->
 
                         <div class="details-actions-footer">
                             <ng-container *ngIf="!editMode">

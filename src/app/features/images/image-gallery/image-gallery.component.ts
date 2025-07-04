@@ -1,4 +1,9 @@
-import { Component, type OnInit } from '@angular/core';
+import {
+  AfterViewInit,
+  Component,
+  ViewChild,
+  type OnInit,
+} from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router, RouterModule } from '@angular/router';
 import { MatCardModule } from '@angular/material/card';
@@ -7,6 +12,7 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatDividerModule } from '@angular/material/divider';
 import {
   MatPaginatorModule,
+  MatPaginator,
   type PageEvent,
 } from '@angular/material/paginator';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
@@ -47,17 +53,19 @@ import { HttpResponse } from '@angular/common/http';
   templateUrl: './image-gallery.component.html',
   styleUrl: './image-gallery.component.css',
 })
-export class ImageGalleryComponent {
+export class ImageGalleryComponent implements OnInit, AfterViewInit {
   images: ImageDoc[] = [];
   selectedImage: ImageDoc | null = null;
   loading = true;
   totalImages = 0;
   currentPage = 0;
-  offset = 10;
+  offset = 5;
   deleteInProgress = false;
   editMode = false;
   editImageName = '';
   saveInProgress = false;
+
+  @ViewChild(MatPaginator) paginator!: MatPaginator;
 
   constructor(
     private imageService: ImageService,
@@ -70,13 +78,34 @@ export class ImageGalleryComponent {
     this.loadImages();
   }
 
+  ngAfterViewInit(): void {
+    if (this.paginator) {
+      this.paginator._intl.getRangeLabel = (
+        page: number,
+        pageSize: number,
+        length: number
+      ) => {
+        if (length === 0 || pageSize === 0) {
+          return `Page 1 (0 of ${length})`;
+        }
+
+        const startIndex = page * pageSize;
+        const endIndex =
+          startIndex < length
+            ? Math.min(startIndex + pageSize, length)
+            : startIndex + pageSize;
+        const currentPage = page + 1;
+
+        return `Page ${currentPage} (${
+          startIndex + 1
+        } - ${endIndex} of ${length})`;
+      };
+    }
+  }
+
   loadImages(): void {
     this.loading = true;
-
-    // In a real application, you would call your image service with pagination parameters
-    // For this example, we'll simulate the API call with mock data
     setTimeout(() => {
-      // this.images = this.generateMockImages(this.currentPage, this.pageSize);
       var imageFilters: ImageFilters = {
         currentPage: this.currentPage,
         offset: this.offset,
@@ -85,16 +114,45 @@ export class ImageGalleryComponent {
         next: (response) => {
           this.images = response.content;
           this.totalImages = response.totalElements;
+          this.paginator.firstPage();
           this.loading = false;
+          setTimeout(() => {
+            if (this.paginator) {
+              this.paginator.pageIndex = this.currentPage;
+              this.paginator.pageSize = this.offset;
+              this.paginator.length = this.totalImages;
+              this.paginator._intl.changes.next();
+
+              this.paginator._intl.getRangeLabel = (
+                page: number,
+                pageSize: number,
+                length: number
+              ) => {
+                if (length === 0 || pageSize === 0) {
+                  return `Page 1 (0 of ${length})`;
+                }
+
+                const startIndex = page * pageSize;
+                const endIndex =
+                  startIndex < length
+                    ? Math.min(startIndex + pageSize, length)
+                    : startIndex + pageSize;
+                const currentPage = page + 1;
+
+                return `Page ${currentPage} (${
+                  startIndex + 1
+                } - ${endIndex} of ${length})`;
+              };
+            }
+          }, 0);
         },
         error: (error) => {
           console.error('Error loading products', error);
           this.loading = false;
         },
       });
-      this.totalImages = 100; // Mock total count
       this.loading = false;
-    }, 800);
+    }, 300);
   }
 
   refreshImages(): void {
@@ -113,8 +171,14 @@ export class ImageGalleryComponent {
   onPageChange(event: PageEvent): void {
     this.currentPage = event.pageIndex;
     this.offset = event.pageSize;
+    console.log(
+      'Page changed to:',
+      this.currentPage,
+      'with offset:',
+      this.offset
+    );
     this.loadImages();
-    this.selectedImage = null; // Clear selection when changing pages
+    this.selectedImage = null;
   }
 
   navigateToAddImage(): void {
@@ -123,7 +187,6 @@ export class ImageGalleryComponent {
 
   confirmDelete(): void {
     if (!this.selectedImage || this.deleteInProgress) return;
-
     const dialogRef = this.dialog.open(ConfirmationDialogComponent, {
       width: '400px',
       data: {
@@ -134,7 +197,6 @@ export class ImageGalleryComponent {
         confirmColor: 'warn',
       },
     });
-
     dialogRef.afterClosed().subscribe((result) => {
       if (result) {
         this.deleteImage();
@@ -144,10 +206,8 @@ export class ImageGalleryComponent {
 
   deleteImage(): void {
     if (!this.selectedImage) return;
-
     this.deleteInProgress = true;
     const imageId = this.selectedImage.id || '';
-
     this.imageService.deleteImage(imageId).subscribe({
       next: (response: HttpResponse<string>) => {
         if (response.status == 200 && response.body?.includes('successfully')) {

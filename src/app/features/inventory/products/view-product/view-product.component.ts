@@ -134,7 +134,12 @@ export class ViewProductComponent {
     });
 
     this.brandService.getAll().subscribe((brands) => {
-      this.brands = brands;
+      this.brands = brands.filter(
+        (brand) =>
+          brand.brandName != 'NULL' &&
+          brand.brandName != '' &&
+          brand.brandName != null
+      );
     });
   }
 

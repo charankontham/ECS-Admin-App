@@ -14,11 +14,7 @@ Once the server is running, open your browser and navigate to `http://localhost:
 
 bugs:
 
-images pagination is not working properly in image gallery.
-Remove NULL from brands list in UI (create new product ui)
 change brand -> productBrand in product model
-Add back button in view product details page to go back to all products page
-Display "Image not available" image if no image is linked with product
 initializing the dimensions form with values
 change colors of section labels (currently they are not appearing because of grey color submerged in background color)
 Update snackbars position and message contents, panel classes.
@@ -26,3 +22,4 @@ Update snackbars position and message contents, panel classes.
 improvements:
 
 Add text formating/styling options in product description
+Multi select/delete for Images and products
