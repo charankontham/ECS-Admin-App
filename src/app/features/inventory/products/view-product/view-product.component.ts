@@ -24,7 +24,7 @@ import { MatTooltipModule } from '@angular/material/tooltip';
 import { MatSlideToggleModule } from '@angular/material/slide-toggle';
 import { Product, ProductRequest } from '../../../../core/models/product.model';
 import { ProductService } from '../../../../core/services/product.service';
-import { ProductSubCategoryService } from '../../../../core/services/product-subcategory.service';
+import { ProductSubCategoryService } from '../../../../core/services/product-sub-category.service';
 import {
   ProductCategory,
   SubCategory,
@@ -494,7 +494,8 @@ export class ViewProductComponent {
     ) {
       this.location.back();
     } else {
-      this.router.navigate(['/inventory/products']);
+      // this.router.navigate(['/inventory/products']);
+      this.location.back();
     }
   }
 

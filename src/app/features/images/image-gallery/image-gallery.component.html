@@ -53,9 +53,11 @@
                         </div>
                     </div>
                 </div>
-                <mat-paginator [length]="totalImages" [pageSize]="offset" [pageSizeOptions]="[5, 10, 25, 50]"
-                    (page)="onPageChange($event)" showFirstLastButtons>
-                </mat-paginator>
+                <div class="paginator-container">
+                    <mat-paginator [length]="totalImages" [pageSize]="offset"
+                        [pageSizeOptions]="[6, 12, 18, 24, 36, 48]" (page)="onPageChange($event)" showFirstLastButtons>
+                    </mat-paginator>
+                </div>
             </mat-card-content>
         </mat-card>
 

@@ -3,3 +3,11 @@ export interface ProductBrand {
   brandName: string;
   brandDescription: string;
 }
+
+export interface ProductBrandFilters {
+  currentPage: number;
+  offset: number;
+  searchValue?: string | null;
+  sortField?: string;
+  sortDirection?: 'asc' | 'desc';
+}

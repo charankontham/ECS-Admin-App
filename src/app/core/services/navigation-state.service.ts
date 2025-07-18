@@ -11,6 +11,33 @@ export interface ProductsPageState {
   scrollPosition?: number;
 }
 
+export interface BrandsPageState {
+  filters: any;
+  currentPage: number;
+  pageSize: number;
+  sortField?: string;
+  sortDirection?: 'asc' | 'desc';
+  scrollPosition?: number;
+}
+
+export interface CategoriesPageState {
+  filters: any;
+  currentPage: number;
+  pageSize: number;
+  sortField?: string;
+  sortDirection?: 'asc' | 'desc';
+  scrollPosition?: number;
+}
+
+export interface SubCategoriesPageState {
+  filters: any;
+  currentPage: number;
+  pageSize: number;
+  sortField?: string;
+  sortDirection?: 'asc' | 'desc';
+  scrollPosition?: number;
+}
+
 @Injectable({
   providedIn: 'root',
 })
@@ -18,6 +45,12 @@ export class NavigationStateService {
   private productsPageState = new BehaviorSubject<ProductsPageState | null>(
     null
   );
+  private brandsPageState = new BehaviorSubject<BrandsPageState | null>(null);
+  private categoriesPageState = new BehaviorSubject<CategoriesPageState | null>(
+    null
+  );
+  private subCategoriesPageState =
+    new BehaviorSubject<SubCategoriesPageState | null>(null);
 
   getProductsPageState() {
     return this.productsPageState.asObservable();
@@ -29,5 +62,41 @@ export class NavigationStateService {
 
   clearProductsPageState() {
     this.productsPageState.next(null);
+  }
+
+  getBrandsPageState() {
+    return this.brandsPageState.asObservable();
+  }
+
+  setBrandsPageState(state: BrandsPageState) {
+    this.brandsPageState.next(state);
+  }
+
+  clearBrandsPageState() {
+    this.brandsPageState.next(null);
+  }
+
+  getCategoriesPageState() {
+    return this.categoriesPageState.asObservable();
+  }
+
+  setCategoriesPageState(state: CategoriesPageState) {
+    this.categoriesPageState.next(state);
+  }
+
+  clearCategoriesPageState() {
+    this.categoriesPageState.next(null);
+  }
+
+  getSubCategoriesPageState() {
+    return this.subCategoriesPageState.asObservable();
+  }
+
+  setSubCategoriesPageState(state: SubCategoriesPageState) {
+    this.subCategoriesPageState.next(state);
+  }
+
+  clearSubCategoriesPageState() {
+    this.subCategoriesPageState.next(null);
   }
 }

@@ -54,4 +54,30 @@
             <span *ngIf="!compact">Remove</span>
         </button>
     </div>
+
+    <!-- Enter Image ID Section -->
+    <div class="enter-image-id-section" *ngIf="!currentImageId || enterImageIdMode || enableEnterImageIdButton">
+        <button mat-flat-button color="primary" type="button" (click)="toggleEnterImageId()" [disabled]="uploading"
+            [matTooltip]="enterImageIdMode ? 'Cancel' : 'Enter Image ID'"
+            *ngIf="!enterImageIdMode || enableEnterImageIdButton">
+            <mat-icon>{{enterImageIdMode? 'cancel' : 'add'}}</mat-icon>
+            <span *ngIf="!compact">{{enterImageIdMode ? 'Cancel' : 'Enter Image ID'}}</span>
+        </button>
+
+        <div class="image-id-input-group" *ngIf="enterImageIdMode || !enableEnterImageIdButton">
+            <mat-form-field appearance="outline" class="image-id-input">
+                <mat-label>Image ID</mat-label>
+                <input matInput [(ngModel)]="enteredImageId" placeholder="Enter image ID" [disabled]="uploading"
+                    (keyup.enter)="addImageId()">
+            </mat-form-field>
+            <button mat-flat-button color="primary" type="button" (click)="addImageId()"
+                [disabled]="uploading || !enteredImageId.trim()" [matTooltip]="'Add Image ID'">
+                <mat-icon>check</mat-icon>
+            </button>
+            <button mat-stroked-button type="button" (click)="toggleEnterImageId()" [disabled]="uploading"
+                [matTooltip]="'Cancel'">
+                <mat-icon>close</mat-icon>
+            </button>
+        </div>
+    </div>
 </div>

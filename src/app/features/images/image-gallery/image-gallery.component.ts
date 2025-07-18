@@ -59,7 +59,7 @@ export class ImageGalleryComponent implements OnInit, AfterViewInit {
   loading = true;
   totalImages = 0;
   currentPage = 0;
-  offset = 5;
+  offset = 6;
   deleteInProgress = false;
   editMode = false;
   editImageName = '';

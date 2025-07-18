@@ -1,8 +1,14 @@
-import { AfterViewInit, Component, OnInit, ViewChild } from '@angular/core';
+import {
+  type AfterViewInit,
+  Component,
+  type OnInit,
+  ViewChild,
+} from '@angular/core';
+import { ProductSubCategoryService } from '../../../core/services/product-sub-category.service';
 import { ProductCategoryService } from '../../../core/services/product-category.service';
 import {
+  SubCategory,
   ProductCategory,
-  ProductCategoryFiletrs,
 } from '../../../core/models/product-category.model';
 import { CommonModule, NgFor, NgIf } from '@angular/common';
 import {
@@ -11,13 +17,7 @@ import {
   FormsModule,
   ReactiveFormsModule,
 } from '@angular/forms';
-import {
-  catchError,
-  debounceTime,
-  distinctUntilChanged,
-  type Observable,
-  of,
-} from 'rxjs';
+import { catchError, debounceTime, distinctUntilChanged, of } from 'rxjs';
 import {
   MatTableModule,
   MatTable,
@@ -31,6 +31,7 @@ import {
 import { MatSortModule, MatSort, type Sort } from '@angular/material/sort';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
+import { MatSelectModule } from '@angular/material/select';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatCardModule } from '@angular/material/card';
@@ -40,16 +41,23 @@ import { MatTooltipModule } from '@angular/material/tooltip';
 import { Router, RouterModule } from '@angular/router';
 import {
   NavigationStateService,
-  CategoriesPageState,
+  SubCategoriesPageState,
 } from '../../../core/services/navigation-state.service';
-import { HttpResponse } from '@angular/common/http';
+
+interface SubCategoryFilters {
+  currentPage: number;
+  offset: number;
+  categoryId?: number | null;
+  searchValue?: string | null;
+  sortField?: string;
+  sortDirection?: 'asc' | 'desc';
+}
 
 @Component({
-  selector: 'app-product-category',
+  selector: 'app-subcategories',
   standalone: true,
   imports: [
     ReactiveFormsModule,
-    NgIf,
     CommonModule,
     RouterModule,
     FormsModule,
@@ -58,6 +66,7 @@ import { HttpResponse } from '@angular/common/http';
     MatSortModule,
     MatFormFieldModule,
     MatInputModule,
+    MatSelectModule,
     MatButtonModule,
     MatIconModule,
     MatCardModule,
@@ -65,50 +74,54 @@ import { HttpResponse } from '@angular/common/http';
     MatChipsModule,
     MatTooltipModule,
   ],
-  templateUrl: './product-category.component.html',
-  styleUrl: './product-category.component.css',
+  templateUrl: './product-sub-categories.component.html',
+  styleUrl: './product-sub-categories.component.css',
 })
-export class ProductCategoryComponent implements OnInit, AfterViewInit {
+export class ProductSubCategoriesComponent implements OnInit, AfterViewInit {
   isLoading = false;
+  subCategories: SubCategory[] = [];
   categories: ProductCategory[] = [];
-  totalCategories = 0;
+  totalSubCategories = 0;
   filterForm: FormGroup;
-  dataSource = new MatTableDataSource<ProductCategory>([]);
-  displayedColumns: string[] = ['categoryId', 'categoryName'];
-  filters: ProductCategoryFiletrs = {
+  dataSource = new MatTableDataSource<SubCategory>([]);
+  displayedColumns: string[] = [
+    'subCategoryId',
+    'subCategoryName',
+    'categoryName',
+  ];
+  filters: SubCategoryFilters = {
     currentPage: 0,
     offset: 5,
-    searchValue: null,
   };
   useClientSideSorting = true;
 
   @ViewChild(MatPaginator) paginator!: MatPaginator;
   @ViewChild(MatSort) sort!: MatSort;
-  @ViewChild(MatTable) table!: MatTable<ProductCategory>;
+  @ViewChild(MatTable) table!: MatTable<SubCategory>;
 
   constructor(
+    private subCategoryService: ProductSubCategoryService,
     private categoryService: ProductCategoryService,
     private fb: FormBuilder,
     private navigationStateService: NavigationStateService,
     private router: Router
   ) {
     this.filterForm = this.fb.group({
+      category: null,
       search: '',
     });
   }
 
   ngOnInit(): void {
     this.isLoading = true;
-    console.log('ProductCategoryComponent initialized');
-
-    // Check for saved state
+    this.loadCategories();
     this.navigationStateService
-      .getCategoriesPageState()
+      .getSubCategoriesPageState()
       .subscribe((currentState) => {
         if (currentState) {
           this.restorePageState(currentState);
         } else {
-          this.loadCategories();
+          this.loadSubCategories();
         }
       });
 
@@ -123,10 +136,11 @@ export class ProductCategoryComponent implements OnInit, AfterViewInit {
       .subscribe((values) => {
         this.filters = {
           ...this.filters,
+          categoryId: values.category ? values.category.categoryId : null,
           searchValue: values.search.trim() != '' ? values.search : null,
           currentPage: 0,
         };
-        this.loadCategories();
+        this.loadSubCategories();
         if (this.paginator) {
           this.paginator.firstPage();
         }
@@ -139,35 +153,48 @@ export class ProductCategoryComponent implements OnInit, AfterViewInit {
         console.log('Sort : ', sort);
         this.filters.sortField = sort.active;
         this.filters.sortDirection = sort.direction as 'asc' | 'desc';
-        this.loadCategories();
+        this.loadSubCategories();
       });
     }
   }
 
   loadCategories(): void {
-    this.isLoading = true;
-    this.categoryService.getAllCategoriesByPagination(this.filters).subscribe({
-      next: (response: any) => {
-        if (response.content.length >= response.totalElements) {
-          const startIndex = this.filters.currentPage * this.filters.offset;
-          const endIndex = startIndex + this.filters.offset;
-          this.dataSource.data = response.content.slice(startIndex, endIndex);
-          this.categories = response.content.slice(startIndex, endIndex);
-        } else {
-          this.categories = response.content;
-          this.dataSource.data = response.content;
-        }
-        this.totalCategories = response.totalElements;
-        if (this.sort && this.useClientSideSorting) {
-          this.dataSource.sort = this.sort;
-        }
-        this.isLoading = false;
+    this.categoryService.getAllCategories().subscribe({
+      next: (categories) => {
+        this.categories = categories;
       },
       error: (error) => {
         console.error('Error loading categories', error);
-        this.isLoading = false;
       },
     });
+  }
+
+  loadSubCategories(): void {
+    this.isLoading = true;
+    this.subCategoryService
+      .getAllSubCategoriesByPagination(this.filters)
+      .subscribe({
+        next: (response) => {
+          this.totalSubCategories = response.totalElements;
+          if (response.content.length >= response.totalElements) {
+            const startIndex = this.filters.currentPage * this.filters.offset;
+            const endIndex = startIndex + this.filters.offset;
+            this.subCategories = response.content.slice(startIndex, endIndex);
+            this.dataSource.data = response.content.slice(startIndex, endIndex);
+          } else {
+            this.subCategories = response.content;
+            this.dataSource.data = response.content;
+          }
+          if (this.sort && this.useClientSideSorting) {
+            this.dataSource.sort = this.sort;
+          }
+          this.isLoading = false;
+        },
+        error: (error) => {
+          console.error('Error loading subcategories', error);
+          this.isLoading = false;
+        },
+      });
   }
 
   private compare(
@@ -181,15 +208,18 @@ export class ProductCategoryComponent implements OnInit, AfterViewInit {
   pageChanged(event: PageEvent): void {
     this.filters.currentPage = event.pageIndex;
     this.filters.offset = event.pageSize;
-    this.loadCategories();
+    this.loadSubCategories();
   }
 
   clearFilter(filterName: string): void {
-    this.filterForm.get(filterName)?.setValue('');
+    this.filterForm
+      .get(filterName)
+      ?.setValue(filterName === 'category' ? null : '');
   }
 
   resetFilters(): void {
     this.filterForm.reset({
+      category: null,
       search: '',
     });
     this.filters.currentPage = 0;
@@ -200,7 +230,7 @@ export class ProductCategoryComponent implements OnInit, AfterViewInit {
 
   saveCurrentState(): void {
     console.log('Saving current state before navigation');
-    const state: CategoriesPageState = {
+    const state: SubCategoriesPageState = {
       filters: this.filters,
       currentPage: this.filters.currentPage,
       pageSize: this.filters.offset,
@@ -208,21 +238,26 @@ export class ProductCategoryComponent implements OnInit, AfterViewInit {
       sortDirection: this.filters.sortDirection,
       scrollPosition: window.pageYOffset || document.documentElement.scrollTop,
     };
-    this.navigationStateService.setCategoriesPageState(state);
+    this.navigationStateService.setSubCategoriesPageState(state);
   }
 
-  private restorePageState(state: CategoriesPageState): void {
+  private restorePageState(state: SubCategoriesPageState): void {
     console.log('Restoring State :', state);
     this.filters = state.filters;
 
+    const categoryToRestore = this.categories.find(
+      (c) => c.categoryId == state.filters.categoryId
+    );
+
     this.filterForm.patchValue(
       {
+        category: categoryToRestore || null,
         search: state.filters.searchValue || '',
       },
       { emitEvent: false }
     );
 
-    this.loadCategories();
+    this.loadSubCategories();
 
     setTimeout(() => {
       if (this.paginator) {
@@ -237,18 +272,27 @@ export class ProductCategoryComponent implements OnInit, AfterViewInit {
     }, 300);
   }
 
-  onCategoryClick(event: Event, category: ProductCategory): void {
+  onSubCategoryClick(event: Event, subCategory: SubCategory): void {
     this.saveCurrentState();
-    console.log('Navigating to category details');
-    this.router.navigate(['/inventory/categories', category.categoryId]);
+    this.router.navigate([
+      '/inventory/sub-categories',
+      subCategory.subCategoryId,
+    ]);
     event.preventDefault();
   }
 
-  navigateToSubCategories(): void {
-    this.router.navigate(['/inventory/sub-categories']);
+  getCategoryName(categoryId: number): string {
+    const category = this.categories.find((c) => c.categoryId === categoryId);
+    return category ? category.categoryName : 'Unknown';
   }
 
+  compareCategories = (c1: ProductCategory, c2: ProductCategory) =>
+    c1 && c2 && c1.categoryId === c2.categoryId;
+
   checkIsDefaultFilterForm(): boolean {
-    return !this.filterForm.get('search')?.value;
+    return (
+      !this.filterForm.get('search')?.value &&
+      !this.filterForm.get('category')?.value
+    );
   }
 }

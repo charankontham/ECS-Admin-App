@@ -30,6 +30,13 @@ export const INVENTORY_ROUTES: Routes = [
       ),
   },
   {
+    path: 'sub-categories',
+    loadChildren: () =>
+      import('../product-sub-categories/product-sub-categories.routes').then(
+        (m) => m.PRODUCTSUBCATEGORIES_ROUTES
+      ),
+  },
+  {
     path: 'brands',
     loadChildren: () =>
       import('../product-brand/product-brand.routes').then(

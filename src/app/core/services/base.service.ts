@@ -11,6 +11,7 @@ import { environment } from '../../../../environment';
 import * as CryptoJS from 'crypto-js';
 import { ProductFilters } from '../models/product.model';
 import { ImageFilters } from '../models/image.model';
+import { SubCategoryFilters } from '../models/product-category.model';
 
 @Injectable({
   providedIn: 'root',
@@ -79,25 +80,31 @@ export class BaseService<T> {
     resource: string,
     headers?: HttpHeaders
   ): Observable<any> {
-    var params: HttpParams;
+    var params: HttpParams = new HttpParams()
+      .set('currentPage', filters.currentPage)
+      .set('offset', filters.offset);
     if (
       typeof filters === 'object' &&
       filters !== null &&
-      'currentPage' in filters &&
-      'offset' in filters
+      'brandId' in filters
     ) {
-      params = new HttpParams()
-        .set('currentPage', (filters as ProductFilters).currentPage)
-        .set('offset', (filters as ProductFilters).offset)
-        .set('categoryId', (filters as ProductFilters).categoryId || '')
+      params = params
+        .set('categoryId', filters.categoryId || '')
         .set('subCategoryId', (filters as ProductFilters).subCategoryId || '')
         .set('brandId', (filters as ProductFilters).brandId || '')
         .set('searchValue', (filters as ProductFilters).searchValue || '');
-    } else {
-      params = new HttpParams()
-        .set('currentPage', (filters as ImageFilters).currentPage)
-        .set('offset', (filters as ImageFilters).offset)
+    } else if ('imageSize' in filters) {
+      params = params
+        .set('imageType', (filters as ImageFilters).imageSize || '')
+        .set('imageCategory', (filters as ImageFilters).dimensions || '')
+        .set('contentType', (filters as ImageFilters).contentType || '')
         .set('searchValue', (filters as ImageFilters).searchValue || '');
+    } else if ('categoryId' in filters) {
+      params = params
+        .set('categoryId', (filters as SubCategoryFilters).categoryId || '')
+        .set('searchValue', filters.searchValue || '');
+    } else if ('searchValue' in filters) {
+      params = params.set('searchValue', filters.searchValue || '');
     }
 
     return this.http.get<Object>(

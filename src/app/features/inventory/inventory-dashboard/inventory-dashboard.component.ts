@@ -1,45 +1,193 @@
 import { NgFor, isPlatformBrowser } from '@angular/common';
-import { Component, OnInit, Inject, PLATFORM_ID } from '@angular/core';
+import { Component, Inject, type OnInit } from '@angular/core';
 import { Chart, registerables } from 'chart.js';
-import { Admin } from '../../../core/models/admin.model';
-import { AuthService } from '../../../core/services/auth.service';
+import { PLATFORM_ID } from '@angular/core';
 import { ProductService } from '../../../core/services/product.service';
-import { Product } from '../../../core/models/product.model';
+import type {
+  Product,
+  ProductFilters,
+} from '../../../core/models/product.model';
+import { MatTableModule, MatTableDataSource } from '@angular/material/table';
+import {
+  MatPaginatorModule,
+  type PageEvent,
+} from '@angular/material/paginator';
+import { MatCardModule } from '@angular/material/card';
+import { MatProgressBarModule } from '@angular/material/progress-bar';
+import { CommonModule } from '@angular/common';
+import { Router, RouterModule } from '@angular/router';
+
+interface HighSellingProduct {
+  name: string;
+  unitsSold: number;
+  category?: string;
+  revenue: number;
+}
 
 @Component({
   selector: 'app-inventory-dashboard',
-  imports: [NgFor],
+  standalone: true,
+  imports: [
+    NgFor,
+    CommonModule,
+    MatTableModule,
+    MatPaginatorModule,
+    MatCardModule,
+    MatProgressBarModule,
+    RouterModule,
+  ],
   templateUrl: './inventory-dashboard.component.html',
   styleUrl: './inventory-dashboard.component.css',
 })
 export class InventoryDashboardComponent implements OnInit {
   recentProducts: Product[] = [];
+  outOfStockProducts: Product[] = [];
+  highSellingProducts: HighSellingProduct[] = [];
 
-  outOfStockProducts = [
-    { name: 'Product 3', category: 'Category 3' },
-    { name: 'Product 4', category: 'Category 4' },
-  ];
+  // Mat Table Data Sources
+  outOfStockDataSource = new MatTableDataSource<Product>([]);
+  highSellingDataSource = new MatTableDataSource<HighSellingProduct>([]);
 
-  highSellingProducts = [
-    { name: 'Product 5', unitsSold: 500 },
-    { name: 'Product 6', unitsSold: 400 },
-  ];
+  // Table Columns
+  outOfStockColumns: string[] = ['name', 'category', 'quantity', 'price'];
+  highSellingColumns: string[] = ['name', 'unitsSold', 'category', 'revenue'];
+
+  // Pagination
+  totalOutOfStockProducts = 0;
+  totalHighSellingProducts = 0;
+  outOfStockPageSize = 5;
+  highSellingPageSize = 5;
+  outOfStockCurrentPage = 0;
+  highSellingCurrentPage = 0;
+
+  // platformId: Object;
+  productService: ProductService;
+
+  constructor(
+    @Inject(PLATFORM_ID) private platformId: Object,
+    productService: ProductService,
+    private router: Router
+  ) {
+    this.platformId = platformId;
+    this.productService = productService;
+  }
 
   ngOnInit(): void {
     if (isPlatformBrowser(this.platformId)) {
       Chart.register(...registerables);
       this.createSalesTrendsChart();
     }
-    this.productService.getAllProducts().subscribe((products) => {
-      this.recentProducts = products;
-    });
+    this.loadRecentProducts();
+    this.loadOutOfStockProducts();
+    this.loadHighSellingProducts();
   }
 
-  constructor(
-    @Inject(PLATFORM_ID) private platformId: Object,
-    private authService: AuthService,
-    private productService: ProductService
-  ) {}
+  loadRecentProducts() {
+    const filters: ProductFilters = {
+      offset: 10,
+      currentPage: 0,
+      sortField: 'dateAdded',
+      sortDirection: 'desc',
+    };
+    this.productService
+      .getAllProductsBypagination(filters)
+      .subscribe((products) => {
+        this.recentProducts = products.content;
+      });
+  }
+
+  loadOutOfStockProducts() {
+    this.productService
+      .getAllOutOfStockProductsBypagination(
+        this.outOfStockCurrentPage,
+        this.outOfStockPageSize
+      )
+      .subscribe((products) => {
+        this.outOfStockProducts = products.content;
+        this.outOfStockDataSource.data = products.content;
+        this.totalOutOfStockProducts = products.totalElements;
+      });
+  }
+
+  loadHighSellingProducts() {
+    // Mock data for high selling products with pagination
+    const allHighSellingProducts: HighSellingProduct[] = [
+      {
+        name: 'Product A',
+        unitsSold: 500,
+        category: 'Electronics',
+        revenue: 25000,
+      },
+      {
+        name: 'Product B',
+        unitsSold: 450,
+        category: 'Clothing',
+        revenue: 22500,
+      },
+      {
+        name: 'Product C',
+        unitsSold: 400,
+        category: 'Electronics',
+        revenue: 20000,
+      },
+      {
+        name: 'Product D',
+        unitsSold: 380,
+        category: 'Home & Garden',
+        revenue: 19000,
+      },
+      { name: 'Product E', unitsSold: 350, category: 'Sports', revenue: 17500 },
+      {
+        name: 'Product F',
+        unitsSold: 320,
+        category: 'Electronics',
+        revenue: 16000,
+      },
+      { name: 'Product G', unitsSold: 300, category: 'Books', revenue: 15000 },
+      {
+        name: 'Product H',
+        unitsSold: 280,
+        category: 'Clothing',
+        revenue: 14000,
+      },
+      {
+        name: 'Product I',
+        unitsSold: 260,
+        category: 'Electronics',
+        revenue: 13000,
+      },
+      {
+        name: 'Product J',
+        unitsSold: 240,
+        category: 'Home & Garden',
+        revenue: 12000,
+      },
+    ];
+
+    // Simulate pagination
+    const startIndex = this.highSellingCurrentPage * this.highSellingPageSize;
+    const endIndex = startIndex + this.highSellingPageSize;
+    const paginatedProducts = allHighSellingProducts.slice(
+      startIndex,
+      endIndex
+    );
+
+    this.highSellingProducts = paginatedProducts;
+    this.highSellingDataSource.data = paginatedProducts;
+    this.totalHighSellingProducts = allHighSellingProducts.length;
+  }
+
+  onOutOfStockPageChange(event: PageEvent): void {
+    this.outOfStockCurrentPage = event.pageIndex;
+    this.outOfStockPageSize = event.pageSize;
+    this.loadOutOfStockProducts();
+  }
+
+  onHighSellingPageChange(event: PageEvent): void {
+    this.highSellingCurrentPage = event.pageIndex;
+    this.highSellingPageSize = event.pageSize;
+    this.loadHighSellingProducts();
+  }
 
   createSalesTrendsChart() {
     setTimeout(() => {
@@ -75,5 +223,9 @@ export class InventoryDashboardComponent implements OnInit {
         }
       }
     }, 0);
+  }
+
+  onProductClick(product: Product): void {
+    this.router.navigate(['/inventory/products', product.productId]);
   }
 }

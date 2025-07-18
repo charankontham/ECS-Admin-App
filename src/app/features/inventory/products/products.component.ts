@@ -43,9 +43,8 @@ import {
   SubCategory,
 } from '../../../core/models/product-category.model';
 import { ProductBrand } from '../../../core/models/product-brand.model';
-import { ProductSubCategoryService } from '../../../core/services/product-subcategory.service';
+import { ProductSubCategoryService } from '../../../core/services/product-sub-category.service';
 import { Router, RouterModule } from '@angular/router';
-import { ImageUploaderComponent } from '../../images/image-uploader/image-uploader.component';
 import {
   NavigationStateService,
   ProductsPageState,
@@ -166,10 +165,18 @@ export class ProductsComponent implements OnInit, AfterViewInit {
       });
 
     this.filterForm.get('category')?.valueChanges.subscribe((category) => {
-      if (!category || category == '' || category == 'null') {
+      if (
+        !category ||
+        category == '' ||
+        category == 'null' ||
+        category == null
+      ) {
         this.filterForm.get('subCategory')?.setValue('');
+        this.subCategories = [];
       } else {
-        this.loadSubCategories(category.categoryId);
+        this.loadSubCategories(category.categoryId).then(() => {
+          this.filterForm.get('subCategory')?.setValue('');
+        });
       }
     });
   }
@@ -239,7 +246,7 @@ export class ProductsComponent implements OnInit, AfterViewInit {
         this.isLoading = false;
       },
       error: (error) => {
-        console.error('Error loading products', error);
+        console.error('Error loading products : ', error);
         this.isLoading = false;
       },
     });

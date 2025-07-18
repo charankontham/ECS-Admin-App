@@ -1,27 +1,8 @@
-.container {
-  max-width: 600px;
-  margin: auto;
-  padding: 20px;
-  border: 1px solid #ddd;
-  border-radius: 8px;
-  background: #fff;
-}
-
-.categories-container {
+.subcategories-container {
   padding: 20px;
   display: flex;
   flex-direction: column;
   gap: 20px;
-}
-
-h2 {
-  text-align: center;
-}
-
-form {
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
 }
 
 .filter-form {
@@ -42,21 +23,7 @@ form {
   align-items: center;
 }
 
-input,
-textarea {
-  width: 100%;
-  padding: 8px;
-  border: 1px solid #ccc;
-  border-radius: 5px;
-}
-
-button.delete {
-  background: #dc3545;
-}
-
-.add-category-button,
-.add-subcategory-button,
-.subcategories-button {
+.add-subcategory-button {
   height: 48px;
   padding: 0 24px;
   font-weight: 500;
@@ -65,9 +32,7 @@ button.delete {
 .action-button-container {
   display: flex;
   justify-content: flex-end;
-  gap: 12px;
   margin-bottom: 16px;
-  flex-wrap: wrap;
 }
 
 .table-container {
@@ -83,25 +48,8 @@ button.delete {
   z-index: 10;
 }
 
-table {
+.subcategories-table {
   width: 100%;
-  margin-top: 20px;
-  border-collapse: collapse;
-}
-
-.categories-table {
-  width: 100%;
-}
-
-th,
-td {
-  padding: 10px;
-  text-align: left;
-  border-bottom: 1px solid #ddd;
-}
-
-th {
-  background: #f4f4f4;
 }
 
 .mat-mdc-row:hover {
@@ -129,11 +77,4 @@ th {
 
 ::ng-deep .mat-mdc-form-field-subscript-wrapper {
   display: none;
-}
-
-@media (max-width: 768px) {
-  .action-button-container {
-    flex-direction: column;
-    align-items: stretch;
-  }
 }

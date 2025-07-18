@@ -1,4 +1,4 @@
-.product-details-container {
+.subcategory-details-container {
   padding: 20px;
   display: flex;
   flex-direction: column;
@@ -40,21 +40,25 @@
   gap: 16px;
 }
 
-.product-title {
+.subcategory-title {
   display: flex;
   flex-direction: column;
   gap: 4px;
 }
 
-.product-title h1 {
+.subcategory-title h1 {
   margin: 0;
   font-size: 24px;
   font-weight: 500;
 }
 
-.product-id {
+.subcategory-id {
   color: white;
   font-size: 14px;
+}
+
+.back-button {
+  margin-right: 12px;
 }
 
 .header-actions {
@@ -64,27 +68,27 @@
   flex-wrap: wrap;
 }
 
+@media (max-width: 768px) {
+  .header-actions {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .back-button {
+    margin-right: 0;
+    margin-bottom: 8px;
+  }
+}
+
 .details-grid {
   display: grid;
   grid-template-columns: 1fr 2fr;
   gap: 20px;
 }
 
-.back-button {
-  margin-right: 12px;
-}
-
 @media (max-width: 768px) {
-  .header-actions {
-    flex-direction: column;
-    align-items: stretch;
-  }
   .details-grid {
     grid-template-columns: 1fr;
-  }
-  .back-button {
-    margin-right: 0;
-    margin-bottom: 8px;
   }
 }
 
@@ -99,7 +103,7 @@
   color: white;
 }
 
-.product-image-container {
+.subcategory-image-container {
   display: flex;
   justify-content: center;
   align-items: center;
@@ -109,27 +113,10 @@
   margin-bottom: 16px;
 }
 
-.product-image {
+.subcategory-image {
   max-width: 100%;
   max-height: 300px;
   object-fit: contain;
-}
-
-.product-status {
-  text-align: center;
-  padding: 8px;
-  border-radius: 4px;
-  font-weight: 500;
-}
-
-.in-stock {
-  background-color: #e8f5e9;
-  color: #2e7d32;
-}
-
-.out-of-stock {
-  background-color: #ffebee;
-  color: #c62828;
 }
 
 .tab-content {
@@ -150,22 +137,11 @@
 
 .info-label {
   font-size: 12px;
-  /* color: rgba(0, 0, 0, 0.6); */
   color: white;
 }
 
 .info-value {
   font-size: 16px;
-}
-
-.low-stock {
-  color: #f44336;
-  font-weight: 500;
-}
-
-.product-description {
-  white-space: pre-line;
-  line-height: 1.6;
 }
 
 /* Edit Form Styles */
@@ -175,7 +151,7 @@
 
 .form-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+  grid-template-columns: 1fr;
   gap: 20px;
 }
 
@@ -194,26 +170,4 @@
 
 mat-form-field {
   width: 100%;
-}
-
-.dimensions-row {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-}
-
-.dimensions-label {
-  font-size: 12px;
-  color: white;
-  margin-bottom: 4px;
-}
-
-.dimensions-fields {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 12px;
-}
-
-.mat-mdc-card-title {
-  color: #c9c9c9;
 }

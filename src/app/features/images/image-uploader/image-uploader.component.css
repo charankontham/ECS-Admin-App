@@ -107,3 +107,52 @@
   width: 32px;
   height: 32px;
 }
+
+.enter-image-id-section {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  width: 100%;
+}
+
+.image-id-input-group {
+  display: flex;
+  gap: 8px;
+  align-items: flex-start;
+  width: 100%;
+}
+
+.image-id-input {
+  flex: 1;
+  min-width: 200px;
+}
+
+.image-id-input mat-form-field {
+  width: 100%;
+}
+
+.compact .image-id-input-group {
+  flex-direction: column;
+  align-items: stretch;
+}
+
+.compact .image-id-input {
+  min-width: auto;
+}
+
+.compact .image-id-input-group button {
+  align-self: center;
+}
+
+/* Responsive design for mobile */
+@media (max-width: 600px) {
+  .image-id-input-group {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .image-id-input-group button {
+    align-self: center;
+    max-width: 200px;
+  }
+}

@@ -28,6 +28,16 @@ export class ProductService extends BaseService<Product> {
     return this.getAllByPagination(filters, 'getProductsByPagination');
   }
 
+  getAllOutOfStockProductsBypagination(
+    currentPage: number,
+    offset: number
+  ): Observable<any> {
+    return this.getAllByPagination(
+      { currentPage: currentPage, offset: offset },
+      'getAllOutOfStockProductsByPagination'
+    );
+  }
+
   getAllProductsByProductCategory(categoryId: number): Observable<Product[]> {
     return this.getAllByPath('getProductsByCategoryId', categoryId);
   }

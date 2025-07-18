@@ -1,5 +1,11 @@
 import { CommonModule } from '@angular/common';
-import { Component, ElementRef, Input, Output, ViewChild } from '@angular/core';
+import {
+  Component,
+  type ElementRef,
+  Input,
+  Output,
+  ViewChild,
+} from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
@@ -10,29 +16,35 @@ import { ImageDoc } from '../../../core/models/image.model';
 import { finalize } from 'rxjs';
 import { EventEmitter } from '@angular/core';
 import { HttpResponse } from '@angular/common/http';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatInputModule } from '@angular/material/input';
+import { FormsModule } from '@angular/forms';
 
 @Component({
   selector: 'app-image-uploader',
   standalone: true,
   imports: [
     CommonModule,
+    FormsModule,
     MatButtonModule,
     MatIconModule,
     MatProgressSpinnerModule,
     MatSnackBarModule,
     MatTooltipModule,
+    MatFormFieldModule,
+    MatInputModule,
   ],
   templateUrl: './image-uploader.component.html',
   styleUrl: './image-uploader.component.css',
 })
 export class ImageUploaderComponent {
-  @Input() currentImageId: string = '';
-  @Input() placeholderText: string = 'Upload an image';
+  @Input() currentImageId = '';
+  @Input() placeholderText = 'Upload an image';
   @Input() placeholderIcon = 'image';
   @Input() imageAltText = 'Product image';
   @Input() acceptedFileTypes = 'image/*';
-  @Input() allowMultiple: boolean = false;
-  @Input() compact: boolean = false;
+  @Input() allowMultiple = false;
+  @Input() compact = false;
   @Input() maxFileSizeMB = 5;
   @Input() disableUploadNewButton = false;
   @Input() currentImageUrl = 'assets/images/image-placeholder.jpg';
@@ -43,6 +55,9 @@ export class ImageUploaderComponent {
   uploading = false;
   isDragging = false;
   selectedFile: File | null = null;
+  @Input() enterImageIdMode = false;
+  @Input() enableEnterImageIdButton = false;
+  enteredImageId = '';
 
   constructor(
     private imageService: ImageService,
@@ -208,6 +223,8 @@ export class ImageUploaderComponent {
     }
     this.isDragging = false;
     this.uploading = false;
+    this.enterImageIdMode = false;
+    this.enteredImageId = '';
     console.log('Image uploader refreshed');
     this.snackBar.open('Image uploader refreshed', 'Close', {
       duration: 2000,
@@ -224,11 +241,16 @@ export class ImageUploaderComponent {
   getImageUrl(): string {
     if (this.currentImageId) {
       console.log('Current image ID : ', this.currentImageId);
-      this.imageService
-        .getImageById(this.currentImageId)
-        .subscribe((imageDoc) => {
+      this.imageService.getImageById(this.currentImageId).subscribe({
+        next: (imageDoc) => {
           this.currentImageUrl = this.mapToImageURL(imageDoc);
-        });
+        },
+        error: (error) => {
+          console.error('Error loading image:', error);
+          this.handleError('Failed to load image with the provided ID');
+          this.currentImageUrl = 'assets/images/image-placeholder.jpg';
+        },
+      });
     }
     return 'assets/images/image-placeholder.jpg';
   }
@@ -300,6 +322,38 @@ export class ImageUploaderComponent {
         this.uploadImage(imageDoc);
       };
     }
+  }
+
+  toggleEnterImageId(): void {
+    this.enterImageIdMode = !this.enterImageIdMode;
+    if (!this.enterImageIdMode) {
+      this.enteredImageId = '';
+    }
+  }
+
+  addImageId(): void {
+    if (!this.enteredImageId.trim()) {
+      this.snackBar.open('Please enter a valid Image ID', 'Close', {
+        duration: 3000,
+        horizontalPosition: 'end',
+        verticalPosition: 'top',
+        panelClass: ['error-snackbar'],
+      });
+      return;
+    }
+
+    this.currentImageId = this.enteredImageId.trim();
+    this.getImageUrl();
+    this.dataEmitter.emit(this.currentImageId);
+    this.enterImageIdMode = false;
+    this.enteredImageId = '';
+
+    this.snackBar.open('Image ID added successfully', 'Close', {
+      duration: 3000,
+      horizontalPosition: 'end',
+      verticalPosition: 'top',
+      panelClass: ['success-snackbar'],
+    });
   }
 
   private handleError(message: string): void {

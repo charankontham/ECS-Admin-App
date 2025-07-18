@@ -1,0 +1,131 @@
+<div class="brand-details-container">
+    <!-- Loading State -->
+    <div *ngIf="loading" class="loading-container">
+        <mat-progress-bar mode="indeterminate"></mat-progress-bar>
+    </div>
+
+    <!-- Error State -->
+    <mat-card *ngIf="error" class="error-card">
+        <mat-card-content>
+            <div class="error-message">
+                <mat-icon>error</mat-icon>
+                <p>{{ error }}</p>
+            </div>
+            <button mat-flat-button color="primary" routerLink="/inventory/brands">
+                Back to Brands
+            </button>
+        </mat-card-content>
+    </mat-card>
+
+    <!-- Brand Details -->
+    <ng-container *ngIf="!loading && !error && brand">
+        <!-- Header Card -->
+        <mat-card class="header-card">
+            <mat-card-content>
+                <div class="header-content">
+                    <div class="brand-title">
+                        <h1>{{ isNewBrand ? 'Add New Brand' : (isEditMode ? 'Edit Brand' : brand.brandName) }}</h1>
+                        <div class="brand-id" *ngIf="!isNewBrand">ID: {{ brand.brandId }}</div>
+                    </div>
+                    <div class="header-actions">
+                        <button mat-stroked-button (click)="goBack()" class="back-button">
+                            <mat-icon>arrow_back</mat-icon>
+                            Back to Brands
+                        </button>
+                        <button *ngIf="!isEditMode && !isNewBrand" mat-flat-button color="primary"
+                            (click)="toggleEditMode()">
+                            <mat-icon>edit</mat-icon>
+                            Edit Brand
+                        </button>
+                        <button *ngIf="!isEditMode && !isNewBrand" mat-flat-button color="warn" (click)="deleteBrand()">
+                            <mat-icon>delete</mat-icon>
+                            Delete Brand
+                        </button>
+                        <ng-container *ngIf="isEditMode">
+                            <button mat-flat-button color="primary" (click)="saveBrand()"
+                                [disabled]="brandForm.invalid">
+                                <mat-icon>save</mat-icon>
+                                {{ isNewBrand ? 'Create Brand' : 'Save Changes' }}
+                            </button>
+                            <button mat-stroked-button (click)="cancelEdit()">
+                                Cancel
+                            </button>
+                        </ng-container>
+                    </div>
+                </div>
+            </mat-card-content>
+        </mat-card>
+
+        <!-- View Mode -->
+        <ng-container *ngIf="!isEditMode">
+            <div class="details-grid">
+                <mat-card class="image-card">
+                    <mat-card-content>
+                        <div class="brand-image-container">
+                            <img [src]="'/assets/images/image-placeholder.jpg'" [alt]="brand.brandName"
+                                class="brand-image">
+                        </div>
+                    </mat-card-content>
+                </mat-card>
+
+                <!-- Brand Info Card -->
+                <mat-card class="info-card">
+                    <mat-card-content>
+                        <mat-tab-group>
+                            <mat-tab label="Basic Info">
+                                <div class="tab-content">
+                                    <div class="info-grid">
+                                        <div class="info-item">
+                                            <div class="info-label">Brand Name</div>
+                                            <div class="info-value">{{ brand.brandName }}</div>
+                                        </div>
+                                        <div class="info-item">
+                                            <div class="info-label">Description</div>
+                                            <div class="info-value">{{ brand.brandDescription || "No description " +
+                                                "available" }}</div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </mat-tab>
+                        </mat-tab-group>
+                    </mat-card-content>
+                </mat-card>
+            </div>
+        </ng-container>
+
+        <!-- Edit Mode -->
+        <ng-container *ngIf="isEditMode">
+            <form [formGroup]="brandForm" class="edit-form">
+                <div class="form-grid">
+                    <!-- Basic Information -->
+                    <mat-card class="form-card">
+                        <mat-card-header>
+                            <mat-card-title>Brand Information</mat-card-title>
+                        </mat-card-header>
+                        <mat-card-content>
+                            <div class="form-row">
+                                <mat-form-field appearance="outline">
+                                    <mat-label>Brand Name</mat-label>
+                                    <input matInput formControlName="brandName" required>
+                                    <mat-error *ngIf="brandForm.get('brandName')?.hasError('required')">
+                                        Brand name is required
+                                    </mat-error>
+                                </mat-form-field>
+                            </div>
+
+                            <div class="form-row">
+                                <mat-form-field appearance="outline">
+                                    <mat-label>Description</mat-label>
+                                    <textarea matInput formControlName="brandDescription" rows="5" required></textarea>
+                                    <mat-error *ngIf="brandForm.get('brandDescription')?.hasError('required')">
+                                        Description is required
+                                    </mat-error>
+                                </mat-form-field>
+                            </div>
+                        </mat-card-content>
+                    </mat-card>
+                </div>
+            </form>
+        </ng-container>
+    </ng-container>
+</div>
