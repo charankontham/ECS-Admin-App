@@ -1,14 +1,14 @@
 import { Routes } from '@angular/router';
 import { HomeComponent } from './features/home/home.component';
 import { LoginComponent } from './features/auth/login/login.component';
-import { DashboardComponent } from './features/dashboard/dashboard.component';
 import { AuthGuard } from './core/guards/auth.guard';
 import { InventoryAdminComponent } from './features/inventory/inventory-admin.component';
 import { RoleGuard } from './core/guards/role.guard';
-import { LogisticsAdminComponent } from './features/logistics-admin/logistics-admin.component';
 import { MarketingAdminComponent } from './features/marketing-admin/marketing-admin.component';
 import { INVENTORY_ROUTES } from '../app/features/inventory/routes/inventory.routes';
 import { ImageUploaderComponent } from './features/images/image-uploader/image-uploader.component';
+import { LogisticsAdminComponent } from './features/logistics/logistics-admin/logistics-admin.component';
+import { LOGISTICS_ROUTES } from './features/logistics/routes/logistics.routes';
 
 export const routes: Routes = [
   { path: 'login', component: LoginComponent },
@@ -34,13 +34,14 @@ export const routes: Routes = [
     path: 'logistics',
     component: LogisticsAdminComponent,
     canActivate: [AuthGuard, RoleGuard],
-    data: { role: 'logistics-admin' },
+    data: { role: 'admin', subRoles: ['logistics'] },
+    children: LOGISTICS_ROUTES,
   },
   {
-    path: 'marketing-dashboard',
+    path: 'marketing',
     component: MarketingAdminComponent,
     canActivate: [AuthGuard, RoleGuard],
-    data: { role: 'marketing-admin' },
+    data: { role: 'admin', subRoles: ['marketing'] },
   },
   {
     path: 'images',

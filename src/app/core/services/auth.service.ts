@@ -82,6 +82,7 @@ export class AuthService extends BaseService<Admin> {
       adminUsername: login.adminUsername,
       adminPassword: login.adminPassword,
     };
+    console.log('Login attempt for user:', login.adminUsername);
 
     return this.login(requestBody, 'login').pipe(
       switchMap((response) => {

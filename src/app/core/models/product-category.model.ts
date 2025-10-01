@@ -1,5 +1,3 @@
-import { off } from 'node:process';
-
 export interface ProductCategory {
   categoryId: number | null;
   categoryName: string;

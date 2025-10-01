@@ -1,0 +1,32 @@
+<!-- inventory.component.html -->
+
+<div class="sidebar">
+    <h2>Logistics Admin</h2>
+    <ul>
+        <li><a routerLink="/logistics/dashboard" routerLinkActive="active"
+                [routerLinkActiveOptions]="{exact: true}">Dashboard</a></li>
+        <li><a routerLink="/logistics/products" routerLinkActive="active">Products</a></li>
+        <li><a routerLink="/logistics/brands" routerLinkActive="active">Brands</a></li>
+        <li><a routerLink="/logistics/categories" routerLinkActive="active">Categories</a></li>
+        <li><a routerLink="/logistics/sub-categories" routerLinkActive="active">Sub Categories</a></li>
+        <li><a routerLink="/logistics/analytics" routerLinkActive="active">Analytics</a></li>
+        <li><a routerLink="/logistics/images" routerLinkActive="active">Images</a></li>
+    </ul>
+</div>
+
+<div class="main-content">
+    <header>
+        <h1>{{currentPageTitle}}</h1>
+        <div class="user-wrapper">
+            <div class="user-icon"><fa-icon [icon]="faUser" size="lg"></fa-icon></div>
+            <div class="name-role">
+                <div>{{adminData?.adminName}}</div>
+                <small>{{adminData?.adminRole?.subRole + " " + adminData?.adminRole?.roleName}}</small>
+            </div>
+        </div>
+    </header>
+
+    <main>
+        <router-outlet></router-outlet>
+    </main>
+</div>
