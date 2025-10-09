@@ -1,1 +1,177 @@
-<p>logistics-dashboard works!</p>
+<section id="recent-orders" class="card">
+    <h2>Recent Orders</h2>
+    <div *ngIf="loadingRecentOrders" class="loading-container">
+        <mat-spinner diameter="40"></mat-spinner>
+        <p class="loading-text">Loading recent orders...</p>
+    </div>
+    <table *ngIf="!loadingRecentOrders">
+        <thead>
+            <tr>
+                <th>Order Id</th>
+                <th>Customer Id</th>
+                <th>Order Date</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr *ngIf="recentOrders.length == 0">
+                <td colspan="3" [style.text-align]="'center'" [style.color]="'grey'">No orders found!</td>
+            </tr>
+            <tr *ngFor="let order of recentOrders">
+                <td>
+                    <a style="color:black;" [routerLink]="['/logistics/orders', order.orderId]"
+                        routerLinkActive="active">
+                        {{order.orderId }}
+                    </a>
+                </td>
+                <td>{{ order.customer.customerId }}</td>
+                <td>{{ order.orderDate | date:'medium' }}</td>
+            </tr>
+        </tbody>
+    </table>
+</section>
+
+<section id="return-orders" class="card">
+    <h2>Return Orders</h2>
+    <div *ngIf="loadingReturnedOrders" class="loading-container">
+        <mat-spinner diameter="40"></mat-spinner>
+        <p class="loading-text">Loading return orders...</p>
+    </div>
+    <table *ngIf="!loadingReturnedOrders">
+        <thead>
+            <tr>
+                <th>Return Order Id</th>
+                <th>Customer Id</th>
+                <th>Order Item Id</th>
+                <th>Returned Date</th>
+                <th>Payment Source</th>
+                <th>Reason</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr *ngIf="returnedOrders.length == 0">
+                <td colspan="6" [style.text-align]="'center'" [style.color]="'grey'">No return orders found!</td>
+            </tr>
+            <tr *ngFor="let orderReturn of returnedOrders">
+                <td>
+                    <a style="color:black;" [routerLink]="['/logistics/order-returns', orderReturn.orderReturnId]"
+                        routerLinkActive="active">
+                        {{orderReturn.orderReturnId }}
+                    </a>
+                </td>
+                <td>{{ orderReturn.customerId }}</td>
+                <td>{{ orderReturn.orderItemId }}</td>
+                <td>{{ orderReturn.dateAdded| date:'medium' }}</td>
+                <td>{{ orderReturn.returnPaymentSourceId }}</td>
+                <td>{{ orderReturn.returnReasonCategoryId }}</td>
+            </tr>
+        </tbody>
+    </table>
+</section>
+
+<section id="pending-deliveries" class="card">
+    <h2>Pending Deliveries</h2>
+    <div *ngIf="loadingDeliveries" class="loading-container">
+        <mat-spinner diameter="40"></mat-spinner>
+        <p class="loading-text">Loading deliveries...</p>
+    </div>
+    <table *ngIf="!loadingDeliveries">
+        <thead>
+            <tr>
+                <th>Order Tracking Id</th>
+                <th>Delivery Agent</th>
+                <th>Product</th>
+                <th>Estimated Delivery Date</th>
+                <th>Tracking Status</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr *ngIf="deliveries.length == 0">
+                <td colspan="5" [style.text-align]="'center'" [style.color]="'grey'">No deliveries found!</td>
+            </tr>
+            <tr *ngFor="let delivery of deliveries">
+                <td>
+                    <a style="color:black;" [routerLink]="['/logistics/deliveries', delivery.orderTrackingId]"
+                        routerLinkActive="active">
+                        {{delivery.orderTrackingId }}
+                    </a>
+                </td>
+                <td [style.color]="!delivery.deliveryAgent ? 'grey' : 'inherit'">{{
+                    delivery.deliveryAgent?.deliveryAgentId ||
+                    "N/A" }}</td>
+                <td>{{ delivery.product?.productId }}</td>
+                <td>{{ delivery.estimatedDeliveryDate| date:'medium' }}</td>
+                <td>{{ getOrderStatusValue(delivery.orderTrackingStatusId) }}</td>
+            </tr>
+        </tbody>
+    </table>
+</section>
+
+<section id="delivery-agents" class="card">
+    <h2>Delivery Agents</h2>
+    <div *ngIf="loadingDeliveryAgents" class="loading-container">
+        <mat-spinner diameter="40"></mat-spinner>
+        <p class="loading-text">Loading delivery agents...</p>
+    </div>
+    <table *ngIf="!loadingDeliveryAgents">
+        <thead>
+            <tr>
+                <th>Agent Id</th>
+                <th>Agent Name</th>
+                <th>Availability</th>
+                <th>Rating</th>
+                <th>Serving Area</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr *ngIf="deliveryAgents.length == 0">
+                <td colspan="5" [style.text-align]="'center'" [style.color]="'grey'">No delivery agents found!</td>
+            </tr>
+            <tr *ngFor="let agent of deliveryAgents">
+                <td>
+                    <a style="color:black;" [routerLink]="['/logistics/delivery-agents', agent.deliveryAgentId]"
+                        routerLinkActive="active">
+                        {{agent.deliveryAgentId }}
+                    </a>
+                </td>
+                <td>{{ agent.deliveryAgentName || "Not Assigned" }}</td>
+                <td>{{ getAvailabilityStatusValue(agent.availabilityStatus) }}</td>
+                <td>{{ agent.rating }}</td>
+                <td>{{ agent.servingArea }}</td>
+            </tr>
+        </tbody>
+    </table>
+</section>
+
+<section id="delivery-hubs" class="card">
+    <h2>Delivery Hubs</h2>
+    <div *ngIf="loadingDeliveryHubs" class="loading-container">
+        <mat-spinner diameter="40"></mat-spinner>
+        <p class="loading-text">Loading delivery hubs...</p>
+    </div>
+    <table *ngIf="!loadingDeliveryHubs">
+        <thead>
+            <tr>
+                <th>Hub Id</th>
+                <th>Hub Name</th>
+                <th>Address</th>
+                <th>Date Added</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr *ngIf="deliveryHubs.length == 0">
+                <td colspan="4" [style.text-align]="'center'" [style.color]="'grey'">No delivery hubs found!</td>
+            </tr>
+            <tr *ngFor="let hub of deliveryHubs">
+                <td>
+                    <a style="color:black;" [routerLink]="['/logistics/delivery-hubs', hub.deliveryHubId]"
+                        routerLinkActive="active">
+                        {{hub.deliveryHubId }}
+                    </a>
+                </td>
+                <td>{{ hub.deliveryHubName || "Not Assigned" }}</td>
+                <td>{{ hub.deliveryHubAddress?.city || "Not Available"}}</td>
+                <td>{{ hub.dateAdded | date: 'medium' }}</td>
+            </tr>
+        </tbody>
+    </table>
+</section>
