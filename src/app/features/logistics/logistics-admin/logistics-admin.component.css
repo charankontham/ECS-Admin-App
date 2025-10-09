@@ -41,6 +41,13 @@ header {
 .user-wrapper {
   display: flex;
   align-items: center;
+  gap: 15px;
+}
+
+.user-info {
+  display: flex;
+  align-items: center;
+  gap: 12px;
 }
 
 .user-wrapper .user-icon {
@@ -51,4 +58,20 @@ header {
 .name-role div {
   font-size: large;
   font-weight: 500;
+}
+
+.logout-button {
+  color: #e74c3c;
+  transition: all 0.3s ease;
+}
+
+.logout-button:hover {
+  background-color: rgba(231, 76, 60, 0.1);
+  transform: scale(1.1);
+}
+
+.logout-button mat-icon {
+  font-size: 22px;
+  width: 22px;
+  height: 22px;
 }

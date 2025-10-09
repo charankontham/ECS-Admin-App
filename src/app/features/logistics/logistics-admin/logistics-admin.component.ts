@@ -5,10 +5,21 @@ import { AuthService } from '../../../core/services/auth.service';
 import { NavigationEnd, Router, RouterModule } from '@angular/router';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { faUser } from '@fortawesome/free-solid-svg-icons';
+import { MatDialog } from '@angular/material/dialog';
+import { ConfirmationDialogComponent } from '../../../shared/components/confirmation-dialog/confirmation-dialog.component';
+import { MatButtonModule } from '@angular/material/button';
+import { MatIconModule } from '@angular/material/icon';
+import { MatTooltipModule } from '@angular/material/tooltip';
 
 @Component({
   selector: 'app-logistics-admin',
-  imports: [RouterModule, FontAwesomeModule],
+  imports: [
+    RouterModule,
+    FontAwesomeModule,
+    MatButtonModule,
+    MatIconModule,
+    MatTooltipModule,
+  ],
   templateUrl: './logistics-admin.component.html',
   styleUrl: './logistics-admin.component.css',
 })
@@ -21,6 +32,7 @@ export class LogisticsAdminComponent implements OnInit, OnDestroy {
   private router = inject(Router);
   private authService = inject(AuthService);
   faUser = faUser;
+  private dialog = inject(MatDialog);
 
   ngOnInit() {
     this.routerSubscription = this.router.events
@@ -55,6 +67,25 @@ export class LogisticsAdminComponent implements OnInit, OnDestroy {
         }
       }
     );
+  }
+
+  logout(): void {
+    const dialogRef = this.dialog.open(ConfirmationDialogComponent, {
+      width: '400px',
+      data: {
+        title: 'Logout',
+        message: 'Are you sure you want to logout?',
+        confirmText: 'Logout',
+        cancelText: 'Cancel',
+        confirmColor: 'warn',
+      },
+    });
+
+    dialogRef.afterClosed().subscribe((result) => {
+      if (result) {
+        this.authService.logout();
+      }
+    });
   }
 
   ngOnDestroy() {

@@ -1,15 +1,30 @@
 <!-- inventory.component.html -->
 
 <div class="sidebar">
+    <mat-icon class="logo-icon">local_shipping</mat-icon>
     <h2>Logistics Admin</h2>
     <ul>
         <li><a routerLink="/logistics/dashboard" routerLinkActive="active"
                 [routerLinkActiveOptions]="{exact: true}">Dashboard</a></li>
-        <li><a routerLink="/logistics/products" routerLinkActive="active">Products</a></li>
-        <li><a routerLink="/logistics/brands" routerLinkActive="active">Brands</a></li>
-        <li><a routerLink="/logistics/categories" routerLinkActive="active">Categories</a></li>
-        <li><a routerLink="/logistics/sub-categories" routerLinkActive="active">Sub Categories</a></li>
-        <li><a routerLink="/logistics/analytics" routerLinkActive="active">Analytics</a></li>
+        <li><a routerLink="/logistics/order-items" routerLinkActive="active">
+                <mat-icon matListItemIcon>{{"shopping_cart" }}</mat-icon>
+                Orders
+            </a></li>
+        <li><a routerLink="/logistics/delivery-hubs" routerLinkActive="active">
+                <mat-icon matListItemIcon>{{"store" }}</mat-icon>
+                Delivery Hubs
+            </a></li>
+        <li><a routerLink="/logistics/delivery-agents" routerLinkActive="active">
+                <mat-icon matListItemIcon>{{"person" }}</mat-icon>
+                Delivery Agents
+            </a></li>
+        <li><a routerLink="/logistics/deliveries" routerLinkActive="active">
+                <mat-icon matListItemIcon>{{"local_shipping" }}</mat-icon>
+                Deliveries
+            </a></li>
+        <li><a routerLink="/logistics/return-orders" routerLinkActive="active">Return Orders <mat-icon
+                    matListItemIcon>{{
+                    "assignment_return" }}</mat-icon></a></li>
         <li><a routerLink="/logistics/images" routerLinkActive="active">Images</a></li>
     </ul>
 </div>
@@ -18,11 +33,17 @@
     <header>
         <h1>{{currentPageTitle}}</h1>
         <div class="user-wrapper">
-            <div class="user-icon"><fa-icon [icon]="faUser" size="lg"></fa-icon></div>
-            <div class="name-role">
-                <div>{{adminData?.adminName}}</div>
-                <small>{{adminData?.adminRole?.subRole + " " + adminData?.adminRole?.roleName}}</small>
+            <div class="user-info">
+                <div class="user-icon"><fa-icon [icon]="faUser" size="lg"></fa-icon></div>
+                <div class="name-role">
+                    <div>{{adminData?.adminName}}</div>
+                    <small>{{adminData?.adminRole?.subRole + " " + adminData?.adminRole?.roleName}}</small>
+                </div>
             </div>
+            <button mat-icon-button class="logout-button" (click)="logout()" matTooltip="Logout"
+                matTooltipPosition="below">
+                <mat-icon>logout</mat-icon>
+            </button>
         </div>
     </header>
 
