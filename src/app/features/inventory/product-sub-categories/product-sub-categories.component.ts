@@ -9,6 +9,7 @@ import { ProductCategoryService } from '../../../core/services/product-category.
 import {
   SubCategory,
   ProductCategory,
+  SubCategoryFilters,
 } from '../../../core/models/product-category.model';
 import { CommonModule, NgFor, NgIf } from '@angular/common';
 import {
@@ -43,15 +44,6 @@ import {
   NavigationStateService,
   SubCategoriesPageState,
 } from '../../../core/services/navigation-state.service';
-
-interface SubCategoryFilters {
-  currentPage: number;
-  offset: number;
-  categoryId?: number | null;
-  searchValue?: string | null;
-  sortField?: string;
-  sortDirection?: 'asc' | 'desc';
-}
 
 @Component({
   selector: 'app-subcategories',
@@ -90,6 +82,7 @@ export class ProductSubCategoriesComponent implements OnInit, AfterViewInit {
     'categoryName',
   ];
   filters: SubCategoryFilters = {
+    type: 'subCategory',
     currentPage: 0,
     offset: 5,
   };

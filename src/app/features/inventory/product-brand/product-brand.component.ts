@@ -1,6 +1,9 @@
 import { AfterViewInit, Component, OnInit, ViewChild } from '@angular/core';
 import { ProductBrandService } from '../../../core/services/product-brand.service';
-import { ProductBrand } from '../../../core/models/product-brand.model';
+import {
+  ProductBrand,
+  ProductBrandFilters,
+} from '../../../core/models/product-brand.model';
 import { CommonModule, NgFor, NgIf } from '@angular/common';
 import {
   FormBuilder,
@@ -31,16 +34,8 @@ import { MatTooltipModule } from '@angular/material/tooltip';
 import { Router, RouterModule } from '@angular/router';
 import { NavigationStateService } from '../../../core/services/navigation-state.service';
 
-interface BrandFilters {
-  currentPage: number;
-  offset: number;
-  searchValue?: string | null;
-  sortField?: string;
-  sortDirection?: 'asc' | 'desc';
-}
-
 interface BrandsPageState {
-  filters: BrandFilters;
+  filters: ProductBrandFilters;
   currentPage: number;
   pageSize: number;
   sortField?: string;
@@ -79,7 +74,8 @@ export class ProductBrandComponent implements OnInit, AfterViewInit {
   filterForm: FormGroup;
   dataSource = new MatTableDataSource<ProductBrand>([]);
   displayedColumns: string[] = ['brandId', 'brandName', 'brandDescription'];
-  filters: BrandFilters = {
+  filters: ProductBrandFilters = {
+    type: 'productBrand',
     currentPage: 0,
     offset: 10,
   };

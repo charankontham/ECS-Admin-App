@@ -1,32 +1,66 @@
-<!-- inventory.component.html -->
-
-<div class="sidebar">
-    <h2>Inventory Admin</h2>
-    <ul>
-        <li><a routerLink="/inventory/dashboard" routerLinkActive="active"
-                [routerLinkActiveOptions]="{exact: true}">Dashboard</a></li>
-        <li><a routerLink="/inventory/products" routerLinkActive="active">Products</a></li>
-        <li><a routerLink="/inventory/brands" routerLinkActive="active">Brands</a></li>
-        <li><a routerLink="/inventory/categories" routerLinkActive="active">Categories</a></li>
-        <li><a routerLink="/inventory/sub-categories" routerLinkActive="active">Sub Categories</a></li>
-        <li><a routerLink="/inventory/analytics" routerLinkActive="active">Analytics</a></li>
-        <li><a routerLink="/inventory/images" routerLinkActive="active">Images</a></li>
-    </ul>
-</div>
-
-<div class="main-content">
-    <header>
-        <h1>{{currentPageTitle}}</h1>
-        <div class="user-wrapper">
-            <div class="user-icon"><fa-icon [icon]="faUser" size="lg"></fa-icon></div>
-            <div class="name-role">
-                <div>{{adminData?.adminName}}</div>
-                <small>{{adminData?.adminRole?.subRole + " " + adminData?.adminRole?.roleName}}</small>
+<div class="logistics-admin-container">
+    <mat-sidenav-container class="sidenav-container">
+        <mat-sidenav #sidenav [opened]="isSidenavOpen" mode="side" class="sidenav">
+            <div class="sidenav-header">
+                <mat-icon class="logo-icon">warehouse</mat-icon>
+                <h2>Inventory Admin</h2>
             </div>
-        </div>
-    </header>
-
-    <main>
-        <router-outlet></router-outlet>
-    </main>
+            <mat-nav-list>
+                <a mat-list-item routerLink="/inventory/dashboard" routerLinkActive="active"
+                    [routerLinkActiveOptions]="{exact: true}">
+                    Dashboard
+                    <mat-icon matListItemIcon>{{"dashboard"}}</mat-icon>
+                </a>
+                <a mat-list-item routerLink="/inventory/products" routerLinkActive="active">
+                    <mat-icon matListItemIcon>{{"inventory_2" }}</mat-icon>
+                    Products
+                </a>
+                <a mat-list-item routerLink="/inventory/brands" routerLinkActive="active">
+                    <mat-icon matListItemIcon>{{"shoppingmode" }}</mat-icon>
+                    Brands
+                </a>
+                <a mat-list-item routerLink="/inventory/categories" routerLinkActive="active">
+                    <mat-icon matListItemIcon>{{"category" }}</mat-icon>
+                    Categories
+                </a>
+                <a mat-list-item routerLink="/inventory/sub-categories" routerLinkActive="active">
+                    <mat-icon matListItemIcon>{{"subdirectory_arrow_right" }}</mat-icon>
+                    Sub Categories
+                </a>
+                <a mat-list-item routerLink="/inventory/analytics" routerLinkActive="active">
+                    <mat-icon matListItemIcon>{{"insights" }}</mat-icon>
+                    Analytics
+                </a>
+                <a mat-list-item routerLink="/inventory/images" routerLinkActive="active">
+                    Images
+                    <mat-icon matListItemIcon>{{"add_photo_alternate" }}</mat-icon>
+                </a>
+            </mat-nav-list>
+        </mat-sidenav>
+        <mat-sidenav-content class="main-content">
+            <mat-toolbar class="header">
+                <button mat-icon-button (click)="toggleSidenav()" class="menu-button">
+                    <mat-icon>menu</mat-icon>
+                </button>
+                {{currentPageTitle}}
+                <span class="spacer"></span>
+                <div class="user-wrapper">
+                    <div class="user-info">
+                        <div class="user-details">
+                            <span class="user-name">{{ adminData?.adminName }}</span>
+                            <span class="user-role">{{ adminData?.adminRole?.subRole + " " +
+                                adminData?.adminRole?.roleName }}</span>
+                        </div>
+                        <mat-icon class="user-icon">account_circle</mat-icon>
+                    </div>
+                    <button mat-icon-button class="logout-button" (click)="logout()" matTooltip="Logout">
+                        <mat-icon>logout</mat-icon>
+                    </button>
+                </div>
+            </mat-toolbar>
+            <div class="content">
+                <router-outlet></router-outlet>
+            </div>
+        </mat-sidenav-content>
+    </mat-sidenav-container>
 </div>

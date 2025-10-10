@@ -91,6 +91,7 @@ export class ProductsComponent implements OnInit, AfterViewInit {
   displayedColumns: string[] = ['id', 'name', 'quantity', 'price'];
   baseColumns: string[] = ['id', 'name', 'quantity', 'price'];
   filters: ProductFilters = {
+    type: 'product',
     currentPage: 0,
     offset: 5,
   };

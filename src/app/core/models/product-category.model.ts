@@ -1,3 +1,5 @@
+import { BaseFilters } from './common.model';
+
 export interface ProductCategory {
   categoryId: number | null;
   categoryName: string;
@@ -20,19 +22,11 @@ export interface SubCategoryEnriched {
   subCategoryImage: string;
 }
 
-export interface ProductCategoryFiletrs {
-  currentPage: number;
-  offset: number;
-  searchValue?: string | null;
-  sortField?: string;
-  sortDirection?: 'asc' | 'desc';
+export interface ProductCategoryFiletrs extends BaseFilters {
+  type: 'productCategory';
 }
 
-export interface SubCategoryFilters {
-  currentPage: number;
-  offset: number;
+export interface SubCategoryFilters extends BaseFilters {
+  type: 'subCategory';
   categoryId?: number | null;
-  searchValue?: string | null;
-  sortField?: string;
-  sortDirection?: 'asc' | 'desc';
 }

@@ -5,10 +5,29 @@ import { AuthService } from '../../core/services/auth.service';
 import { Admin } from '../../core/models/admin.model';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { faUser } from '@fortawesome/free-solid-svg-icons';
+import { ConfirmationDialogComponent } from '../../shared/components/confirmation-dialog/confirmation-dialog.component';
+import { MatDialog, MatDialogModule } from '@angular/material/dialog';
+import { MatTooltipModule } from '@angular/material/tooltip';
+import { MatIconModule } from '@angular/material/icon';
+import { MatButtonModule } from '@angular/material/button';
+import { MatSidenavModule } from '@angular/material/sidenav';
+import { MatListModule } from '@angular/material/list';
+import { MatToolbarModule } from '@angular/material/toolbar';
 
 @Component({
   selector: 'app-inventory-admin',
-  imports: [RouterModule, FontAwesomeModule],
+  standalone: true,
+  imports: [
+    RouterModule,
+    FontAwesomeModule,
+    MatButtonModule,
+    MatIconModule,
+    MatTooltipModule,
+    MatSidenavModule,
+    MatListModule,
+    MatToolbarModule,
+    MatDialogModule,
+  ],
   templateUrl: './inventory-admin.component.html',
   styleUrl: './inventory-admin.component.css',
 })
@@ -21,6 +40,8 @@ export class InventoryAdminComponent implements OnInit, OnDestroy {
   private router = inject(Router);
   private authService = inject(AuthService);
   faUser = faUser;
+  dialog = inject(MatDialog);
+  isSidenavOpen = true;
 
   ngOnInit() {
     this.routerSubscription = this.router.events
@@ -55,6 +76,33 @@ export class InventoryAdminComponent implements OnInit, OnDestroy {
         }
       }
     );
+  }
+
+  logout(): void {
+    const dialogRef = this.dialog.open(ConfirmationDialogComponent, {
+      width: '400px',
+      data: {
+        title: 'Logout',
+        message: 'Are you sure you want to logout?',
+        confirmText: 'Logout',
+        cancelText: 'Cancel',
+        confirmColor: 'warn',
+      },
+    });
+
+    dialogRef.afterClosed().subscribe((result) => {
+      if (result) {
+        this.authService.logout();
+      }
+    });
+  }
+
+  toggleSidenav(): void {
+    this.isSidenavOpen = !this.isSidenavOpen;
+  }
+
+  isActive(route: string): boolean {
+    return this.router.url.includes(route);
   }
 
   ngOnDestroy() {

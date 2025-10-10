@@ -65,6 +65,7 @@ export class ViewProductSubCategoryComponent {
   isNewSubCategory = false;
   currentImageUrl = '';
   filters: SubCategoryFilters = {
+    type: 'subCategory',
     currentPage: 0,
     offset: 5,
     searchValue: null,

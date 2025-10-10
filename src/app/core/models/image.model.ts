@@ -1,3 +1,5 @@
+import { BaseFilters } from './common.model';
+
 export interface ImageDoc {
   id?: string;
   imageName: string;
@@ -10,11 +12,9 @@ export interface ImageDoc {
   imageURL?: string;
 }
 
-export interface ImageFilters {
-  currentPage: number;
-  offset: number;
+export interface ImageFilters extends BaseFilters {
+  type: 'image';
   imageSize?: number;
   dimensions?: string;
   contentType?: string;
-  searchValue?: string;
 }

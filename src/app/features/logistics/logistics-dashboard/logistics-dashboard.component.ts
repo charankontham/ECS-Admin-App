@@ -26,22 +26,34 @@ import {
 } from '../../../core/models/delivery.model';
 import {
   AVAILABILITY_STATUS_MAP,
+  AvailabilityStatusClassMap,
   ORDER_TRACKING_STATUS_MAP,
-} from '../../../core/models/constants.model';
+  sleep,
+} from '../../../core/util/util';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
+import { MatIconModule } from '@angular/material/icon';
+import { MatButtonModule } from '@angular/material/button';
+import { OrderStatusClassMap } from '../../../core/util/util';
+
+interface DashboardStats {
+  label: string;
+  value: number;
+  icon: string;
+  color: string;
+  trend?: string;
+}
 
 @Component({
   selector: 'app-logistics-dashboard',
   standalone: true,
   imports: [
-    NgFor,
-    NgIf,
-    CommonModule,
-    MatTableModule,
-    MatPaginatorModule,
+    MatIconModule,
     MatCardModule,
-    MatProgressBarModule,
+    CommonModule,
     MatProgressSpinnerModule,
+    MatTableModule,
+    MatButtonModule,
+    MatProgressBarModule,
     RouterModule,
   ],
   templateUrl: './logistics-dashboard.component.html',
@@ -63,6 +75,44 @@ export class LogisticsDashboardComponent implements OnInit {
   loadingDeliveryAgents: boolean = true;
   loadingDeliveryHubs: boolean = true;
   loadingDeliveries: boolean = true;
+  loadingStats = true;
+  stats: DashboardStats[] = [];
+  orderDisplayedColumns: string[] = [
+    'orderId',
+    'customerName',
+    'status',
+    'deliveryAddress',
+    'amount',
+  ];
+  // deliveryDisplayedColumns: string[] = [
+  //   'orderId',
+  //   'customerName',
+  //   'status',
+  //   'deliveryAddress',
+  //   'amount',
+  // ];
+  returnOrderDisplayedColumns: string[] = [
+    'returnOrderId',
+    'customerName',
+    'orderItemId',
+    'returnedDate',
+    'returnReason',
+  ];
+  deliveryAgentColumns: string[] = [
+    'agentId',
+    'agentName',
+    'availability',
+    'rating',
+    'servingArea',
+  ];
+  deliveryHubColumns: string[] = ['hubId', 'hubName', 'address', 'dateAdded'];
+  deliveryColumns: string[] = [
+    'orderTrackingId',
+    'deliveryAgent',
+    'product',
+    'estimatedDeliveryDate',
+    'trackingStatus',
+  ];
 
   constructor(
     @Inject(PLATFORM_ID) private platformId: Object,
@@ -82,11 +132,63 @@ export class LogisticsDashboardComponent implements OnInit {
   }
 
   ngOnInit(): void {
+    this.loadStats();
     this.loadRecentOrders();
     this.loadReturnedOrders();
     this.loadDeliveries();
     this.loadDeliveryAgents();
     this.loadDeliveryHubs();
+  }
+
+  loadStats(): void {
+    this.loadingStats = true;
+    setTimeout(() => {
+      this.stats = [
+        {
+          label: 'Total Orders',
+          value: 1245,
+          icon: 'shopping_cart',
+          color: '#3b82f6',
+          trend: '+12.5%',
+        },
+        {
+          label: 'Pending Deliveries',
+          value: 87,
+          icon: 'local_shipping',
+          color: '#f59e0b',
+          trend: '+5.2%',
+        },
+        {
+          label: 'Completed Today',
+          value: 156,
+          icon: 'check_circle',
+          color: '#10b981',
+          trend: '+8.3%',
+        },
+        {
+          label: 'Active Agents',
+          value: 42,
+          icon: 'person',
+          color: '#8b5cf6',
+          trend: '+2',
+        },
+        {
+          label: 'Return Orders',
+          value: 23,
+          icon: 'assignment_return',
+          color: '#ef4444',
+          trend: '-3.1%',
+        },
+        {
+          label: 'Delivery Hubs',
+          value: 8,
+          icon: 'store',
+          color: '#06b6d4',
+          trend: '0',
+        },
+      ];
+      this.loadingStats = false;
+    }, 1000);
   }
 
   loadRecentOrders(): void {
@@ -170,5 +272,17 @@ export class LogisticsDashboardComponent implements OnInit {
 
   getAvailabilityStatusValue(statusId: number): string {
     return AVAILABILITY_STATUS_MAP[statusId] || 'Unknown Status';
+  }
+
+  getStatusClass(status: number): string {
+    return OrderStatusClassMap[status] || '';
+  }
+
+  getAvailabilityStatusClass(status: number): string {
+    return AvailabilityStatusClassMap[status] || '';
+  }
+
+  onLinkClick(path: string, id: number | string): void {
+    this.router.navigate([path, id]);
   }
 }

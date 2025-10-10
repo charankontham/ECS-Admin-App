@@ -1,3 +1,4 @@
+import { BaseFilters } from './common.model';
 import { ProductBrand } from './product-brand.model';
 import { ProductCategory, SubCategoryEnriched } from './product-category.model';
 
@@ -36,13 +37,9 @@ export interface ProductRequest {
   dateModified: Date;
 }
 
-export interface ProductFilters {
+export interface ProductFilters extends BaseFilters {
+  type: 'product';
   categoryId?: number | null;
   subCategoryId?: number | null;
   brandId?: number | null;
-  searchValue?: string | null;
-  offset: number;
-  currentPage: number;
-  sortField?: string;
-  sortDirection?: 'asc' | 'desc';
 }

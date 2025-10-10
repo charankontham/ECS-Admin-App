@@ -84,6 +84,7 @@ export class InventoryDashboardComponent implements OnInit {
 
   loadRecentProducts() {
     const filters: ProductFilters = {
+      type: 'product',
       offset: 10,
       currentPage: 0,
       sortField: 'dateAdded',

@@ -5,34 +5,46 @@ import { AuthService } from '../../../core/services/auth.service';
 import { NavigationEnd, Router, RouterModule } from '@angular/router';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { faUser } from '@fortawesome/free-solid-svg-icons';
-import { MatDialog } from '@angular/material/dialog';
+import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { ConfirmationDialogComponent } from '../../../shared/components/confirmation-dialog/confirmation-dialog.component';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatTooltipModule } from '@angular/material/tooltip';
+import { MatSidenavModule } from '@angular/material/sidenav';
+import { MatListModule } from '@angular/material/list';
+import { MatToolbarModule } from '@angular/material/toolbar';
 
 @Component({
   selector: 'app-logistics-admin',
+  standalone: true,
   imports: [
     RouterModule,
     FontAwesomeModule,
     MatButtonModule,
     MatIconModule,
     MatTooltipModule,
+    MatSidenavModule,
+    MatListModule,
+    MatToolbarModule,
+    MatDialogModule,
   ],
   templateUrl: './logistics-admin.component.html',
   styleUrl: './logistics-admin.component.css',
 })
 export class LogisticsAdminComponent implements OnInit, OnDestroy {
+  isSidenavOpen = true;
   currentPageTitle: string = 'Dashboard';
   private routerSubscription?: Subscription;
   private userSubscription?: Subscription;
   adminData: Admin | null = null;
   currentRoute: string = '';
-  private router = inject(Router);
-  private authService = inject(AuthService);
   faUser = faUser;
-  private dialog = inject(MatDialog);
+
+  constructor(
+    private router: Router,
+    private authService: AuthService,
+    private dialog: MatDialog
+  ) {}
 
   ngOnInit() {
     this.routerSubscription = this.router.events
@@ -67,6 +79,14 @@ export class LogisticsAdminComponent implements OnInit, OnDestroy {
         }
       }
     );
+  }
+
+  toggleSidenav(): void {
+    this.isSidenavOpen = !this.isSidenavOpen;
+  }
+
+  isActive(route: string): boolean {
+    return this.router.url.includes(route);
   }
 
   logout(): void {

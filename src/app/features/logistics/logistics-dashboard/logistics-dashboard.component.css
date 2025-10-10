@@ -1,147 +1,235 @@
-.card {
-  margin: 20px 0;
-  padding: 20px;
-  background-color: #f9f9f9;
-  border-radius: 8px;
+.dashboard-container {
+  max-width: 1400px;
+  margin: 0 auto;
 }
 
-h2 {
-  font-size: 24px;
-  font-weight: bold;
-  color: grey;
+.dashboard-header {
+  margin-bottom: 32px;
 }
 
-table {
-  width: 100%;
-  border-collapse: collapse;
+.dashboard-header h1 {
+  font-size: 32px;
+  font-weight: 600;
+  color: #1e293b;
+  margin: 0 0 8px 0;
 }
 
-table th,
-table td {
-  padding: 12px;
-  text-align: left;
-  font-size: 15px;
-  color: black;
-  border: 1px solid #ddd;
+.subtitle {
+  font-size: 16px;
+  color: #64748b;
+  margin: 0;
 }
 
-canvas {
-  width: 100%;
-  height: 400px;
+.loading-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 400px;
+  gap: 16px;
 }
 
-/* Dashboard Section Styles */
-.dashboard-section {
-  margin: 20px 0;
-  border-radius: 8px;
-  background-color: #f9f9f9 !important;
-  color: black;
-  border: 1px solid #ddd;
-  font-family: Roboto, "Helvetica Neue", sans-serif;
+.loading-container p {
+  color: #64748b;
+  font-size: 16px;
 }
 
-mat-card {
-  background-color: #f9f9f9 !important;
-  box-shadow: none;
+.loading-bar {
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 10;
 }
 
-mat-paginator {
-  background-color: #f9f9f9 !important;
-  color: black !important;
+.dashboard-content {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 20px;
+}
+
+.stat-card {
+  background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
+  border-radius: 12px;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.stat-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+}
+
+.stat-card mat-card-content {
+  padding: 24px;
+}
+
+.stat-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+}
+
+.stat-icon {
+  font-size: 32px;
+  width: 32px;
+  height: 32px;
+}
+
+.stat-trend {
+  font-size: 12px;
+  font-weight: 600;
+  padding: 4px 8px;
+  border-radius: 12px;
+}
+
+.stat-trend.positive {
+  color: #10b981;
+  background-color: rgba(16, 185, 129, 0.1);
+}
+
+.stat-trend.negative {
+  color: #ef4444;
+  background-color: rgba(239, 68, 68, 0.1);
+}
+
+.stat-value {
+  font-size: 36px;
+  font-weight: 700;
+  color: #1e293b;
+  margin-bottom: 8px;
+}
+
+.stat-label {
+  font-size: 14px;
+  color: #64748b;
+  font-weight: 500;
 }
 
 .table-card {
-  /* border-radius: 12px; */
-  overflow: hidden;
-  border-collapse: collapse;
+  border-radius: 12px;
+  background-color: #d5dce6;
+}
+
+.table-card mat-card-header {
+  padding: 24px 24px 0;
+}
+
+.table-card mat-card-title {
+  font-size: 20px;
+  font-weight: 700;
+  color: #626e82;
+}
+
+.table-card mat-card-content {
+  padding: 16px 24px 24px;
 }
 
 .table-container {
-  position: relative;
-  min-height: 100px;
-  overflow: auto;
+  overflow-x: auto;
 }
 
 .dashboard-table {
   width: 100%;
-  color: black !important;
-  background-color: #f9f9f9;
-  border-collapse: collapse;
-  font-size: 24px;
-  font-weight: bold;
+  background: white;
 }
 
-.mat-mdc-row:hover {
-  background-color: rgba(0, 0, 0, 0.04);
+.dashboard-table th {
+  background-color: #f8fafc !important;
+  color: #475569;
+  font-weight: 600;
+  font-size: 14px;
+  padding: 16px;
+}
+
+.dashboard-table td {
+  padding: 16px;
+  color: #1e293b;
 }
 
 .no-data {
   text-align: center;
   padding: 20px;
   font-style: italic;
-  color: #666;
+  color: white;
 }
 
-.out-of-stock-badge {
-  background-color: #ffebee;
-  color: #c62828;
-  padding: 4px 8px;
-  border-radius: 12px;
+.clickable-row {
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.clickable-row:hover {
+  background-color: #f8fafc;
+}
+
+.status-badge {
+  padding: 6px 12px;
+  border-radius: 16px;
   font-size: 12px;
-  font-weight: 500;
+  font-weight: 600;
+  text-transform: uppercase;
 }
 
-.high-selling-badge {
-  background-color: #e8f5e9;
-  color: #2e7d32;
-  padding: 4px 8px;
-  border-radius: 12px;
-  font-size: 12px;
-  font-weight: 500;
+.status-order-placed {
+  background-color: rgba(59, 130, 246, 0.1) !important;
+  color: #3b82f6 !important;
 }
 
-/* Material Design Form Field Subscript Fix */
-::ng-deep .mat-mdc-form-field-subscript-wrapper {
-  display: none;
+.status-in-transit {
+  background-color: rgba(139, 92, 246, 0.1) !important;
+  color: #8b5cf6 !important;
 }
 
-/* Loading Container Styles */
-.loading-container {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  padding: 60px 20px;
-  min-height: 200px;
+.status-shipped {
+  background-color: rgba(14, 165, 233, 0.1) !important;
+  color: #0ea5e9 !important;
 }
 
-.loading-text {
-  margin-top: 20px;
-  font-size: 14px;
-  color: #666;
-  font-weight: 500;
+.status-waiting-for-delivery-agent,
+.status-busy {
+  background-color: rgba(251, 146, 60, 0.1) !important;
+  color: #fb923c !important;
 }
 
-/* Responsive Design */
+.status-out-for-delivery {
+  background-color: rgba(245, 158, 11, 0.1) !important;
+  color: #f59e0b !important;
+}
+
+.status-delivered,
+.status-available {
+  background-color: rgba(16, 185, 129, 0.1) !important;
+  color: #10b981 !important;
+}
+
+.status-returned-to-delivery-hub,
+.status-unavailable {
+  background-color: rgba(99, 102, 241, 0.1) !important;
+  color: #6366f1 !important;
+}
+
+.status-cancelled,
+.status-on-leave {
+  background-color: rgba(239, 68, 68, 0.1) !important;
+  color: #ef4444 !important;
+}
+
 @media (max-width: 768px) {
-  .dashboard-section {
-    margin: 16px 0;
+  .stats-grid {
+    grid-template-columns: 1fr;
   }
 
-  .table-container {
-    overflow-x: auto;
+  .dashboard-header h1 {
+    font-size: 24px;
   }
 
-  .loading-container {
-    padding: 40px 20px;
-    min-height: 150px;
-  }
-
-  .loading-text {
-    font-size: 13px;
-  }
-
-  .dashboard-table {
-    min-width: 600px;
+  .table-card mat-card-content {
+    padding: 8px;
   }
 }

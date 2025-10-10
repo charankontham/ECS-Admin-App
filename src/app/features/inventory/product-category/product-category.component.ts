@@ -76,6 +76,7 @@ export class ProductCategoryComponent implements OnInit, AfterViewInit {
   dataSource = new MatTableDataSource<ProductCategory>([]);
   displayedColumns: string[] = ['categoryId', 'categoryName'];
   filters: ProductCategoryFiletrs = {
+    type: 'productCategory',
     currentPage: 0,
     offset: 5,
     searchValue: null,

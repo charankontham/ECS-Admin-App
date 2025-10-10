@@ -1,177 +1,303 @@
-<section id="recent-orders" class="card">
-    <h2>Recent Orders</h2>
-    <div *ngIf="loadingRecentOrders" class="loading-container">
-        <mat-spinner diameter="40"></mat-spinner>
-        <p class="loading-text">Loading recent orders...</p>
+<div class="dashboard-container">
+    <div class="dashboard-header">
+        <p class="subtitle">Overview of logistics operations and delivery management</p>
     </div>
-    <table *ngIf="!loadingRecentOrders">
-        <thead>
-            <tr>
-                <th>Order Id</th>
-                <th>Customer Id</th>
-                <th>Order Date</th>
-            </tr>
-        </thead>
-        <tbody>
-            <tr *ngIf="recentOrders.length == 0">
-                <td colspan="3" [style.text-align]="'center'" [style.color]="'grey'">No orders found!</td>
-            </tr>
-            <tr *ngFor="let order of recentOrders">
-                <td>
-                    <a style="color:black;" [routerLink]="['/logistics/orders', order.orderId]"
-                        routerLinkActive="active">
-                        {{order.orderId }}
-                    </a>
-                </td>
-                <td>{{ order.customer.customerId }}</td>
-                <td>{{ order.orderDate | date:'medium' }}</td>
-            </tr>
-        </tbody>
-    </table>
-</section>
 
-<section id="return-orders" class="card">
-    <h2>Return Orders</h2>
-    <div *ngIf="loadingReturnedOrders" class="loading-container">
-        <mat-spinner diameter="40"></mat-spinner>
-        <p class="loading-text">Loading return orders...</p>
+    <div *ngIf="loadingStats" class="loading-container">
+        <mat-spinner diameter="50"></mat-spinner>
+        <p>Loading dashboard data...</p>
     </div>
-    <table *ngIf="!loadingReturnedOrders">
-        <thead>
-            <tr>
-                <th>Return Order Id</th>
-                <th>Customer Id</th>
-                <th>Order Item Id</th>
-                <th>Returned Date</th>
-                <th>Payment Source</th>
-                <th>Reason</th>
-            </tr>
-        </thead>
-        <tbody>
-            <tr *ngIf="returnedOrders.length == 0">
-                <td colspan="6" [style.text-align]="'center'" [style.color]="'grey'">No return orders found!</td>
-            </tr>
-            <tr *ngFor="let orderReturn of returnedOrders">
-                <td>
-                    <a style="color:black;" [routerLink]="['/logistics/order-returns', orderReturn.orderReturnId]"
-                        routerLinkActive="active">
-                        {{orderReturn.orderReturnId }}
-                    </a>
-                </td>
-                <td>{{ orderReturn.customerId }}</td>
-                <td>{{ orderReturn.orderItemId }}</td>
-                <td>{{ orderReturn.dateAdded| date:'medium' }}</td>
-                <td>{{ orderReturn.returnPaymentSourceId }}</td>
-                <td>{{ orderReturn.returnReasonCategoryId }}</td>
-            </tr>
-        </tbody>
-    </table>
-</section>
 
-<section id="pending-deliveries" class="card">
-    <h2>Pending Deliveries</h2>
-    <div *ngIf="loadingDeliveries" class="loading-container">
-        <mat-spinner diameter="40"></mat-spinner>
-        <p class="loading-text">Loading deliveries...</p>
-    </div>
-    <table *ngIf="!loadingDeliveries">
-        <thead>
-            <tr>
-                <th>Order Tracking Id</th>
-                <th>Delivery Agent</th>
-                <th>Product</th>
-                <th>Estimated Delivery Date</th>
-                <th>Tracking Status</th>
-            </tr>
-        </thead>
-        <tbody>
-            <tr *ngIf="deliveries.length == 0">
-                <td colspan="5" [style.text-align]="'center'" [style.color]="'grey'">No deliveries found!</td>
-            </tr>
-            <tr *ngFor="let delivery of deliveries">
-                <td>
-                    <a style="color:black;" [routerLink]="['/logistics/deliveries', delivery.orderTrackingId]"
-                        routerLinkActive="active">
-                        {{delivery.orderTrackingId }}
-                    </a>
-                </td>
-                <td [style.color]="!delivery.deliveryAgent ? 'grey' : 'inherit'">{{
-                    delivery.deliveryAgent?.deliveryAgentId ||
-                    "N/A" }}</td>
-                <td>{{ delivery.product?.productId }}</td>
-                <td>{{ delivery.estimatedDeliveryDate| date:'medium' }}</td>
-                <td>{{ getOrderStatusValue(delivery.orderTrackingStatusId) }}</td>
-            </tr>
-        </tbody>
-    </table>
-</section>
+    <div class="dashboard-content">
+        <div *ngIf="!loadingStats" class="stats-grid">
+            <mat-card *ngFor="let stat of stats" class="stat-card">
+                <mat-card-content>
+                    <div class="stat-header">
+                        <mat-icon [style.color]="stat.color" class="stat-icon">{{ stat.icon }}</mat-icon>
+                        <span class="stat-trend" [class.positive]="stat.trend?.startsWith('+')"
+                            [class.negative]="stat.trend?.startsWith('-')">
+                            {{ stat.trend }}
+                        </span>
+                    </div>
+                    <div class="stat-value">{{ stat.value }}</div>
+                    <div class="stat-label">{{ stat.label }}</div>
+                </mat-card-content>
+            </mat-card>
+        </div>
 
-<section id="delivery-agents" class="card">
-    <h2>Delivery Agents</h2>
-    <div *ngIf="loadingDeliveryAgents" class="loading-container">
-        <mat-spinner diameter="40"></mat-spinner>
-        <p class="loading-text">Loading delivery agents...</p>
-    </div>
-    <table *ngIf="!loadingDeliveryAgents">
-        <thead>
-            <tr>
-                <th>Agent Id</th>
-                <th>Agent Name</th>
-                <th>Availability</th>
-                <th>Rating</th>
-                <th>Serving Area</th>
-            </tr>
-        </thead>
-        <tbody>
-            <tr *ngIf="deliveryAgents.length == 0">
-                <td colspan="5" [style.text-align]="'center'" [style.color]="'grey'">No delivery agents found!</td>
-            </tr>
-            <tr *ngFor="let agent of deliveryAgents">
-                <td>
-                    <a style="color:black;" [routerLink]="['/logistics/delivery-agents', agent.deliveryAgentId]"
-                        routerLinkActive="active">
-                        {{agent.deliveryAgentId }}
-                    </a>
-                </td>
-                <td>{{ agent.deliveryAgentName || "Not Assigned" }}</td>
-                <td>{{ getAvailabilityStatusValue(agent.availabilityStatus) }}</td>
-                <td>{{ agent.rating }}</td>
-                <td>{{ agent.servingArea }}</td>
-            </tr>
-        </tbody>
-    </table>
-</section>
+        <mat-card class="table-card">
+            <mat-card-header>
+                <mat-card-title>Recent Orders</mat-card-title>
+            </mat-card-header>
+            <mat-card-content>
+                <div class="table-container">
+                    <div *ngIf="loadingRecentOrders" class="loading-container">
+                        <mat-spinner diameter="40"></mat-spinner>
+                        <p class="loading-text">Loading recent orders...</p>
+                    </div>
+                    <table mat-table [dataSource]="recentOrders" class="dashboard-table">
+                        <ng-container matColumnDef="orderId">
+                            <th mat-header-cell *matHeaderCellDef>Order ID</th>
+                            <td mat-cell *matCellDef="let order">
+                                <a href="" [routerLink]="['/logistics/order-items', order.orderId]"
+                                    style="cursor: pointer; color: #1976d2; text-decoration: none;"
+                                    routerLinkActive="active">
+                                    {{ order.orderId }}
+                                </a>
+                            </td>
+                        </ng-container>
+                        <ng-container matColumnDef="customerName">
+                            <th mat-header-cell *matHeaderCellDef>Customer Name</th>
+                            <td mat-cell *matCellDef="let order">{{ order.customer.customerName }}</td>
+                        </ng-container>
+                        <ng-container matColumnDef="status">
+                            <th mat-header-cell *matHeaderCellDef>Status</th>
+                            <td mat-cell *matCellDef="let order">
+                                <span class="status-badge" [ngClass]="getStatusClass(order.orderStatus)">
+                                    {{ getOrderStatusValue(order.orderStatus) }}
+                                </span>
+                            </td>
+                        </ng-container>
+                        <ng-container matColumnDef="deliveryAddress">
+                            <th mat-header-cell *matHeaderCellDef>Delivery Address</th>
+                            <td mat-cell *matCellDef="let order">{{ order.shippingAddress.city }}</td>
+                        </ng-container>
+                        <ng-container matColumnDef="amount">
+                            <th mat-header-cell *matHeaderCellDef>Amount</th>
+                            <td mat-cell *matCellDef="let order">${{ order.totalOrderValue | number : '1.2-2'}}</td>
+                        </ng-container>
 
-<section id="delivery-hubs" class="card">
-    <h2>Delivery Hubs</h2>
-    <div *ngIf="loadingDeliveryHubs" class="loading-container">
-        <mat-spinner diameter="40"></mat-spinner>
-        <p class="loading-text">Loading delivery hubs...</p>
+                        <tr mat-header-row *matHeaderRowDef="orderDisplayedColumns; sticky: true"></tr>
+                        <tr mat-row *matRowDef="let row; columns: orderDisplayedColumns"></tr>
+                        <tr class="mat-row" *matNoDataRow>
+                            <td class="mat-cell no-data" [attr.colspan]="orderDisplayedColumns.length">
+                                No orders found!
+                            </td>
+                        </tr>
+                    </table>
+                </div>
+            </mat-card-content>
+        </mat-card>
+
+        <mat-card class="table-card">
+            <mat-card-header>
+                <mat-card-title>Return Orders</mat-card-title>
+            </mat-card-header>
+            <mat-card-content>
+                <div class="table-container">
+                    <div *ngIf="loadingReturnedOrders" class="loading-container">
+                        <mat-spinner diameter="40"></mat-spinner>
+                        <p class="loading-text">Loading return orders...</p>
+                    </div>
+                    <table mat-table [dataSource]="returnedOrders" class="dashboard-table">
+                        <ng-container matColumnDef="returnOrderId">
+                            <th mat-header-cell *matHeaderCellDef>Return Order ID</th>
+                            <td mat-cell *matCellDef="let returnOrder">
+                                <a href="" [routerLink]="['/logistics/return-orders', returnOrder.orderReturnId]"
+                                    style="cursor: pointer; color: #1976d2; text-decoration: none;"
+                                    routerLinkActive="active">
+                                    {{ returnOrder.orderReturnId }}
+                                </a>
+                            </td>
+                        </ng-container>
+                        <ng-container matColumnDef="customerName">
+                            <th mat-header-cell *matHeaderCellDef>Customer Name</th>
+                            <td mat-cell *matCellDef="let returnOrder">{{ returnOrder.customerId }}</td>
+                        </ng-container>
+                        <ng-container matColumnDef="orderItemId">
+                            <th mat-header-cell *matHeaderCellDef>Order Item</th>
+                            <td mat-cell *matCellDef="let returnOrder">
+                                {{ returnOrder.orderItemId }}
+                            </td>
+                        </ng-container>
+                        <ng-container matColumnDef="returnedDate">
+                            <th mat-header-cell *matHeaderCellDef>Returned Date</th>
+                            <td mat-cell *matCellDef="let returnOrder">{{ returnOrder.dateAdded | date: 'medium'}}</td>
+                        </ng-container>
+                        <ng-container matColumnDef="returnReason">
+                            <th mat-header-cell *matHeaderCellDef>Return Reason</th>
+                            <td mat-cell *matCellDef="let returnOrder">{{ returnOrder.returnReasonCategoryId }}</td>
+                        </ng-container>
+
+                        <tr mat-header-row *matHeaderRowDef="returnOrderDisplayedColumns; sticky: true"></tr>
+                        <tr mat-row *matRowDef="let row; columns: returnOrderDisplayedColumns"></tr>
+                        <tr class="mat-row" *matNoDataRow>
+                            <td class="mat-cell no-data" [attr.colspan]="returnOrderDisplayedColumns.length">
+                                No return orders found!
+                            </td>
+                        </tr>
+                    </table>
+                </div>
+            </mat-card-content>
+        </mat-card>
+
+        <mat-card class="table-card">
+            <mat-card-header>
+                <mat-card-title>Pending Deliveries</mat-card-title>
+            </mat-card-header>
+            <mat-card-content>
+                <div class="table-container">
+                    <div *ngIf="loadingDeliveries" class="loading-container">
+                        <mat-spinner diameter="40"></mat-spinner>
+                        <p class="loading-text">Loading pending deliveries...</p>
+                    </div>
+                    <table mat-table [dataSource]="deliveries" class="dashboard-table">
+                        <ng-container matColumnDef="orderTrackingId">
+                            <th mat-header-cell *matHeaderCellDef>Order Tracking Id</th>
+                            <td mat-cell *matCellDef="let delivery">
+                                <a href="" [routerLink]="['/logistics/deliveries', delivery.orderTrackingId]"
+                                    style="cursor: pointer; color: #1976d2; text-decoration: none;"
+                                    routerLinkActive="active">
+                                    {{ delivery.orderTrackingId }}
+                                </a>
+                            </td>
+                        </ng-container>
+                        <ng-container matColumnDef="deliveryAgent">
+                            <th mat-header-cell *matHeaderCellDef>Delivery Agent</th>
+                            <td mat-cell *matCellDef="let delivery"
+                                [style.color]="!delivery.deliveryAgent ? 'grey' : 'inherit'">{{
+                                delivery.deliveryAgent?.deliveryAgentId || "N/A" }}</td>
+                        </ng-container>
+                        <ng-container matColumnDef="product">
+                            <th mat-header-cell *matHeaderCellDef>Product</th>
+                            <td mat-cell *matCellDef="let delivery">
+                                {{ delivery.product?.productId }}
+                            </td>
+                        </ng-container>
+                        <ng-container matColumnDef="estimatedDeliveryDate">
+                            <th mat-header-cell *matHeaderCellDef>Delivery Date</th>
+                            <td mat-cell *matCellDef="let delivery">{{ delivery.estimatedDeliveryDate | date: 'medium'}}
+                            </td>
+                        </ng-container>
+                        <ng-container matColumnDef="trackingStatus">
+                            <th mat-header-cell *matHeaderCellDef>Tracking Status</th>
+                            <td mat-cell *matCellDef="let delivery">
+                                <span class="status-badge" [ngClass]="getStatusClass(delivery.orderTrackingStatusId)">
+                                    {{ getOrderStatusValue(delivery.orderTrackingStatusId) }}
+                                </span>
+                            </td>
+                        </ng-container>
+                        <tr mat-header-row *matHeaderRowDef="deliveryColumns; sticky: true"></tr>
+                        <tr mat-row *matRowDef="let row; columns: deliveryColumns"></tr>
+                        <tr class="mat-row" *matNoDataRow>
+                            <td class="mat-cell no-data" [attr.colspan]="deliveryColumns.length">
+                                No pending deliveries found!
+                            </td>
+                        </tr>
+                    </table>
+                </div>
+            </mat-card-content>
+        </mat-card>
+
+        <mat-card class="table-card">
+            <mat-card-header>
+                <mat-card-title>Delivery Agents</mat-card-title>
+            </mat-card-header>
+            <mat-card-content>
+                <div class="table-container">
+                    <div *ngIf="loadingDeliveryAgents" class="loading-container">
+                        <mat-spinner diameter="40"></mat-spinner>
+                        <p class="loading-text">Loading delivery agents...</p>
+                    </div>
+                    <table mat-table [dataSource]="deliveryAgents" class="dashboard-table">
+                        <ng-container matColumnDef="agentId">
+                            <th mat-header-cell *matHeaderCellDef>Agent Id</th>
+                            <td mat-cell *matCellDef="let agent">
+                                <a href="" [routerLink]="['/logistics/delivery-agents', agent.deliveryAgentId]"
+                                    style="cursor: pointer; color: #1976d2; text-decoration: none;"
+                                    routerLinkActive="active">
+                                    {{ agent.deliveryAgentId }}
+                                </a>
+                            </td>
+                        </ng-container>
+                        <ng-container matColumnDef="agentName">
+                            <th mat-header-cell *matHeaderCellDef>Agent Name</th>
+                            <td mat-cell *matCellDef="let agent">{{
+                                agent.deliveryAgentName }}
+                            </td>
+                        </ng-container>
+                        <ng-container matColumnDef="availability">
+                            <th mat-header-cell *matHeaderCellDef>Availability Status</th>
+                            <td mat-cell *matCellDef="let agent">
+                                <span class="status-badge"
+                                    [ngClass]="getAvailabilityStatusClass(agent.availabilityStatus)">
+                                    {{ getAvailabilityStatusValue(agent.availabilityStatus) }}
+                                </span>
+                            </td>
+                        </ng-container>
+                        <ng-container matColumnDef="rating">
+                            <th mat-header-cell *matHeaderCellDef>Rating</th>
+                            <td mat-cell *matCellDef="let agent">{{ agent.rating | number: '1.1-1'}}
+                            </td>
+                        </ng-container>
+                        <ng-container matColumnDef="servingArea">
+                            <th mat-header-cell *matHeaderCellDef>Serving Area</th>
+                            <td mat-cell *matCellDef="let agent">
+                                {{ agent.servingArea }}
+                            </td>
+                        </ng-container>
+                        <tr mat-header-row *matHeaderRowDef="deliveryAgentColumns; sticky: true"></tr>
+                        <tr mat-row *matRowDef="let row; columns: deliveryAgentColumns"></tr>
+                        <tr class="mat-row" *matNoDataRow>
+                            <td class="mat-cell no-data" [attr.colspan]="deliveryAgentColumns.length">
+                                No delivery agents found!
+                            </td>
+                        </tr>
+                    </table>
+                </div>
+            </mat-card-content>
+        </mat-card>
+
+        <mat-card class="table-card">
+            <mat-card-header>
+                <mat-card-title>Delivery Hubs</mat-card-title>
+            </mat-card-header>
+            <mat-card-content>
+                <div class="table-container">
+                    <div *ngIf="loadingDeliveryHubs" class="loading-container">
+                        <mat-spinner diameter="40"></mat-spinner>
+                        <p class="loading-text">Loading delivery hubs...</p>
+                    </div>
+                    <table mat-table [dataSource]="deliveryHubs" class="dashboard-table">
+                        <ng-container matColumnDef="hubId">
+                            <th mat-header-cell *matHeaderCellDef>Hub Id</th>
+                            <td mat-cell *matCellDef="let hub">
+                                <a href="" [routerLink]="['/logistics/delivery-hubs', hub.deliveryHubId]"
+                                    style="cursor: pointer; color: #1976d2; text-decoration: none;"
+                                    routerLinkActive="active">
+                                    {{ hub.deliveryHubId }}
+                                </a>
+                            </td>
+                        </ng-container>
+                        <ng-container matColumnDef="hubName">
+                            <th mat-header-cell *matHeaderCellDef>Hub Name</th>
+                            <td mat-cell *matCellDef="let hub">{{
+                                hub.deliveryHubName }}
+                            </td>
+                        </ng-container>
+                        <ng-container matColumnDef="address">
+                            <th mat-header-cell *matHeaderCellDef>Hub Address</th>
+                            <td mat-cell *matCellDef="let hub">
+                                {{ hub.deliveryHubAddress?.city == undefined ? "Not Available" :
+                                (hub.deliveryHubAddress?.city + ", "+ hub.deliveryHubAddress.state)
+                                }}
+                            </td>
+                        </ng-container>
+                        <ng-container matColumnDef="dateAdded">
+                            <th mat-header-cell *matHeaderCellDef>Date Added</th>
+                            <td mat-cell *matCellDef="let hub">{{ hub.dateAdded | date: 'medium'}}
+                            </td>
+                        </ng-container>
+                        <tr mat-header-row *matHeaderRowDef="deliveryHubColumns; sticky: true"></tr>
+                        <tr mat-row *matRowDef="let row; columns: deliveryHubColumns"></tr>
+                        <tr class="mat-row" *matNoDataRow>
+                            <td class="mat-cell no-data" [attr.colspan]="deliveryHubColumns.length">
+                                No delivery hubs found!
+                            </td>
+                        </tr>
+                    </table>
+                </div>
+            </mat-card-content>
+        </mat-card>
     </div>
-    <table *ngIf="!loadingDeliveryHubs">
-        <thead>
-            <tr>
-                <th>Hub Id</th>
-                <th>Hub Name</th>
-                <th>Address</th>
-                <th>Date Added</th>
-            </tr>
-        </thead>
-        <tbody>
-            <tr *ngIf="deliveryHubs.length == 0">
-                <td colspan="4" [style.text-align]="'center'" [style.color]="'grey'">No delivery hubs found!</td>
-            </tr>
-            <tr *ngFor="let hub of deliveryHubs">
-                <td>
-                    <a style="color:black;" [routerLink]="['/logistics/delivery-hubs', hub.deliveryHubId]"
-                        routerLinkActive="active">
-                        {{hub.deliveryHubId }}
-                    </a>
-                </td>
-                <td>{{ hub.deliveryHubName || "Not Assigned" }}</td>
-                <td>{{ hub.deliveryHubAddress?.city || "Not Available"}}</td>
-                <td>{{ hub.dateAdded | date: 'medium' }}</td>
-            </tr>
-        </tbody>
-    </table>
-</section>
+</div>

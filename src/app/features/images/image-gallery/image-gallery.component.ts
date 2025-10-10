@@ -107,6 +107,7 @@ export class ImageGalleryComponent implements OnInit, AfterViewInit {
     this.loading = true;
     setTimeout(() => {
       var imageFilters: ImageFilters = {
+        type: 'image',
         currentPage: this.currentPage,
         offset: this.offset,
       };
