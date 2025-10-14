@@ -1,19 +1,19 @@
 import { Routes } from '@angular/router';
 import { AuthGuard } from '../../../core/guards/auth.guard';
 import { RoleGuard } from '../../../core/guards/role.guard';
-import { OrderItemsComponent } from './order-items.component';
-import { ViewOrderItemComponent } from './view-order-item/view-order-item.component';
+import { OrdersComponent } from './orders.component';
+import { ViewOrderComponent } from './view-order/view-order.component';
 
 export const ORDER_ITEM_ROUTES: Routes = [
   {
     path: '',
-    component: OrderItemsComponent,
+    component: OrdersComponent,
     canActivate: [AuthGuard, RoleGuard],
     data: { role: 'admin', subRoles: ['logistics'] },
   },
   {
-    path: ':orderItemId',
-    component: ViewOrderItemComponent,
+    path: ':orderId',
+    component: ViewOrderComponent,
     canActivate: [AuthGuard, RoleGuard],
     data: { role: 'admin', subRoles: ['logistics'] },
   },

@@ -85,12 +85,12 @@ export class BaseService<T> {
       `${this.baseUrl}/${this.endpoint}/${resource}`,
       {
         headers: this.mergeHeaders(headers),
-        params: this.getParams(filters),
+        params: this.getHttpParams(filters),
       }
     );
   }
 
-  getParams(filters: any): HttpParams {
+  private getHttpParams(filters: any): HttpParams {
     let params: HttpParams = new HttpParams()
       .set('currentPage', filters.currentPage || 0)
       .set('offset', filters.offset || 10)
@@ -115,11 +115,7 @@ export class BaseService<T> {
           }
 
           if (value instanceof Date) {
-            value = value.toISOString();
-          }
-
-          if (key.toLowerCase().includes('date')) {
-            return;
+            value = value.toISOString().replace('Z', '');
           }
 
           params = params.set(key, value.toString());
@@ -135,13 +131,26 @@ export class BaseService<T> {
     });
   }
 
-  getByPathParam(
-    pathParam: number | string,
+  getByPathParams(
+    pathParams: string,
     path: string,
     headers?: HttpHeaders
   ): Observable<T> {
     return this.http.get<T>(
-      `${this.baseUrl}/${this.endpoint}/${path}/${pathParam}`,
+      `${this.baseUrl}/${this.endpoint}/${path}/${pathParams}`,
+      {
+        headers: this.mergeHeaders(headers),
+      }
+    );
+  }
+
+  getByQueryParams(
+    queryparams: string,
+    resource: string,
+    headers?: HttpHeaders
+  ): Observable<T> {
+    return this.http.get<T>(
+      `${this.baseUrl}/${this.endpoint}/${resource}/${queryparams}`,
       {
         headers: this.mergeHeaders(headers),
       }

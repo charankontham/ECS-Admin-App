@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import { BehaviorSubject } from 'rxjs';
 import type { ProductFilters } from '../models/product.model';
+import { OrderFilters } from '../models/order.model';
 
 export interface ProductsPageState {
   filters: ProductFilters;
@@ -38,6 +39,15 @@ export interface SubCategoriesPageState {
   scrollPosition?: number;
 }
 
+export interface OrdersPageState {
+  filters: OrderFilters;
+  currentPage: number;
+  pageSize: number;
+  sortField?: string;
+  sortDirection?: 'asc' | 'desc';
+  scrollPosition?: number;
+}
+
 @Injectable({
   providedIn: 'root',
 })
@@ -51,9 +61,22 @@ export class NavigationStateService {
   );
   private subCategoriesPageState =
     new BehaviorSubject<SubCategoriesPageState | null>(null);
+  private ordersPageState = new BehaviorSubject<OrdersPageState | null>(null);
 
   getProductsPageState() {
     return this.productsPageState.asObservable();
+  }
+
+  getOrdersPageState() {
+    return this.ordersPageState.asObservable();
+  }
+
+  setOrdersPageState(state: OrdersPageState) {
+    this.ordersPageState.next(state);
+  }
+
+  clearOrdersPageState() {
+    this.ordersPageState.next(null);
   }
 
   setProductsPageState(state: ProductsPageState) {

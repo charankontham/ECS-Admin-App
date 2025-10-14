@@ -1,0 +1,280 @@
+<div class="view-order-container">
+
+    <div *ngIf="error && !isOrderInfoLoading" class="error-container">
+        <mat-icon>error_outline</mat-icon>
+        <h2>Error Loading Order</h2>
+        <p>{{ error }}</p>
+        <button mat-raised-button (click)="goBack()">
+            <mat-icon>arrow_back</mat-icon>
+            Go Back
+        </button>
+    </div>
+
+    <div class="order-content">
+        <div class="order-header" *ngIf="order && !isOrderInfoLoading">
+            <div class="header-left">
+                <button mat-icon-button (click)="goBack()" class="back-button">
+                    <mat-icon>arrow_back</mat-icon>
+                </button>
+                <div class="header-info">
+                    <h1>ORDER #{{ order.orderId }}</h1>
+                    <p class="order-date">
+                        <mat-icon>schedule</mat-icon>
+                        {{ formatDate(order.orderDate) }}
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <div class="order-grid" *ngIf="order && !isOrderInfoLoading">
+            <mat-card class="info-card customer-card">
+                <mat-card-header>
+                    <div class="card-header-content">
+                        <mat-icon class="header-icon customer-icon">person</mat-icon>
+                        <mat-card-title>Customer Information</mat-card-title>
+                    </div>
+                </mat-card-header>
+                <mat-card-content>
+                    <div class="info-row">
+                        <span class="info-label">
+                            <mat-icon>badge</mat-icon>
+                            Customer ID
+                        </span>
+                        <span class="info-value">{{ order.customer.customerId }}</span>
+                    </div>
+                    <div class="info-row">
+                        <span class="info-label">
+                            <mat-icon>person</mat-icon>
+                            Name
+                        </span>
+                        <span class="info-value">{{ order.customer.customerName }}</span>
+                    </div>
+                    <div class="info-row">
+                        <span class="info-label">
+                            <mat-icon>email</mat-icon>
+                            Email
+                        </span>
+                        <span class="info-value">{{ order.customer.email }}</span>
+                    </div>
+                    <div class="info-row">
+                        <span class="info-label">
+                            <mat-icon>phone</mat-icon>
+                            Phone
+                        </span>
+                        <span class="info-value">{{ order.customer.phone }}</span>
+                    </div>
+                </mat-card-content>
+            </mat-card>
+
+            <mat-card class="info-card shipping-card">
+                <mat-card-header>
+                    <div class="card-header-content">
+                        <mat-icon class="header-icon shipping-icon">local_shipping</mat-icon>
+                        <mat-card-title>Shipping Details</mat-card-title>
+                    </div>
+                </mat-card-header>
+                <mat-card-content>
+                    <div class="info-row">
+                        <span class="info-label">
+                            <mat-icon>location_on</mat-icon>
+                            Address
+                        </span>
+                        <span class="info-value">{{ order.shippingAddress.street }}</span>
+                    </div>
+                    <div class="info-row">
+                        <span class="info-label">
+                            <mat-icon>location_city</mat-icon>
+                            City
+                        </span>
+                        <span class="info-value">{{ order.shippingAddress.city }}</span>
+                    </div>
+                    <div class="info-row">
+                        <span class="info-label">
+                            <mat-icon>map</mat-icon>
+                            State
+                        </span>
+                        <span class="info-value">{{ order.shippingAddress.state }}</span>
+                    </div>
+                    <div class="info-row">
+                        <span class="info-label">
+                            <mat-icon>pin_drop</mat-icon>
+                            Pincode
+                        </span>
+                        <span class="info-value">{{ order.shippingAddress.zip }}</span>
+                    </div>
+                    <div class="info-row highlight">
+                        <span class="info-label">
+                            <mat-icon>local_shipping</mat-icon>
+                            Shipping Fee
+                        </span>
+                        <span class="info-value price">${{ order.shippingFee ? order.shippingFee.toFixed(2) : "N/A"
+                            }}</span>
+                    </div>
+                </mat-card-content>
+            </mat-card>
+
+            <mat-card class="info-card payment-card">
+                <mat-card-header>
+                    <div class="card-header-content">
+                        <mat-icon class="header-icon payment-icon">payment</mat-icon>
+                        <mat-card-title>Payment Info</mat-card-title>
+                    </div>
+                </mat-card-header>
+                <mat-card-content>
+                    <div class="info-row">
+                        <span class="info-label">
+                            <mat-icon>credit_card</mat-icon>
+                            Payment Type
+                        </span>
+                        <span class="info-value">{{ getPaymentTypeValue(order.paymentType) }}</span>
+                    </div>
+                    <div class="info-row">
+                        <span class="info-label">
+                            <mat-icon>check_circle</mat-icon>
+                            Payment Status
+                        </span>
+                        <mat-chip [class]="getPaymentStatusClass(order.paymentStatus)">
+                            {{ getPaymentStatusValue(order.paymentStatus) }}
+                        </mat-chip>
+                    </div>
+                    <mat-divider></mat-divider>
+                    <div class="info-row total-row">
+                        <span class="info-label">
+                            <mat-icon>account_balance_wallet</mat-icon>
+                            Total Order Value
+                        </span>
+                        <span class="info-value total-price">${{ order.totalOrderValue ?
+                            order.totalOrderValue.toFixed(2) : "N/A" }}</span>
+                    </div>
+                </mat-card-content>
+            </mat-card>
+        </div>
+
+        <mat-card class="order-items-card" *ngIf="order && !isOrderInfoLoading">
+            <mat-card-header>
+                <div class="card-header-content">
+                    <mat-icon class="header-icon items-icon">shopping_cart</mat-icon>
+                    <mat-card-title>Order Items ({{ order.orderItems.length }})</mat-card-title>
+                </div>
+            </mat-card-header>
+            <mat-card-content>
+                <div class="order-items-list">
+                    <div *ngFor="let item of order.orderItems; let i = index" class="order-item">
+                        <div class="item-header">
+                            <div class="item-number">Order Item {{ i + 1 }}</div>
+                            <mat-chip [class]="getStatusClass(item.orderItemStatus)" class="item-status">
+                                {{ getStatusLabel(item.orderItemStatus) }}
+                            </mat-chip>
+                        </div>
+
+                        <div class="item-content">
+                            <div class="product-section">
+                                <img [src]="getImageUrl(item.product.productImage)" [alt]="item.product.productName"
+                                    class="product-image" />
+                                <div class="product-details">
+                                    <h3 class="product-name">{{ item.product.productName }}</h3>
+                                    <p class="product-id">Product ID: {{ item.product.productId }}</p>
+                                    <div class="price-info">
+                                        <span class="unit-price">
+                                            ${{ item.product.productPrice.toFixed(2)}} × {{
+                                            item.product.productQuantity}}
+                                        </span>
+                                        <span class="total-price">
+                                            ${{ item.product.productPrice * item.product.productQuantity}}
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <mat-divider></mat-divider>
+                            <div *ngIf="isOrderTrackingLoading" class="loading-container">
+                                <mat-progress-bar mode="indeterminate"></mat-progress-bar>
+                                <p>Loading tracking details...</p>
+                            </div>
+                            <div class="tracking-section" *ngIf="ordersTracking.length>0 && !isOrderTrackingLoading">
+                                <h4 class="section-title">
+                                    <mat-icon>local_shipping</mat-icon>
+                                    Tracking Information
+                                </h4>
+                                <div class="tracking-grid">
+                                    <div class="tracking-item">
+                                        <mat-icon>qr_code</mat-icon>
+                                        <div class="tracking-info">
+                                            <span class="tracking-label">Tracking Number</span>
+                                            <span class="tracking-value">{{ ordersTracking[i].orderTrackingId}}</span>
+                                        </div>
+                                    </div>
+                                    <div class="tracking-item">
+                                        <mat-icon>person</mat-icon>
+                                        <div class="tracking-info">
+                                            <span class="tracking-label">Delivery Agent</span>
+                                            <span class="tracking-value"
+                                                [ngClass]="ordersTracking[i].deliveryAgent == null ? 'not-available-value':''">
+                                                {{ ordersTracking[i].deliveryAgent ??
+                                                ordersTracking[i].deliveryAgent?.deliveryAgentName ?? "N/A"}}</span>
+                                        </div>
+                                    </div>
+                                    <div class="tracking-item">
+                                        <mat-icon>store</mat-icon>
+                                        <div class="tracking-info">
+                                            <span class="tracking-label">Delivery Hub</span>
+                                            <span class="tracking-value"
+                                                [ngClass]="ordersTracking[i].nearestHub == null ? 'not-available-value':''">{{
+                                                ordersTracking[i].nearestHub??
+                                                ordersTracking[i].nearestHub?.deliveryHubName ?? "N/A" }}
+                                            </span>
+                                        </div>
+                                    </div>
+                                    <div class="tracking-item">
+                                        <mat-icon>event</mat-icon>
+                                        <div class="tracking-info">
+                                            <span class="tracking-label">Expected Delivery</span>
+                                            <span class="tracking-value"
+                                                [ngClass]="ordersTracking[i].estimatedDeliveryDate == null ? 'not-available-value':''">
+                                                {{ ordersTracking[i].estimatedDeliveryDate ?
+                                                formatDate(ordersTracking[i].estimatedDeliveryDate) : "N/A"
+                                                }}
+                                            </span>
+                                        </div>
+                                    </div>
+                                    <div class="tracking-item full-width">
+                                        <mat-icon>notes</mat-icon>
+                                        <div class="tracking-info">
+                                            <span class="tracking-label">Delivery Instructions</span>
+                                            <span class="tracking-value"
+                                                [ngClass]="ordersTracking[i].customerInstructions==null ? 'not-available-value':''">{{
+                                                ordersTracking[i].customerInstructions ??
+                                                "N/A"}}</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="seller-section">
+                                <h4 class="section-title">
+                                    <mat-icon>storefront</mat-icon>
+                                    Seller Information
+                                </h4>
+                                <div class="seller-info">
+                                    <div class="seller-item">
+                                        <mat-icon>business</mat-icon>
+                                        <div class="seller-details">
+                                            <span class="seller-label">Seller Name</span>
+                                            <span class="seller-value">{{ "N/A" }}</span>
+                                        </div>
+                                    </div>
+                                    <div class="seller-item">
+                                        <mat-icon>tag</mat-icon>
+                                        <div class="seller-details">
+                                            <span class="seller-label">Seller ID</span>
+                                            <span class="seller-value">{{ "N/A" }}</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </mat-card-content>
+        </mat-card>
+    </div>
+</div>

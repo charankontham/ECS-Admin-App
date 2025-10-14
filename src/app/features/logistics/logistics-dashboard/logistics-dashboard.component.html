@@ -35,7 +35,7 @@
                         <mat-spinner diameter="40"></mat-spinner>
                         <p class="loading-text">Loading recent orders...</p>
                     </div>
-                    <table mat-table [dataSource]="recentOrders" class="dashboard-table">
+                    <table *ngIf="!loadingRecentOrders" mat-table [dataSource]="recentOrders" class="dashboard-table">
                         <ng-container matColumnDef="orderId">
                             <th mat-header-cell *matHeaderCellDef>Order ID</th>
                             <td mat-cell *matCellDef="let order">
@@ -89,7 +89,8 @@
                         <mat-spinner diameter="40"></mat-spinner>
                         <p class="loading-text">Loading return orders...</p>
                     </div>
-                    <table mat-table [dataSource]="returnedOrders" class="dashboard-table">
+                    <table *ngIf="!loadingReturnedOrders" mat-table [dataSource]="returnedOrders"
+                        class="dashboard-table">
                         <ng-container matColumnDef="returnOrderId">
                             <th mat-header-cell *matHeaderCellDef>Return Order ID</th>
                             <td mat-cell *matCellDef="let returnOrder">
@@ -141,7 +142,7 @@
                         <mat-spinner diameter="40"></mat-spinner>
                         <p class="loading-text">Loading pending deliveries...</p>
                     </div>
-                    <table mat-table [dataSource]="deliveries" class="dashboard-table">
+                    <table *ngIf="!loadingDeliveries" mat-table [dataSource]="deliveries" class="dashboard-table">
                         <ng-container matColumnDef="orderTrackingId">
                             <th mat-header-cell *matHeaderCellDef>Order Tracking Id</th>
                             <td mat-cell *matCellDef="let delivery">
@@ -199,7 +200,8 @@
                         <mat-spinner diameter="40"></mat-spinner>
                         <p class="loading-text">Loading delivery agents...</p>
                     </div>
-                    <table mat-table [dataSource]="deliveryAgents" class="dashboard-table">
+                    <table *ngIf="!loadingDeliveryAgents" mat-table [dataSource]="deliveryAgents"
+                        class="dashboard-table">
                         <ng-container matColumnDef="agentId">
                             <th mat-header-cell *matHeaderCellDef>Agent Id</th>
                             <td mat-cell *matCellDef="let agent">
@@ -258,7 +260,7 @@
                         <mat-spinner diameter="40"></mat-spinner>
                         <p class="loading-text">Loading delivery hubs...</p>
                     </div>
-                    <table mat-table [dataSource]="deliveryHubs" class="dashboard-table">
+                    <table *ngIf="!loadingDeliveryHubs" mat-table [dataSource]="deliveryHubs" class="dashboard-table">
                         <ng-container matColumnDef="hubId">
                             <th mat-header-cell *matHeaderCellDef>Hub Id</th>
                             <td mat-cell *matCellDef="let hub">

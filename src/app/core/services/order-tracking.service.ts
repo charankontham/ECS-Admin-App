@@ -34,6 +34,16 @@ export class OrderTrackingService extends BaseService<OrderTracking> {
     return this.getById(orderTrackingId);
   }
 
+  getOrderTrackingByOrderIdAndProductId(
+    orderId: number,
+    productId: number
+  ): Observable<OrderTracking> {
+    return this.getByPathParams(
+      '/' + orderId + '/' + productId,
+      'getByOrderIdAndProductId'
+    );
+  }
+
   updateOrderTracking(
     orderTrackingRequest: OrderTrackingRequest
   ): Observable<OrderTracking> {

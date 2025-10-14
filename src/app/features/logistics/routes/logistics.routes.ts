@@ -13,13 +13,11 @@ export const LOGISTICS_ROUTES: Routes = [
     component: LogisticsDashboardComponent,
   },
   {
-    path: 'order-items',
+    path: 'orders',
     canActivate: [AuthGuard, RoleGuard],
     data: { role: 'admin', subRoles: ['logistics'] },
     loadChildren: () =>
-      import('../order-items/order-items.routes').then(
-        (m) => m.ORDER_ITEM_ROUTES
-      ),
+      import('../order-items/orders.routes').then((m) => m.ORDER_ITEM_ROUTES),
   },
   {
     path: 'delivery-hubs',

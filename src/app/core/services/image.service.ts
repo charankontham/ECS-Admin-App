@@ -22,11 +22,11 @@ export class ImageService extends BaseService<ImageDoc> {
   }
 
   getImageById(id: string): Observable<ImageDoc> {
-    return this.getByPathParam(id, 'getByImageId');
+    return this.getByPathParams(id, 'getByImageId');
   }
 
   getImageByName(imageName: string): Observable<ImageDoc> {
-    return this.getByPathParam(imageName, 'getByImageName');
+    return this.getByPathParams(imageName, 'getByImageName');
   }
 
   addImage(image: ImageDoc): Observable<ImageDoc> {

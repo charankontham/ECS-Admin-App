@@ -1,3 +1,6 @@
+import { ProductBrand } from '../models/product-brand.model';
+import { ProductCategory, SubCategory } from '../models/product-category.model';
+
 export const OrderStatusClassMap: { [key: number]: string } = {
   1: 'status-order-placed',
   2: 'status-in-transit',
@@ -14,6 +17,14 @@ export const AvailabilityStatusClassMap: { [key: number]: string } = {
   2: 'status-busy',
   3: 'status-on-leave',
   4: 'status-unavailable',
+};
+
+export const PaymentStatusClassMap: { [key: number]: string } = {
+  1: 'paid',
+  2: 'pending',
+  3: 'failed',
+  4: 'refunded',
+  5: 'cancelled',
 };
 
 export enum OrderTrackingStatusEnum {
@@ -40,6 +51,15 @@ export enum AvailabilityStatus {
   Unavailable = 4,
 }
 
+export enum PaymentMethodEnum {
+  CreditCard = 1,
+  DebitCard = 2,
+  NetBanking = 3,
+  UPI = 4,
+  Wallets = 5,
+  Paypal = 6,
+}
+
 export const ORDER_TRACKING_STATUS_MAP: Readonly<Record<number, string>> = {
   [OrderTrackingStatusEnum.OrderPlaced]: 'Order Placed',
   [OrderTrackingStatusEnum.ShipmentInTransit]: 'In Transit',
@@ -64,6 +84,41 @@ export const AVAILABILITY_STATUS_MAP: Readonly<Record<number, string>> = {
   [AvailabilityStatus.Unavailable]: 'Unavailable',
 };
 
-export function sleep(ms: number): Promise<void> {
+export const PAYMENT_METHOD_MAP: Readonly<Record<number, string>> = {
+  [PaymentMethodEnum.CreditCard]: 'Credit Card',
+  [PaymentMethodEnum.DebitCard]: 'Debit Card',
+  [PaymentMethodEnum.NetBanking]: 'Net Banking',
+  [PaymentMethodEnum.UPI]: 'UPI',
+  [PaymentMethodEnum.Wallets]: 'Wallets',
+  [PaymentMethodEnum.Paypal]: 'Paypal',
+};
+
+export function sleep(ms: number) {
   return new Promise((resolve) => setTimeout(resolve, ms));
 }
+
+export const compare = (
+  a: number | string | Date,
+  b: number | string | Date,
+  isAsc: boolean
+): number => {
+  const dateA =
+    typeof a === 'string' && !isNaN(Date.parse(a)) ? new Date(a) : a;
+  const dateB =
+    typeof b === 'string' && !isNaN(Date.parse(b)) ? new Date(b) : b;
+
+  if (dateA instanceof Date && dateB instanceof Date) {
+    const result = dateA.getTime() - dateB.getTime();
+    return (result < 0 ? -1 : result > 0 ? 1 : 0) * (isAsc ? 1 : -1);
+  }
+  return (a < b ? -1 : 1) * (isAsc ? 1 : -1);
+};
+
+export const compareSubCategories = (sc1: SubCategory, sc2: SubCategory) =>
+  sc1 && sc2 && sc1.subCategoryId === sc2.subCategoryId;
+
+export const compareBrands = (b1: ProductBrand, b2: ProductBrand) =>
+  b1 && b2 && b1.brandId === b2.brandId;
+
+export const compareCategories = (c1: ProductCategory, c2: ProductCategory) =>
+  c1 && c2 && c1.categoryId === c2.categoryId;
