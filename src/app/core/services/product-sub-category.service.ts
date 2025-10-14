@@ -29,11 +29,8 @@ export class ProductSubCategoryService extends BaseService<SubCategory> {
     return this.getAllByPagination(filters, 'getAllSubCategoriesByPagination');
   }
 
-  getSubCategoriesByCategoryId(
-    resource: string,
-    categoryId: number
-  ): Observable<SubCategory[]> {
-    return this.getAllByPath(resource, categoryId);
+  getSubCategoriesByCategoryId(categoryId: number): Observable<SubCategory[]> {
+    return this.getAllByPath('getByCategoryId', categoryId);
   }
 
   getSubCategoryById(subCategoryId: number): Observable<SubCategory> {

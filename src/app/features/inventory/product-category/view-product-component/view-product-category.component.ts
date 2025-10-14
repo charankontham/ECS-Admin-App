@@ -120,16 +120,14 @@ export class ViewProductCategory {
   }
 
   loadSubCategories(categoryId: number): void {
-    this.subCategoryService
-      .getSubCategoriesByCategoryId('getByCategoryId', categoryId)
-      .subscribe({
-        next: (subCategories) => {
-          this.subCategories = subCategories.slice(0, 6); // Limit to 5 subcategories
-        },
-        error: (error) => {
-          console.error('Error loading subcategories', error);
-        },
-      });
+    this.subCategoryService.getSubCategoriesByCategoryId(categoryId).subscribe({
+      next: (subCategories) => {
+        this.subCategories = subCategories.slice(0, 6); // Limit to 5 subcategories
+      },
+      error: (error) => {
+        console.error('Error loading subcategories', error);
+      },
+    });
   }
 
   createCategoryForm(): FormGroup {

@@ -145,7 +145,7 @@ export class ViewProductComponent {
 
   loadSubCategories(categoryId: number): void {
     this.subCategoryService
-      .getSubCategoriesByCategoryId('getByCategoryId', categoryId)
+      .getSubCategoriesByCategoryId(categoryId)
       .subscribe((subCategories) => {
         this.subCategories = subCategories;
       });

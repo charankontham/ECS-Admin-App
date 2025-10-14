@@ -49,6 +49,12 @@ import {
   NavigationStateService,
   ProductsPageState,
 } from '../../../core/services/navigation-state.service';
+import {
+  compare,
+  compareBrands,
+  compareCategories,
+  compareSubCategories,
+} from '../../../core/util/util';
 
 @Component({
   selector: 'app-products',
@@ -226,7 +232,7 @@ export class ProductsComponent implements OnInit, AfterViewInit {
   loadSubCategories(categoryId: number): Promise<void> {
     return new Promise((resolve) => {
       this.subCategoryService
-        .getSubCategoriesByCategoryId('getByCategoryId', categoryId)
+        .getSubCategoriesByCategoryId(categoryId)
         .subscribe((subCategories) => {
           this.subCategories = subCategories;
           resolve();
@@ -290,31 +296,27 @@ export class ProductsComponent implements OnInit, AfterViewInit {
         const isAsc = sort.direction === 'asc';
         switch (sort.active) {
           case 'id':
-            return this.compare(a.productId, b.productId, isAsc);
+            return compare(a.productId, b.productId, isAsc);
           case 'name':
-            return this.compare(a.productName, b.productName, isAsc);
+            return compare(a.productName, b.productName, isAsc);
           case 'quantity':
-            return this.compare(a.productQuantity, b.productQuantity, isAsc);
+            return compare(a.productQuantity, b.productQuantity, isAsc);
           case 'price':
-            return this.compare(a.productPrice, b.productPrice, isAsc);
+            return compare(a.productPrice, b.productPrice, isAsc);
           case 'category':
-            return this.compare(
+            return compare(
               a.productSubCategory.productCategory.categoryId || '',
               b.productSubCategory.productCategory.categoryId || '',
               isAsc
             );
           case 'subCategory':
-            return this.compare(
+            return compare(
               a.productSubCategory.subCategoryId || '',
               b.productSubCategory.subCategoryId || '',
               isAsc
             );
           case 'brand':
-            return this.compare(
-              a.brand.brandId || '',
-              b.brand.brandId || '',
-              isAsc
-            );
+            return compare(a.brand.brandId || '', b.brand.brandId || '', isAsc);
           default:
             return 0;
         }
@@ -327,14 +329,6 @@ export class ProductsComponent implements OnInit, AfterViewInit {
       this.filters.sortDirection = sort.direction as 'asc' | 'desc';
       this.loadProducts();
     }
-  }
-
-  private compare(
-    a: number | string,
-    b: number | string,
-    isAsc: boolean
-  ): number {
-    return (a < b ? -1 : 1) * (isAsc ? 1 : -1);
   }
 
   updateDisplayedColumns(): void {
@@ -436,20 +430,20 @@ export class ProductsComponent implements OnInit, AfterViewInit {
     }, 300);
   }
 
-  onProductClick(event: Event, product: Product): void {
+  onProductClick(event: MouseEvent, product: Product): void {
+    if (event.ctrlKey || event.metaKey || event.button === 1) {
+      return;
+    }
     this.saveCurrentState();
     this.router.navigate(['/inventory/products', product.productId]);
     event.preventDefault();
   }
 
-  compareBrands = (b1: ProductBrand, b2: ProductBrand) =>
-    b1 && b2 && b1.brandId === b2.brandId;
-
-  compareCategories = (c1: ProductCategory, c2: ProductCategory) =>
-    c1 && c2 && c1.categoryId === c2.categoryId;
-
-  compareSubCategories = (sc1: SubCategory, sc2: SubCategory) =>
-    sc1 && sc2 && sc1.subCategoryId === sc2.subCategoryId;
+  getProductUrl(product: Product): string {
+    return this.router.serializeUrl(
+      this.router.createUrlTree(['/inventory/products', product.productId])
+    );
+  }
 
   checkIsDefaultFilterForm(): boolean {
     return !(
@@ -459,4 +453,8 @@ export class ProductsComponent implements OnInit, AfterViewInit {
       this.filterForm.get('search')?.value
     );
   }
+
+  compareBrands = compareBrands;
+  compareCategories = compareCategories;
+  compareSubCategories = compareSubCategories;
 }
