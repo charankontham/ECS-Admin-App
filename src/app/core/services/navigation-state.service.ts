@@ -2,6 +2,7 @@ import { Injectable } from '@angular/core';
 import { BehaviorSubject } from 'rxjs';
 import type { ProductFilters } from '../models/product.model';
 import { OrderFilters } from '../models/order.model';
+import { DeliveryHubFilters } from '../models/delivery.model';
 
 export interface ProductsPageState {
   filters: ProductFilters;
@@ -48,6 +49,15 @@ export interface OrdersPageState {
   scrollPosition?: number;
 }
 
+export interface DeliveryHubsPageState {
+  filters: DeliveryHubFilters;
+  currentPage: number;
+  pageSize: number;
+  sortField?: string;
+  sortDirection?: 'asc' | 'desc';
+  scrollPosition?: number;
+}
+
 @Injectable({
   providedIn: 'root',
 })
@@ -62,9 +72,19 @@ export class NavigationStateService {
   private subCategoriesPageState =
     new BehaviorSubject<SubCategoriesPageState | null>(null);
   private ordersPageState = new BehaviorSubject<OrdersPageState | null>(null);
+  private deliveryHubsPageState =
+    new BehaviorSubject<DeliveryHubsPageState | null>(null);
 
   getProductsPageState() {
     return this.productsPageState.asObservable();
+  }
+
+  setProductsPageState(state: ProductsPageState) {
+    this.productsPageState.next(state);
+  }
+
+  clearProductsPageState() {
+    this.productsPageState.next(null);
   }
 
   getOrdersPageState() {
@@ -77,14 +97,6 @@ export class NavigationStateService {
 
   clearOrdersPageState() {
     this.ordersPageState.next(null);
-  }
-
-  setProductsPageState(state: ProductsPageState) {
-    this.productsPageState.next(state);
-  }
-
-  clearProductsPageState() {
-    this.productsPageState.next(null);
   }
 
   getBrandsPageState() {
@@ -121,5 +133,17 @@ export class NavigationStateService {
 
   clearSubCategoriesPageState() {
     this.subCategoriesPageState.next(null);
+  }
+
+  getDeliveryHubsPageState() {
+    return this.deliveryHubsPageState.asObservable();
+  }
+
+  setDeliveryHubsPageState(state: DeliveryHubsPageState) {
+    this.deliveryHubsPageState.next(state);
+  }
+
+  clearDeliveryHubsPageState() {
+    this.deliveryHubsPageState.next(null);
   }
 }

@@ -1,0 +1,331 @@
+.delivery-hubs-container {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 24px;
+  background: #fafafa;
+  min-height: 100vh;
+}
+
+.header {
+  margin-bottom: 24px;
+}
+
+.header-content h1 {
+  font-size: 28px;
+  font-weight: 600;
+  color: #1e293b;
+  margin: 0;
+}
+
+.subtitle {
+  font-size: 14px;
+  color: #64748b;
+  margin: 4px 0 0 0;
+}
+
+.filter-card {
+  margin-bottom: 24px;
+  border-radius: 12px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.34);
+  background: white;
+  border: 1px solid #f1f5f9;
+  overflow: hidden;
+}
+
+mat-label {
+  color: #3d3d40 !important;
+}
+
+.filter-card mat-card-content {
+  padding: 20px;
+}
+
+.filter-form {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.filter-row {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 16px;
+}
+
+.filter-actions {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.search-field {
+  flex: 1;
+}
+
+.mat-mdc-input-element:focus::placeholder {
+  color: #3d3d40 !important;
+  opacity: 1 !important;
+}
+
+::ng-deep .mat-mdc-paginator-page-size-label,
+.mat-mdc-paginator-page-size {
+  color: #1e293b !important;
+}
+
+.filter-form mat-form-field {
+  background: #ffffff;
+}
+
+::ng-deep .mat-mdc-form-field.mat-focused .mat-mdc-floating-label {
+  color: #1e293b !important;
+}
+
+::ng-deep .search-field.mat-focused .mdc-notched-outline * {
+  border-color: #1e293b !important;
+}
+
+::ng-deep .mat-focused .mdc-notched-outline * {
+  border-color: #1e293b !important;
+}
+
+.filter-actions .mat-icon {
+  color: white;
+}
+
+.mat-icon {
+  color: black;
+}
+
+.search-field input {
+  color: #3d3d40 !important;
+  font-size: 16px;
+}
+
+.clear-button {
+  height: 56px;
+  background: black;
+  color: #64748b;
+  border: 1px solid #e2e8f0;
+  font-weight: 500;
+  transition: all 0.2s ease;
+}
+
+.clear-button:hover {
+  background: #f8fafc;
+  border-color: #cbd5e1;
+}
+
+.no-data {
+  text-align: center;
+  padding: 20px;
+  font-style: italic;
+  color: white;
+}
+
+.loading-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 400px;
+  gap: 16px;
+  background: white;
+  border-radius: 8px;
+  padding: 48px;
+  border: 1px solid #f1f5f9;
+}
+
+.loading-container p {
+  margin-top: 16px;
+  color: #64748b;
+  font-size: 14px;
+}
+
+.table-card {
+  border-radius: 12px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.34);
+  background: white;
+  border: 1px solid #f1f5f9;
+}
+
+.table-container {
+  overflow-x: auto;
+  background: white;
+  border-radius: 8px;
+}
+
+.delivery-hubs-table {
+  width: 100%;
+}
+
+.delivery-hubs-table th {
+  background-color: #ffffff;
+  color: #1e293b;
+  font-weight: 600;
+  font-size: 14px;
+  padding: 16px;
+  border-bottom: 2px solid #f1f5f9;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.delivery-hubs-table td {
+  padding: 16px;
+  color: #334155;
+  border-bottom: 1px solid #f1f5f9;
+  font-size: 14px;
+}
+
+.delivery-hubs-table tr {
+  background: white;
+}
+
+.clickable-row {
+  cursor: pointer;
+}
+
+.mat-mdc-row.clickable-row:hover {
+  background-color: #cad4e3 !important;
+  transition: background-color 0.2s ease;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+}
+
+.filter-actions ::ng-deep .mat-mdc-chip {
+  background-color: #000000 !important;
+  color: #ffffff !important;
+  border-radius: 15px !important;
+  border: none !important;
+  overflow: hidden !important;
+}
+
+::ng-deep .filter-card .mat-mdc-form-field {
+  background: white;
+}
+
+::ng-deep .filter-card .mat-mdc-text-field-wrapper {
+  background: white;
+}
+
+::ng-deep .filter-card .mat-mdc-form-field-focus-overlay {
+  background-color: transparent !important;
+}
+
+::ng-deep .filter-card .mdc-text-field--filled {
+  background-color: white !important;
+}
+
+::ng-deep .filter-card .mat-mdc-select-value,
+::ng-deep .filter-card .mat-mdc-select-arrow {
+  color: #334155;
+}
+
+::ng-deep .filter-card .mat-mdc-form-field-icon-prefix,
+::ng-deep .filter-card .mat-mdc-form-field-icon-suffix {
+  color: #64748b;
+}
+
+::ng-deep .mat-mdc-input-element {
+  color: #334155;
+}
+
+/* Material Paginator Styling */
+::ng-deep .mat-mdc-paginator {
+  background: white !important;
+  color: #334155;
+}
+
+::ng-deep .mat-mdc-paginator-container {
+  border-top: 1px solid #f1f5f9;
+}
+
+::ng-deep .mat-datepicker-toggle {
+  color: #64748b;
+}
+
+::ng-deep .mat-mdc-paginator .mat-mdc-select-value,
+::ng-deep .mat-mdc-paginator .mat-mdc-select-arrow {
+  color: #475569 !important;
+}
+
+::ng-deep .mat-mdc-paginator .mat-mdc-icon-button {
+  color: #475569;
+}
+
+::ng-deep .mat-mdc-paginator .mat-mdc-icon-button[disabled] {
+  color: #cbd5e1;
+}
+
+::ng-deep .mat-mdc-table {
+  background: white !important;
+}
+
+::ng-deep .mat-mdc-header-row {
+  background: white !important;
+}
+
+::ng-deep .mat-mdc-row {
+  background: white !important;
+}
+
+::ng-deep .mat-mdc-row:hover {
+  background-color: #f8fafc !important;
+}
+
+/* Material Paginator Button Colors */
+::ng-deep .mat-mdc-paginator .mat-mdc-icon-button {
+  color: #475569 !important;
+}
+
+::ng-deep .mat-mdc-paginator .mat-mdc-icon-button[disabled] {
+  color: #cbd5e1 !important;
+}
+
+::ng-deep .mat-mdc-paginator .mat-mdc-paginator-icon {
+  fill: #475569 !important;
+}
+
+::ng-deep .mat-mdc-paginator .mat-mdc-button:disabled .mat-mdc-paginator-icon {
+  fill: #cbd5e1 !important;
+}
+
+/* Paginator text color */
+::ng-deep .mat-mdc-paginator .mat-mdc-paginator-range-label {
+  color: #475569 !important;
+}
+
+.mat-mdc-paginator-page-size {
+  color: black;
+}
+
+.clear-all-filters-button .mat-mdc-unelevated-button[disabled],
+.mat-mdc-unelevated-button.mat-mdc-button-disabled {
+  color: #949494;
+  background-color: #ededed;
+}
+
+@media (max-width: 768px) {
+  .delivery-hubs-container {
+    padding: 16px;
+  }
+
+  .filter-form {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .filter-form mat-form-field,
+  .search-field {
+    width: 100%;
+    min-width: auto;
+  }
+
+  .clear-button {
+    width: 100%;
+  }
+
+  .delivery-hubs-table th,
+  .delivery-hubs-table td {
+    padding: 12px 8px;
+    font-size: 13px;
+  }
+}

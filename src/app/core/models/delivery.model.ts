@@ -33,8 +33,7 @@ export interface DeliveryAgent {
 
 export interface DeliveryHubFilters extends BaseFilters {
   type: 'deliveryHub';
-  deliveryHubName?: string | null;
-  city?: string | null;
+  address?: string | null;
 }
 
 export interface DeliveryAgentFilters extends BaseFilters {

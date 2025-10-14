@@ -26,10 +26,6 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatChipsModule } from '@angular/material/chips';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
-import {
-  OrderItem,
-  OrderTrackingStatusEnum,
-} from '../../../core/models/logistics.model';
 import { OrderService } from '../../../core/services/order.service';
 import { Order, OrderFilters } from '../../../core/models/order.model';
 import {

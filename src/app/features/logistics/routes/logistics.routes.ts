@@ -17,7 +17,7 @@ export const LOGISTICS_ROUTES: Routes = [
     canActivate: [AuthGuard, RoleGuard],
     data: { role: 'admin', subRoles: ['logistics'] },
     loadChildren: () =>
-      import('../order-items/orders.routes').then((m) => m.ORDER_ITEM_ROUTES),
+      import('../orders/orders.routes').then((m) => m.ORDER_ITEM_ROUTES),
   },
   {
     path: 'delivery-hubs',
