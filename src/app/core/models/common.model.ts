@@ -5,3 +5,15 @@ export interface BaseFilters {
   sortField?: string;
   sortDirection?: 'asc' | 'desc';
 }
+
+export interface AddressDto {
+  addressId: number;
+  userId: string;
+  name: string;
+  contact: string;
+  street: string;
+  city: string;
+  state: string;
+  zip: string;
+  country: string;
+}

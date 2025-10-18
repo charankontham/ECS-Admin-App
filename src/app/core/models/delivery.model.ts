@@ -1,5 +1,5 @@
 import { BaseFilters } from './common.model';
-import { AddressDto } from './order.model';
+import { AddressDto } from './common.model';
 
 export interface DeliveryHubRequest {
   deliveryHubId?: number;
@@ -13,6 +13,7 @@ export interface DeliveryHub {
   deliveryHubId: number;
   deliveryHubName: string;
   deliveryHubAddress?: AddressDto;
+  deliveryHubAddressId?: number | null;
   dateAdded: Date;
   dateModified: Date;
 }

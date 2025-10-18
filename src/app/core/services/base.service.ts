@@ -232,6 +232,20 @@ export class BaseService<T> {
     });
   }
 
+  updateWithBody(
+    path: string = '',
+    data: any,
+    headers?: HttpHeaders
+  ): Observable<any> {
+    var apiURL =
+      !!path && path != ''
+        ? `${this.baseUrl}/${this.endpoint}/${path}`
+        : `${this.baseUrl}/${this.endpoint}`;
+    return this.http.put<any>(apiURL, data, {
+      headers: this.mergeHeaders(headers),
+    });
+  }
+
   patchUpdate(path: string, headers?: HttpHeaders): Observable<T> {
     return this.http.patch<T>(`${this.baseUrl}/${this.endpoint}/${path}`, {
       headers: this.mergeHeaders(headers),

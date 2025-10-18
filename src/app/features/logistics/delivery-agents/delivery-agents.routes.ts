@@ -12,7 +12,7 @@ export const DELIVERY_AGENTS_ROUTES: Routes = [
     data: { role: 'admin', subRoles: ['logistics'] },
   },
   {
-    path: ':orderItemId',
+    path: ':deliveryAgentId',
     component: ViewDeliveryAgentComponent,
     canActivate: [AuthGuard, RoleGuard],
     data: { role: 'admin', subRoles: ['logistics'] },

@@ -39,6 +39,10 @@ export class DeliveryAgentService extends BaseService<DeliveryAgent> {
     return this.update(data);
   }
 
+  updateAgentPassword(data: any): Observable<DeliveryAgent | string> {
+    return this.updateWithBody('updatePassword', data);
+  }
+
   deleteDeliveryAgent(agentId: number): Observable<void | boolean> {
     return this.delete(agentId);
   }

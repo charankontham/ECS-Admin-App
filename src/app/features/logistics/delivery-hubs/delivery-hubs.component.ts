@@ -39,7 +39,6 @@ import {
   catchError,
   debounceTime,
   distinctUntilChanged,
-  forkJoin,
   Observable,
   of,
 } from 'rxjs';
@@ -334,5 +333,16 @@ export class DeliveryHubsComponent implements OnInit, AfterViewInit {
       this.filterForm.get('address')?.value ||
       this.filterForm.get('search')?.value
     );
+  }
+
+  formatDate(date: string): string {
+    const newDate = new Date(date);
+    return newDate.toLocaleDateString('en-US', {
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit',
+    });
   }
 }

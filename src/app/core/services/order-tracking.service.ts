@@ -34,6 +34,10 @@ export class OrderTrackingService extends BaseService<OrderTracking> {
     return this.getById(orderTrackingId);
   }
 
+  getAllOrderTrackingsByAgentId(agentId: number): Observable<OrderTracking[]> {
+    return this.getAllByPath('GetAllByAgentId', agentId);
+  }
+
   getOrderTrackingByOrderIdAndProductId(
     orderId: number,
     productId: number

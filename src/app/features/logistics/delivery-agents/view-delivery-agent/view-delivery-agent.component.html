@@ -1,1 +1,340 @@
-<p>view-delivery-agent works!</p>
+<div class="view-agent-container">
+    <mat-progress-bar *ngIf="loading" mode="indeterminate" class="loading-bar"></mat-progress-bar>
+
+    <div class="header-section">
+        <button mat-icon-button (click)="goBack()" class="back-button" matTooltip="Go back">
+            <mat-icon>arrow_back</mat-icon>
+        </button>
+        <h1>{{ isNewAgent ? 'Create New Delivery Agent' : 'Delivery Agent Details' }}</h1>
+        <div class="header-actions">
+            <button *ngIf="!isNewAgent && !isEditMode" mat-raised-button (click)="toggleEditMode()" class="edit-button">
+                <mat-icon>edit</mat-icon>
+                Edit Agent
+            </button>
+            <button *ngIf="!isNewAgent && !isEditMode" mat-raised-button class="delete-button" (click)="deleteAgent()">
+                <mat-icon>delete</mat-icon>
+                Delete Agent
+            </button>
+        </div>
+    </div>
+
+    <div *ngIf="error" class="error-message">
+        <mat-icon>error</mat-icon>
+        <span>{{ error }}</span>
+    </div>
+
+    <div *ngIf="!loading && !error && agent" class="content-section">
+        <mat-card class="info-card agent-info-card">
+            <mat-card-header class="gradient-header agent-gradient">
+                <mat-icon>person</mat-icon>
+                <mat-card-title>Agent Information</mat-card-title>
+            </mat-card-header>
+            <mat-card-content>
+                <form [formGroup]="agentForm">
+                    <div class="info-grid">
+                        <div class="info-item">
+                            <mat-icon>badge</mat-icon>
+                            <div class="info-content">
+                                <label>Agent ID</label>
+                                <span *ngIf="!isNewAgent">{{ agent.deliveryAgentId }}</span>
+                                <span *ngIf="isNewAgent" class="text-muted">Auto-generated</span>
+                            </div>
+                        </div>
+
+                        <div class="info-item">
+                            <mat-icon>person</mat-icon>
+                            <div class="info-content">
+                                <label>Agent Name</label>
+                                <mat-form-field *ngIf="isEditMode" appearance="outline" class="full-width">
+                                    <input matInput formControlName="deliveryAgentName"
+                                        placeholder="Enter agent name" />
+                                    <mat-error *ngIf="agentForm.get('deliveryAgentName')?.hasError('required')">
+                                        Agent name is required
+                                    </mat-error>
+                                </mat-form-field>
+                                <span *ngIf="!isEditMode">{{ agent.deliveryAgentName }}</span>
+                            </div>
+                        </div>
+
+                        <div class="info-item">
+                            <mat-icon>email</mat-icon>
+                            <div class="info-content">
+                                <label>Email</label>
+                                <mat-form-field *ngIf="isEditMode" appearance="outline" class="full-width">
+                                    <input matInput formControlName="email" type="email" placeholder="Enter email" />
+                                    <mat-error *ngIf="agentForm.get('email')?.hasError('required')">Email is
+                                        required</mat-error>
+                                    <mat-error *ngIf="agentForm.get('email')?.hasError('email')">Invalid email
+                                        format</mat-error>
+                                </mat-form-field>
+                                <span *ngIf="!isEditMode">{{ agent.email }}</span>
+                            </div>
+                        </div>
+
+                        <div class="info-item">
+                            <mat-icon>phone</mat-icon>
+                            <div class="info-content">
+                                <label>Contact Number</label>
+                                <mat-form-field *ngIf="isEditMode" appearance="outline" class="full-width">
+                                    <input matInput formControlName="contactNumber"
+                                        placeholder="Enter contact number" />
+                                    <mat-error *ngIf="agentForm.get('contactNumber')?.hasError('required')">Contact
+                                        number is required</mat-error>
+                                </mat-form-field>
+                                <span *ngIf="!isEditMode">{{ agent.contactNumber }}</span>
+                            </div>
+                        </div>
+
+                        <div class="info-item">
+                            <mat-icon>location_on</mat-icon>
+                            <div class="info-content">
+                                <label>Serving Area</label>
+                                <mat-form-field *ngIf="isEditMode" appearance="outline" class="full-width">
+                                    <input matInput formControlName="servingArea" placeholder="Enter serving area" />
+                                    <mat-error *ngIf="agentForm.get('servingArea')?.hasError('required')">
+                                        Serving area is required
+                                    </mat-error>
+                                </mat-form-field>
+                                <span *ngIf="!isEditMode">{{ agent.servingArea }}</span>
+                            </div>
+                        </div>
+
+                        <div class="info-item">
+                            <mat-icon>check_circle</mat-icon>
+                            <div class="info-content">
+                                <label>Availability Status</label>
+                                <mat-form-field *ngIf="isEditMode" appearance="outline" class="full-width">
+                                    <mat-select formControlName="availabilityStatus">
+                                        <mat-option *ngFor="let status of availabilityStatuses" [value]="status.value">
+                                            {{ status.label }}
+                                        </mat-option>
+                                    </mat-select>
+                                </mat-form-field>
+                                <mat-chip *ngIf="!isEditMode" [class]="getStatusClass(agent.availabilityStatus)">
+                                    {{ getAvailabilityStatusLabel(agent.availabilityStatus) }}
+                                </mat-chip>
+                            </div>
+                        </div>
+
+                        <div class="info-item" *ngIf="!isNewAgent">
+                            <mat-icon>star</mat-icon>
+                            <div class="info-content">
+                                <label>Rating</label>
+                                <span class="rating-value">{{ agent.rating || 0}} / 5.0</span>
+                            </div>
+                        </div>
+
+                        <div class="info-item" *ngIf="!isNewAgent">
+                            <mat-icon>local_shipping</mat-icon>
+                            <div class="info-content">
+                                <label>Total Deliveries</label>
+                                <span class="highlight-value">{{ agent.totalDeliveries }}</span>
+                            </div>
+                        </div>
+
+                        <div class="info-item" *ngIf="!isNewAgent && agent.dateAdded">
+                            <mat-icon>event</mat-icon>
+                            <div class="info-content">
+                                <label>Date Added</label>
+                                <span>{{ formatDate(agent.dateAdded) }}</span>
+                            </div>
+                        </div>
+
+                        <div class="info-item" *ngIf="!isNewAgent && agent.dateModified">
+                            <mat-icon>update</mat-icon>
+                            <div class="info-content">
+                                <label>Last Modified</label>
+                                <span>{{ formatDate(agent.dateModified) }}</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Password fields for new agent -->
+                    <div *ngIf="isNewAgent" class="password-section">
+                        <h3>Set Password</h3>
+                        <div class="info-grid">
+                            <div class="info-item">
+                                <mat-icon>lock</mat-icon>
+                                <div class="info-content">
+                                    <mat-form-field appearance="outline" class="full-width">
+                                        <mat-label>Password</mat-label>
+                                        <input matInput type="password" formControlName="password"
+                                            placeholder="Enter password (min 8 characters)" />
+                                        <!-- <mat-error *ngIf="agentForm.get('password')?.hasError('minlength')">
+                                            Password must be at least 8 characters
+                                        </mat-error> -->
+                                    </mat-form-field>
+                                </div>
+                            </div>
+
+                            <div class="info-item">
+                                <mat-icon>lock</mat-icon>
+                                <div class="info-content">
+                                    <mat-form-field appearance="outline" class="full-width">
+                                        <mat-label>Confirm Password</mat-label>
+                                        <input matInput type="password" formControlName="confirmPassword"
+                                            placeholder="Confirm password" />
+                                    </mat-form-field>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+
+                <div *ngIf="isEditMode" class="action-buttons">
+                    <button mat-raised-button color="primary" (click)="saveAgent()" class="save-button">
+                        <mat-icon>save</mat-icon>
+                        {{ isNewAgent ? 'Create Agent' : 'Save Changes' }}
+                    </button>
+                    <button mat-stroked-button (click)="cancelEdit()" class="cancel-button">
+                        <mat-icon>cancel</mat-icon>
+                        Cancel
+                    </button>
+                </div>
+            </mat-card-content>
+        </mat-card>
+
+        <!-- Password Update Section (only for existing agents in edit mode) -->
+        <mat-card *ngIf="!isNewAgent && isEditMode" class="info-card password-card">
+            <mat-card-header class="gradient-header password-gradient">
+                <mat-icon>lock</mat-icon>
+                <mat-card-title>Update Password</mat-card-title>
+                <button mat-icon-button (click)="this.showPasswordSection ? 
+                this.showPasswordSection = false : 
+                this.showPasswordSection = true" class="expand-button">
+                    <mat-icon>{{ showPasswordSection ? 'expand_less' : 'expand_more' }}</mat-icon>
+                </button>
+            </mat-card-header>
+            <mat-card-content *ngIf="showPasswordSection">
+                <form [formGroup]="passwordForm">
+                    <div class="info-grid">
+                        <div class="info-item">
+                            <mat-icon>lock_open</mat-icon>
+                            <div class="info-content">
+                                <mat-form-field appearance="outline" class="full-width">
+                                    <mat-label>Old Password</mat-label>
+                                    <input matInput type="password" formControlName="oldPassword"
+                                        placeholder="Enter old password" />
+                                    <mat-error *ngIf="passwordForm.get('oldPassword')?.hasError('required')">
+                                        Old password is required
+                                    </mat-error>
+                                </mat-form-field>
+                            </div>
+                        </div>
+
+                        <div class="info-item">
+                            <mat-icon>lock</mat-icon>
+                            <div class="info-content">
+                                <mat-form-field appearance="outline" class="full-width">
+                                    <mat-label>New Password</mat-label>
+                                    <input matInput type="password" formControlName="newPassword"
+                                        placeholder="Enter new password" />
+                                    <mat-error *ngIf="passwordForm.get('newPassword')?.hasError('required')">
+                                        New password is required
+                                    </mat-error>
+                                    <mat-error *ngIf="passwordForm.get('newPassword')?.hasError('minlength')">
+                                        Password must be at least 8 characters
+                                    </mat-error>
+                                </mat-form-field>
+                            </div>
+                        </div>
+
+                        <div class="info-item">
+                            <mat-icon>lock</mat-icon>
+                            <div class="info-content">
+                                <mat-form-field appearance="outline" class="full-width">
+                                    <mat-label>Confirm New Password</mat-label>
+                                    <input matInput type="password" formControlName="confirmNewPassword"
+                                        placeholder="Confirm new password" />
+                                    <mat-error *ngIf="passwordForm.get('confirmNewPassword')?.hasError('required')">
+                                        Please confirm your new password
+                                    </mat-error>
+                                </mat-form-field>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+
+                <div class="action-buttons">
+                    <button mat-raised-button color="primary" (click)="updatePassword()" class="save-button">
+                        <mat-icon>save</mat-icon>
+                        Update Password
+                    </button>
+                    <button mat-stroked-button (click)="togglePasswordSection()" class="cancel-button">
+                        <mat-icon>cancel</mat-icon>
+                        Cancel
+                    </button>
+                </div>
+            </mat-card-content>
+        </mat-card>
+
+        <!-- Current Deliveries Section -->
+        <mat-card *ngIf="!isNewAgent" class="info-card deliveries-card">
+            <mat-card-header class="gradient-header deliveries-gradient">
+                <mat-icon>local_shipping</mat-icon>
+                <mat-card-title>Current Deliveries ({{ currentDeliveries.length }})</mat-card-title>
+                <button mat-icon-button (click)="this.showDeliveriesSection ? 
+                this.showDeliveriesSection = false : 
+                this.showDeliveriesSection = true" class="expand-button">
+                    <mat-icon>{{ showPasswordSection ? 'expand_less' : 'expand_more' }}</mat-icon>
+                </button>
+            </mat-card-header>
+            <mat-card-content *ngIf="showDeliveriesSection">
+                <div *ngIf="currentDeliveries.length === 0" class="no-deliveries">
+                    <mat-icon>inbox</mat-icon>
+                    <p>No active deliveries</p>
+                </div>
+
+                <div *ngIf="currentDeliveries.length > 0" class="table-container">
+                    <table mat-table [dataSource]="currentDeliveries" class="deliveries-table">
+                        <ng-container matColumnDef="orderTrackingId">
+                            <th mat-header-cell *matHeaderCellDef>Tracking ID</th>
+                            <td mat-cell *matCellDef="let delivery">{{ delivery.orderTrackingId }}</td>
+                        </ng-container>
+
+                        <ng-container matColumnDef="orderItemId">
+                            <th mat-header-cell *matHeaderCellDef>Order Item ID</th>
+                            <td mat-cell *matCellDef="let delivery">{{ delivery.orderItem?.orderItemId || 'N/A' }}</td>
+                        </ng-container>
+
+                        <ng-container matColumnDef="productName">
+                            <th mat-header-cell *matHeaderCellDef>Product</th>
+                            <td mat-cell *matCellDef="let delivery">{{ delivery.product?.productName || 'N/A' }}</td>
+                        </ng-container>
+
+                        <ng-container matColumnDef="customerAddress">
+                            <th mat-header-cell *matHeaderCellDef>Customer Address</th>
+                            <td mat-cell *matCellDef="let delivery">{{ getCustomerAddress(delivery) }}</td>
+                        </ng-container>
+
+                        <ng-container matColumnDef="status">
+                            <th mat-header-cell *matHeaderCellDef>Status</th>
+                            <td mat-cell *matCellDef="let delivery">
+                                <mat-chip [class]="getStatusClass(delivery.orderTrackingStatusId)">
+                                    {{ getStatusLabel(delivery.orderTrackingStatusId) }}
+                                </mat-chip>
+                            </td>
+                        </ng-container>
+
+                        <ng-container matColumnDef="trackingType">
+                            <th mat-header-cell *matHeaderCellDef>Type</th>
+                            <td mat-cell *matCellDef="let delivery">
+                                <mat-chip>{{ getTrackingTypeLabel(delivery.orderTrackingType) }}</mat-chip>
+                            </td>
+                        </ng-container>
+
+                        <ng-container matColumnDef="estimatedDeliveryDate">
+                            <th mat-header-cell *matHeaderCellDef>Est. Delivery</th>
+                            <td mat-cell *matCellDef="let delivery">{{ formatDate(delivery.estimatedDeliveryDate) }}
+                            </td>
+                        </ng-container>
+
+                        <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+                        <tr mat-row *matRowDef="let row; columns: displayedColumns" (click)="onDeliveryClick(row)"
+                            class="clickable-row"></tr>
+                    </table>
+                </div>
+            </mat-card-content>
+        </mat-card>
+    </div>
+</div>

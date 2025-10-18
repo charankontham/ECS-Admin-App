@@ -2,7 +2,10 @@ import { Injectable } from '@angular/core';
 import { BehaviorSubject } from 'rxjs';
 import type { ProductFilters } from '../models/product.model';
 import { OrderFilters } from '../models/order.model';
-import { DeliveryHubFilters } from '../models/delivery.model';
+import {
+  DeliveryAgentFilters,
+  DeliveryHubFilters,
+} from '../models/delivery.model';
 
 export interface ProductsPageState {
   filters: ProductFilters;
@@ -58,6 +61,15 @@ export interface DeliveryHubsPageState {
   scrollPosition?: number;
 }
 
+export interface DeliveryAgentsPageState {
+  filters: DeliveryAgentFilters;
+  currentPage: number;
+  pageSize: number;
+  sortField?: string;
+  sortDirection?: 'asc' | 'desc';
+  scrollPosition?: number;
+}
+
 @Injectable({
   providedIn: 'root',
 })
@@ -74,7 +86,8 @@ export class NavigationStateService {
   private ordersPageState = new BehaviorSubject<OrdersPageState | null>(null);
   private deliveryHubsPageState =
     new BehaviorSubject<DeliveryHubsPageState | null>(null);
-
+  private deliveryAgentsPageState =
+    new BehaviorSubject<DeliveryAgentsPageState | null>(null);
   getProductsPageState() {
     return this.productsPageState.asObservable();
   }
@@ -145,5 +158,17 @@ export class NavigationStateService {
 
   clearDeliveryHubsPageState() {
     this.deliveryHubsPageState.next(null);
+  }
+
+  getDeliveryAgentsPageState() {
+    return this.deliveryAgentsPageState.asObservable();
+  }
+
+  setDeliveryAgentsPageState(state: DeliveryAgentsPageState) {
+    this.deliveryAgentsPageState.next(state);
+  }
+
+  clearDeliveryAgentsPageState() {
+    this.deliveryAgentsPageState.next(null);
   }
 }

@@ -98,8 +98,8 @@ export function sleep(ms: number) {
 }
 
 export const compare = (
-  a: number | string | Date,
-  b: number | string | Date,
+  a: number | string | Date = 0,
+  b: number | string | Date = 0,
   isAsc: boolean
 ): number => {
   const dateA =

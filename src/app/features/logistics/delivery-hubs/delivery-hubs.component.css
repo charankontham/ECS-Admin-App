@@ -303,6 +303,34 @@ mat-label {
   background-color: #ededed;
 }
 
+.add-delivery-hub-container {
+  display: flex;
+  justify-content: flex-end;
+  margin-bottom: 16px;
+}
+
+.add-delivery-hub-button {
+  height: 48px;
+  padding: 0 24px;
+  font-weight: 500;
+  background-color: #3e4655 !important;
+  color: white !important;
+}
+
+.add-delivery-hub-button:hover {
+  transform: scale(1.025);
+  transition: all 0.3s ease;
+  box-shadow: 2px 2px 5px rgb(75, 86, 111);
+}
+
+.add-delivery-hub-button mat-icon {
+  font-weight: 900;
+  font-size: 20px;
+  height: 20px;
+  width: 20px;
+  color: rgb(232, 237, 246);
+}
+
 @media (max-width: 768px) {
   .delivery-hubs-container {
     padding: 16px;

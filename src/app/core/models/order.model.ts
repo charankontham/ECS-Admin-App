@@ -1,4 +1,4 @@
-import { BaseFilters } from './common.model';
+import { AddressDto, BaseFilters } from './common.model';
 import { DeliveryAgent, DeliveryHub } from './delivery.model';
 import { Product } from './product.model';
 
@@ -14,18 +14,6 @@ export interface CustomerDto {
   phone: string;
   password: string;
   role: string;
-}
-
-export interface AddressDto {
-  addressId: number;
-  userId: string;
-  name: string;
-  contact: string;
-  street: string;
-  city: string;
-  state: string;
-  zip: string;
-  country: string;
 }
 
 export interface OrderRequest {

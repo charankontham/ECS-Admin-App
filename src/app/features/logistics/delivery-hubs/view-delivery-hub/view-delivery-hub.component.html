@@ -1,1 +1,265 @@
-<p>view-delivery-hub works!</p>
+<div class="view-hub-container">
+    <mat-progress-bar *ngIf="isLoading" mode="indeterminate" class="loading-bar"></mat-progress-bar>
+
+    <mat-card *ngIf="error" class="error-card">
+        <mat-card-content>
+            <div class="error-content">
+                <mat-icon>error_outline</mat-icon>
+                <p>{{ error }}</p>
+            </div>
+        </mat-card-content>
+    </mat-card>
+
+    <div *ngIf="!error && hub" class="content">
+        <div class="header">
+            <button mat-icon-button (click)="goBack()" class="back-button">
+                <mat-icon>arrow_back</mat-icon>
+            </button>
+            <div class="header-content">
+                <h1>{{ isNewHub ? 'Create New Delivery Hub' : hub.deliveryHubName }}</h1>
+                <mat-chip *ngIf="!isNewHub">Hub #{{ hub.deliveryHubId }}</mat-chip>
+            </div>
+            <div class="header-actions" *ngIf="!isNewHub && !isEditMode">
+                <button mat-raised-button color="primary" (click)="toggleEditMode()">
+                    <mat-icon>edit</mat-icon>
+                    Edit Hub
+                </button>
+                <button mat-raised-button color="warn" (click)="deleteHub()">
+                    <mat-icon>delete</mat-icon>
+                    Delete
+                </button>
+            </div>
+        </div>
+
+        <mat-card class="info-card hub-info-card">
+            <mat-card-header>
+                <mat-icon mat-card-avatar>warehouse</mat-icon>
+                <mat-card-title>Hub Information</mat-card-title>
+            </mat-card-header>
+            <mat-card-content>
+                <form [formGroup]="hubForm" *ngIf="isEditMode">
+                    <mat-form-field appearance="outline" class="full-width">
+                        <mat-label>Hub Name</mat-label>
+                        <mat-icon matPrefix>business</mat-icon>
+                        <input matInput formControlName="hubName" placeholder="Enter hub name" />
+                        <mat-error *ngIf="hubForm.get('hubName')?.hasError('required')">
+                            Hub name is required
+                        </mat-error>
+                    </mat-form-field>
+
+                    <div class="form-actions">
+                        <button mat-raised-button color="primary" (click)="saveHub()"
+                            [disabled]="hubForm.invalid || isLoading">
+                            <mat-icon>save</mat-icon>
+                            {{ isNewHub ? 'Create Hub' : 'Save Changes' }}
+                        </button>
+                        <button mat-stroked-button (click)="cancelEdit()">
+                            <mat-icon>cancel</mat-icon>
+                            Cancel
+                        </button>
+                    </div>
+                </form>
+
+                <div *ngIf="!isEditMode" class="info-display">
+                    <div class="info-row">
+                        <div class="info-label">
+                            <mat-icon>business</mat-icon>
+                            <span>Hub Name</span>
+                        </div>
+                        <div class="info-value">{{ hub.deliveryHubName }}</div>
+                    </div>
+
+                    <div class="info-row">
+                        <div class="info-label">
+                            <mat-icon>event</mat-icon>
+                            <span>Date Added</span>
+                        </div>
+                        <div class="info-value">{{ formatDate(hub.dateAdded.toString() +"Z") }}</div>
+                    </div>
+
+                    <div class="info-row">
+                        <div class="info-label">
+                            <mat-icon>update</mat-icon>
+                            <span>Last Modified</span>
+                        </div>
+                        <div class="info-value">{{ formatDate(hub.dateModified.toString() + "Z") }}</div>
+                    </div>
+                </div>
+            </mat-card-content>
+        </mat-card>
+
+        <mat-card class="info-card address-card" *ngIf="!isNewHub">
+            <mat-card-header>
+                <mat-icon mat-card-avatar>location_on</mat-icon>
+                <mat-card-title>Hub Address</mat-card-title>
+                <div>
+                    <button mat-icon-button *ngIf="hubAddress && !isAddingAddress && !isEditingAddress"
+                        (click)="startEditingAddress()" matTooltip="Edit Address">
+                        <mat-icon>edit</mat-icon>
+                    </button>
+                    <button mat-icon-button color="warn" *ngIf="hubAddress && !isAddingAddress && !isEditingAddress"
+                        (click)="deleteAddress()" matTooltip="Delete Address">
+                        <mat-icon>delete</mat-icon>
+                    </button>
+                </div>
+            </mat-card-header>
+            <mat-card-content>
+                <div *ngIf="!hubAddress && !isAddingAddress" class="no-address">
+                    <mat-icon>location_off</mat-icon>
+                    <p>No address added for this hub</p>
+                    <button mat-raised-button color="primary" (click)="startAddingAddress()">
+                        <mat-icon>add_location</mat-icon>
+                        Add Address
+                    </button>
+                </div>
+
+                <!-- Address Form -->
+                <form [formGroup]="addressForm" *ngIf="isAddingAddress || isEditingAddress">
+                    <div class="address-form-grid">
+                        <mat-form-field appearance="outline" class="full-width">
+                            <mat-label>Name</mat-label>
+                            <mat-icon matPrefix>person</mat-icon>
+                            <input matInput formControlName="name" placeholder="Enter address name" />
+                            <mat-error *ngIf="addressForm.get('name')?.hasError('required')">
+                                Name is required
+                            </mat-error>
+                        </mat-form-field>
+
+                        <mat-form-field appearance="outline" class="full-width">
+                            <mat-label>Street Address</mat-label>
+                            <mat-icon matPrefix>home</mat-icon>
+                            <input matInput formControlName="street" placeholder="Enter street address" />
+                            <mat-error *ngIf="addressForm.get('street')?.hasError('required')">
+                                Street address is required
+                            </mat-error>
+                        </mat-form-field>
+
+                        <mat-form-field appearance="outline">
+                            <mat-label>City</mat-label>
+                            <mat-icon matPrefix>location_city</mat-icon>
+                            <input matInput formControlName="city" placeholder="Enter city" />
+                            <mat-error *ngIf="addressForm.get('city')?.hasError('required')">
+                                City is required
+                            </mat-error>
+                        </mat-form-field>
+
+                        <mat-form-field appearance="outline">
+                            <mat-label>State</mat-label>
+                            <mat-icon matPrefix>map</mat-icon>
+                            <mat-select formControlName="state">
+                                <mat-option [value]="null">Select State</mat-option>
+                                <mat-option *ngFor="let address of addressList" [value]="address">
+                                    {{ address.toString() }}
+                                </mat-option>
+                            </mat-select>
+                            <mat-error *ngIf="addressForm.get('state')?.hasError('required')">
+                                State is required
+                            </mat-error>
+                        </mat-form-field>
+
+                        <mat-form-field appearance="outline">
+                            <mat-label>Zipcode</mat-label>
+                            <mat-icon matPrefix>pin_drop</mat-icon>
+                            <input matInput formControlName="zip" placeholder="Enter zipcode" maxlength="5" />
+                            <mat-error *ngIf="addressForm.get('zip')?.hasError('required')">
+                                Zipcode is required
+                            </mat-error>
+                            <mat-error *ngIf="addressForm.get('zip')?.hasError('pattern')">
+                                Enter valid 5-digit zipcode
+                            </mat-error>
+                        </mat-form-field>
+
+                        <mat-form-field appearance="outline">
+                            <mat-label>Country</mat-label>
+                            <mat-icon matPrefix>public</mat-icon>
+                            <input matInput formControlName="country" placeholder="Enter country" />
+                            <mat-error *ngIf="addressForm.get('country')?.hasError('required')">
+                                Country is required
+                            </mat-error>
+                        </mat-form-field>
+
+                        <mat-form-field appearance="outline">
+                            <mat-label>Contact</mat-label>
+                            <mat-icon matPrefix>phone</mat-icon>
+                            <input matInput formControlName="contact" placeholder="Enter contact" />
+                            <mat-error *ngIf="addressForm.get('contact')?.hasError('required')">
+                                Contact is required
+                            </mat-error>
+                        </mat-form-field>
+                    </div>
+
+                    <div class="form-actions">
+                        <button mat-raised-button color="primary" (click)="saveAddress()"
+                            [disabled]="addressForm.invalid && addressForm.pristine">
+                            <mat-icon>save</mat-icon>
+                            {{ isEditingAddress ? 'Update Address' : 'Add Address' }}
+                        </button>
+                        <button mat-stroked-button (click)="cancelAddress()">
+                            <mat-icon>cancel</mat-icon>
+                            Cancel
+                        </button>
+                    </div>
+                </form>
+
+                <!-- Address Display -->
+                <div *ngIf="hubAddress && !isAddingAddress && !isEditingAddress" class="address-display">
+                    <div class="address-row">
+                        <mat-icon>person</mat-icon>
+                        <div class="address-content">
+                            <div class="address-label">Name</div>
+                            <div class="address-value">{{ hubAddress.name }}</div>
+                        </div>
+                    </div>
+
+                    <div class="address-row">
+                        <mat-icon>home</mat-icon>
+                        <div class="address-content">
+                            <div class="address-label">Street Address</div>
+                            <div class="address-value">{{ hubAddress.street }}</div>
+                        </div>
+                    </div>
+
+                    <div class="address-row">
+                        <mat-icon>location_city</mat-icon>
+                        <div class="address-content">
+                            <div class="address-label">City</div>
+                            <div class="address-value">{{ hubAddress.city }}</div>
+                        </div>
+                    </div>
+
+                    <div class="address-row">
+                        <mat-icon>map</mat-icon>
+                        <div class="address-content">
+                            <div class="address-label">State</div>
+                            <div class="address-value">{{ hubAddress.state }}</div>
+                        </div>
+                    </div>
+
+                    <div class="address-row">
+                        <mat-icon>pin_drop</mat-icon>
+                        <div class="address-content">
+                            <div class="address-label">Zipcode</div>
+                            <div class="address-value">{{ hubAddress.zip }}</div>
+                        </div>
+                    </div>
+
+                    <div class="address-row">
+                        <mat-icon>public</mat-icon>
+                        <div class="address-content">
+                            <div class="address-label">Country</div>
+                            <div class="address-value">{{ hubAddress.country }}</div>
+                        </div>
+                    </div>
+
+                    <div class="address-row">
+                        <mat-icon>phone</mat-icon>
+                        <div class="address-content">
+                            <div class="address-label">Contact</div>
+                            <div class="address-value">{{ hubAddress.contact }}</div>
+                        </div>
+                    </div>
+                </div>
+            </mat-card-content>
+        </mat-card>
+    </div>
+</div>
