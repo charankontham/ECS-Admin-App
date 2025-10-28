@@ -208,54 +208,6 @@ mat-label {
   overflow: hidden !important;
 }
 
-/* Order Placed - Blue */
-.status-order-placed {
-  background-color: rgba(59, 130, 246, 0.15) !important;
-  color: #2563eb !important;
-}
-
-/* Shipment In Transit - Purple */
-.status-shipment-in-transit {
-  background-color: rgba(139, 92, 246, 0.15) !important;
-  color: #7c3aed !important;
-}
-
-/* Shipped - Sky Blue */
-.status-shipped {
-  background-color: rgba(14, 165, 233, 0.15) !important;
-  color: #0284c7 !important;
-}
-
-/* Waiting For Delivery Agent - Orange */
-.status-waiting-for-delivery-agent {
-  background-color: rgba(251, 146, 60, 0.15) !important;
-  color: #ea580c !important;
-}
-
-/* Out For Delivery - Amber */
-.status-out-for-delivery {
-  background-color: rgba(245, 158, 11, 0.15) !important;
-  color: #d97706 !important;
-}
-
-/* Delivered - Green */
-.status-delivered {
-  background-color: rgba(16, 185, 129, 0.15) !important;
-  color: #059669 !important;
-}
-
-/* Returned To Delivery Hub - Indigo */
-.status-returned-to-delivery-hub {
-  background-color: rgba(99, 102, 241, 0.15) !important;
-  color: #4f46e5 !important;
-}
-
-/* Cancelled - Red */
-.status-cancelled {
-  background-color: rgba(239, 68, 68, 0.15) !important;
-  color: #dc2626 !important;
-}
-
 /* Material Form Field Styling */
 ::ng-deep .filter-card .mat-mdc-form-field {
   background: white;
@@ -306,12 +258,17 @@ mat-label {
   color: #475569 !important;
 }
 
+::ng-deep svg.mat-mdc-paginator-icon,
 ::ng-deep .mat-mdc-paginator .mat-mdc-icon-button {
-  color: #475569;
+  fill: #48494b !important;
 }
 
-::ng-deep .mat-mdc-paginator .mat-mdc-icon-button[disabled] {
-  color: #cbd5e1;
+::ng-deep .mat-mdc-paginator .mat-mdc-icon-button {
+  background-color: #f7f5f5 !important;
+}
+
+::ng-deep .mat-mdc-icon-button[aria-disabled] .mat-mdc-paginator-icon {
+  fill: #c8c7c7 !important;
 }
 
 ::ng-deep .mat-datepicker-content {

@@ -16,3 +16,105 @@ body {
   border: none !important;
   outline: none !important;
 }
+
+/* Order Placed - Blue */
+.status-order-placed,
+.status-order-placed .mdc-evolution-chip__text-label {
+  background-color: #a4c4f6 !important;
+  color: #14409f !important;
+}
+
+/* Shipment In Transit - Purple */
+.status-in-transit,
+.status-in-transit .mdc-evolution-chip__text-label {
+  background-color: #cbbdee !important;
+  color: #5f35a9 !important;
+}
+
+/* Shipped - Sky Blue */
+.status-shipped,
+.status-shipped .mdc-evolution-chip__text-label {
+  background-color: #9bd3ed !important;
+  color: #0a5880 !important;
+}
+
+/* Waiting For Delivery Agent - Orange */
+.status-waiting-for-delivery-agent,
+.status-waiting-for-delivery-agent .mdc-evolution-chip__text-label {
+  background-color: #f1b5ae !important;
+  color: #7f2317 !important;
+}
+
+/* Out For Delivery - Amber */
+.status-out-for-delivery,
+.status-out-for-delivery .mdc-evolution-chip__text-label {
+  background-color: #eec886 !important;
+  color: #8f4e04 !important;
+}
+
+/* Delivered - Green */
+.status-delivered,
+.status-delivered .mdc-evolution-chip__text-label {
+  background-color: #7bbda7 !important;
+  color: #07694a !important;
+}
+
+/* Returned To Delivery Hub - Indigo */
+.status-returned-to-delivery-hub,
+.status-returned-to-delivery-hub .mdc-evolution-chip__text-label {
+  background-color: #9e9ff1 !important;
+  color: #2c25a5 !important;
+}
+
+/* Cancelled - Red */
+.status-cancelled,
+.status-cancelled .mdc-evolution-chip__text-label {
+  background-color: #b4b2b2 !important;
+  color: #2a2a2a !important;
+}
+
+::ng-deep .mat-sort-header-arrow,
+::ng-deep .mat-sort-header-arrow svg {
+  color: #6f6f6f !important;
+}
+
+.status-available {
+  background-color: #96d490c1 !important;
+}
+
+.status-busy {
+  background-color: #eda5a1 !important;
+}
+
+.status-on-leave {
+  background-color: #b4c0f0 !important;
+}
+
+.status-unavailable {
+  background-color: #bcbbbb !important;
+}
+
+.cdk-overlay-pane div.mat-mdc-select-panel {
+  background-color: white !important;
+  color: black !important;
+}
+
+.cdk-overlay-pane .mat-mdc-option span {
+  color: black !important;
+}
+
+.cdk-overlay-pane .mat-mdc-option:hover span {
+  color: #353535 !important;
+}
+
+.cdk-overlay-pane .mat-mdc-option:hover {
+  background-color: #f7f7f7 !important;
+}
+
+.cdk-overlay-pane .mat-mdc-option.mat-mdc-option-active.mdc-list-item {
+  background-color: #d5ecef !important;
+}
+
+.cdk-overlay-pane .mat-mdc-option .mat-pseudo-checkbox {
+  --mat-minimal-pseudo-checkbox-selected-checkmark-color: #6e9ba5 !important;
+}

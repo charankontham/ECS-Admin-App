@@ -8,8 +8,8 @@ export const OrderStatusClassMap: { [key: number]: string } = {
   4: 'status-waiting-for-delivery-agent',
   5: 'status-out-for-delivery',
   6: 'status-delivered',
-  7: 'status-returned-to-delivery-hub',
-  8: 'status-cancelled',
+  7: 'status-cancelled',
+  8: 'status-returned-to-delivery-hub',
 };
 
 export const AvailabilityStatusClassMap: { [key: number]: string } = {
@@ -34,8 +34,8 @@ export enum OrderTrackingStatusEnum {
   WaitingForDeliveryAgent = 4,
   OutForDelivery = 5,
   Delivered = 6,
-  ReturnedToDeliveryHub = 7,
-  Cancelled = 8,
+  Cancelled = 7,
+  ReturnedToDeliveryHub = 8,
 }
 
 export enum OrderTrackingTypeEnum {
@@ -67,14 +67,24 @@ export const ORDER_TRACKING_STATUS_MAP: Readonly<Record<number, string>> = {
   [OrderTrackingStatusEnum.WaitingForDeliveryAgent]: 'Waiting For Agent',
   [OrderTrackingStatusEnum.OutForDelivery]: 'Out For Delivery',
   [OrderTrackingStatusEnum.Delivered]: 'Delivered',
-  [OrderTrackingStatusEnum.ReturnedToDeliveryHub]: 'Returned To Delivery Hub',
   [OrderTrackingStatusEnum.Cancelled]: 'Cancelled',
+  [OrderTrackingStatusEnum.ReturnedToDeliveryHub]: 'Returned',
 };
 
 export const ORDER_TRACKING_TYPE_MAP: Readonly<Record<number, string>> = {
   [OrderTrackingTypeEnum.Delivery]: 'Delivery',
   [OrderTrackingTypeEnum.ReturnPickup]: 'Return Pickup',
   [OrderTrackingTypeEnum.Exchange]: 'Exchange',
+};
+
+export const ORDER_RETURN_STATUS_MAP: Readonly<Record<number, string>> = {
+  1: 'Return Requested',
+  2: 'Return Accepted',
+  3: 'Ready For Pickup',
+  4: 'Waiting For Agent',
+  5: 'Out For Pickup',
+  6: 'Returned',
+  7: 'Refund Issued',
 };
 
 export const AVAILABILITY_STATUS_MAP: Readonly<Record<number, string>> = {
@@ -91,6 +101,25 @@ export const PAYMENT_METHOD_MAP: Readonly<Record<number, string>> = {
   [PaymentMethodEnum.UPI]: 'UPI',
   [PaymentMethodEnum.Wallets]: 'Wallets',
   [PaymentMethodEnum.Paypal]: 'Paypal',
+};
+
+export enum ReturnReasonCategoryEnum {
+  DamagedProduct = 1,
+  WrongItem = 2,
+  NotAsDescribed = 3,
+  LowProductQuality = 4,
+  ChangedMind = 5,
+  Other = 6,
+}
+
+export const RETURN_REASON_CATEGORY_MAP: Readonly<Record<number, string>> = {
+  [ReturnReasonCategoryEnum.DamagedProduct]: 'Received damaged product',
+  [ReturnReasonCategoryEnum.WrongItem]: 'Wrong item delivered',
+  [ReturnReasonCategoryEnum.NotAsDescribed]: 'Item not as described',
+  [ReturnReasonCategoryEnum.LowProductQuality]:
+    'Product quality not satisfactory',
+  [ReturnReasonCategoryEnum.ChangedMind]: 'Changed my mind',
+  [ReturnReasonCategoryEnum.Other]: 'Other',
 };
 
 export function sleep(ms: number) {

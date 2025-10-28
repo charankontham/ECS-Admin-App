@@ -1,5 +1,6 @@
 import { Component } from '@angular/core';
 import {
+  ORDER_RETURN_STATUS_MAP,
   OrderTrackingStatusEnum,
   PAYMENT_METHOD_MAP,
   PaymentStatusClassMap,
@@ -133,8 +134,10 @@ export class ViewOrderComponent {
     this.orderTrackingService
       .getOrderTrackingByOrderIdAndProductId(orderId, productId)
       .subscribe({
-        next: (response: OrderTracking) => {
-          this.ordersTracking.push(response);
+        next: (response: OrderTracking[]) => {
+          response.forEach((ot) => {
+            this.ordersTracking.push(ot);
+          });
         },
         error: (error) => {
           console.error('Failed to load order tracking : ', error);
@@ -228,5 +231,21 @@ export class ViewOrderComponent {
       'http://localhost:8080/ecs-inventory-admin/api/public/images/view/getImageById/' +
       imageId
     );
+  }
+
+  getOrderTrackingByOrderItemId(orderItemId: number): OrderTracking {
+    var result = this.ordersTracking.filter(
+      (ot) => ot.orderItem?.orderItemId == orderItemId
+    );
+    if (result.length > 1) {
+      console.log(result.find((ot) => ot.orderTrackingType == 2));
+      return result.find((ot) => ot.orderTrackingType == 2)!;
+    } else {
+      return result[0];
+    }
+  }
+
+  getReturnOrderStatusLabel(id: number) {
+    return ORDER_RETURN_STATUS_MAP[id];
   }
 }

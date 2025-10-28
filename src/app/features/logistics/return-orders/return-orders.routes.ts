@@ -12,7 +12,7 @@ export const RETURN_ORDERS_ROUTES: Routes = [
     data: { role: 'admin', subRoles: ['logistics'] },
   },
   {
-    path: ':orderItemId',
+    path: ':returnOrderId',
     component: ViewReturnOrderComponent,
     canActivate: [AuthGuard, RoleGuard],
     data: { role: 'admin', subRoles: ['logistics'] },

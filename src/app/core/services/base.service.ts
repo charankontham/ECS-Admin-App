@@ -144,6 +144,19 @@ export class BaseService<T> {
     );
   }
 
+  getAllByPathParams(
+    pathParams: string,
+    path: string,
+    headers?: HttpHeaders
+  ): Observable<T[]> {
+    return this.http.get<T[]>(
+      `${this.baseUrl}/${this.endpoint}/${path}/${pathParams}`,
+      {
+        headers: this.mergeHeaders(headers),
+      }
+    );
+  }
+
   getByQueryParams(
     queryparams: string,
     resource: string,

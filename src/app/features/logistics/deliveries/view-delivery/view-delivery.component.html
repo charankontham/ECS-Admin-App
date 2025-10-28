@@ -1,1 +1,452 @@
-<p>view-delivery works!</p>
+<div class="view-delivery-container">
+    <mat-progress-bar *ngIf="loading" mode="indeterminate"></mat-progress-bar>
+
+    <div class="header">
+        <button mat-icon-button (click)="goBack()" class="back-button">
+            <mat-icon>arrow_back</mat-icon>
+        </button>
+        <div class="header-content">
+            <h1>Delivery Details</h1>
+            <p class="subtitle" *ngIf="orderTracking">Tracking ID: {{ orderTracking.orderTrackingId }}</p>
+        </div>
+    </div>
+
+    <div *ngIf="error" class="error-message">
+        <mat-icon>error</mat-icon>
+        <span>{{ error }}</span>
+    </div>
+
+    <div *ngIf="!loading && !error && orderTracking" class="content">
+        <!-- Order Tracking Information -->
+        <mat-card class="info-card tracking-card">
+            <mat-card-header class="card-header">
+                <mat-icon>local_shipping</mat-icon>
+                <mat-card-title>Order Tracking Information</mat-card-title>
+            </mat-card-header>
+            <mat-card-content>
+                <div class="info-row">
+                    <div class="info-label">
+                        <mat-icon>confirmation_number</mat-icon>
+                        <span>Tracking ID</span>
+                    </div>
+                    <div class="info-content">{{ orderTracking.orderTrackingId }}</div>
+                </div>
+                <div class="info-row">
+                    <div class="info-label">
+                        <mat-icon>shopping_bag</mat-icon>
+                        <span>Order Item ID</span>
+                    </div>
+                    <div class="info-content">{{ orderTracking.orderItem?.orderItemId || 'N/A' }}</div>
+                </div>
+
+                <div class="info-row">
+                    <div class="info-label">
+                        <mat-icon>shopping_bag</mat-icon>
+                        <span>Order ID</span>
+                    </div>
+                    <div class="info-content">{{ orderTracking.orderItem?.orderId || 'N/A' }}</div>
+                </div>
+            </mat-card-content>
+        </mat-card>
+
+        <!-- Product Details -->
+        <mat-card class="info-card product-card">
+            <mat-card-header class="card-header">
+                <mat-icon>inventory_2</mat-icon>
+                <mat-card-title>Product Details</mat-card-title>
+            </mat-card-header>
+            <mat-card-content>
+                <div class="info-row">
+                    <div class="info-label">
+                        <mat-icon>label</mat-icon>
+                        <span>Product Name</span>
+                    </div>
+                    <div class="info-content">{{ orderTracking.product?.productName || 'N/A' }}</div>
+                </div>
+                <div class="info-row">
+                    <div class="info-label">
+                        <mat-icon>tag</mat-icon>
+                        <span>Product ID</span>
+                    </div>
+                    <div class="info-content">{{ orderTracking.product?.productId || 'N/A' }}</div>
+                </div>
+                <div class="info-row">
+                    <div class="info-label">
+                        <mat-icon>numbers</mat-icon>
+                        <span>Quantity</span>
+                    </div>
+                    <div class="info-content">{{ orderTracking.orderItem?.quantity || 'N/A' }}</div>
+                </div>
+                <div class="info-row">
+                    <div class="info-label">
+                        <mat-icon>attach_money</mat-icon>
+                        <span>Price</span>
+                    </div>
+                    <div class="info-content">${{ orderTracking.orderItem?.productPrice || "N/A" }}</div>
+                </div>
+            </mat-card-content>
+        </mat-card>
+
+        <!-- Delivery Agent Details -->
+        <mat-card class="info-card agent-card">
+            <mat-card-header class="card-header">
+                <mat-icon>person</mat-icon>
+                <mat-card-title>Delivery Agent</mat-card-title>
+                <button mat-icon-button (click)="toggleAgentList()" class="assign-button"
+                    [matTooltip]="orderTracking.deliveryAgent ? 'Update Agent': 'Assign Agent'">
+                    <mat-icon>{{ showAgentList ? 'close' : orderTracking.deliveryAgent ? 'update' : 'add' }}</mat-icon>
+                </button>
+            </mat-card-header>
+            <mat-card-content>
+                <div *ngIf="!showAgentList">
+                    <div *ngIf="orderTracking.deliveryAgent; else noAgent">
+                        <div class="info-row">
+                            <div class="info-label">
+                                <mat-icon>badge</mat-icon>
+                                <span>Agent ID</span>
+                            </div>
+                            <div class="info-content">{{ orderTracking.deliveryAgent.deliveryAgentId }}</div>
+                        </div>
+                        <div class="info-row">
+                            <div class="info-label">
+                                <mat-icon>person_outline</mat-icon>
+                                <span>Agent Name</span>
+                            </div>
+                            <div class="info-content">{{ orderTracking.deliveryAgent.deliveryAgentName }}</div>
+                        </div>
+                        <div class="info-row">
+                            <div class="info-label">
+                                <mat-icon>phone</mat-icon>
+                                <span>Contact</span>
+                            </div>
+                            <div class="info-content">{{ orderTracking.deliveryAgent.contactNumber }}</div>
+                        </div>
+                        <div class="info-row">
+                            <div class="info-label">
+                                <mat-icon>info</mat-icon>
+                                <span>Status</span>
+                            </div>
+                            <div class="info-content">
+                                <mat-chip
+                                    [ngClass]="getAgentStatusClass(orderTracking.deliveryAgent.availabilityStatus)">
+                                    {{ getAvailabilityStatus(orderTracking.deliveryAgent.availabilityStatus)
+                                    }}</mat-chip>
+                            </div>
+                        </div>
+                    </div>
+                    <ng-template #noAgent>
+                        <div class="no-data">
+                            <mat-icon>person_off</mat-icon>
+                            <p>No agent assigned yet</p>
+                        </div>
+                    </ng-template>
+                </div>
+
+                <div *ngIf="showAgentList" class="assignment-list">
+                    <mat-form-field appearance="outline" class="search-field">
+                        <mat-label>Search Agents</mat-label>
+                        <input matInput [(ngModel)]="agentSearchText" placeholder="Search by name or ID" />
+                        <mat-icon matPrefix>search</mat-icon>
+                    </mat-form-field>
+                    <div class="list-items">
+                        <div *ngFor="let agent of filteredAgents" class="list-item"
+                            [class.assigned]="orderTracking.deliveryAgent?.deliveryAgentId === agent.deliveryAgentId"
+                            (click)="assignAgent(agent)">
+                            <div class="item-info">
+                                <div class="item-title">{{ agent.deliveryAgentName }}</div>
+                                <div class="item-subtitle">ID: {{ agent.deliveryAgentId }} | {{
+                                    getAvailabilityStatus(agent.availabilityStatus) }}</div>
+                            </div>
+                            <mat-icon *ngIf="orderTracking.deliveryAgent?.deliveryAgentId === agent.deliveryAgentId">
+                                check_circle
+                            </mat-icon>
+                        </div>
+                        <div *ngIf="filteredAgents.length === 0" class="no-results">
+                            No agents found
+                        </div>
+                    </div>
+                </div>
+            </mat-card-content>
+        </mat-card>
+
+        <!-- Delivery Hub Details -->
+        <mat-card class="info-card hub-card">
+            <mat-card-header class="card-header">
+                <mat-icon>warehouse</mat-icon>
+                <mat-card-title>Delivery Hub</mat-card-title>
+                <button mat-icon-button (click)="toggleHubList()" class="assign-button"
+                    [matTooltip]="orderTracking.nearestHub ? 'Update Hub': 'Assign Hub'">
+                    <mat-icon>{{ showHubList ? 'close' : orderTracking.nearestHub ? 'update' : 'add' }}</mat-icon>
+                </button>
+            </mat-card-header>
+            <mat-card-content>
+                <div *ngIf="!showHubList">
+                    <div *ngIf="orderTracking.nearestHub; else noHub">
+                        <div class="info-row">
+                            <div class="info-label">
+                                <mat-icon>tag</mat-icon>
+                                <span>Hub ID</span>
+                            </div>
+                            <div class="info-content">{{ orderTracking.nearestHub.deliveryHubId }}</div>
+                        </div>
+                        <div class="info-row">
+                            <div class="info-label">
+                                <mat-icon>business</mat-icon>
+                                <span>Hub Name</span>
+                            </div>
+                            <div class="info-content">{{ orderTracking.nearestHub.deliveryHubName }}</div>
+                        </div>
+                        <div class="info-row">
+                            <div class="info-label">
+                                <mat-icon>location_city</mat-icon>
+                                <span>City</span>
+                            </div>
+                            <div class="info-content">{{ orderTracking.nearestHub.deliveryHubAddress?.city || 'N/A' }}
+                            </div>
+                        </div>
+                        <div class="info-row">
+                            <div class="info-label">
+                                <mat-icon>mail</mat-icon>
+                                <span>ZIP Code</span>
+                            </div>
+                            <div class="info-content">{{ orderTracking.nearestHub.deliveryHubAddress?.zip || 'N/A' }}
+                            </div>
+                        </div>
+                    </div>
+                    <ng-template #noHub>
+                        <div class="no-data">
+                            <mat-icon>warehouse</mat-icon>
+                            <p>No hub allocated yet</p>
+                        </div>
+                    </ng-template>
+                </div>
+
+                <div *ngIf="showHubList" class="assignment-list">
+                    <mat-form-field appearance="outline" class="search-field">
+                        <mat-label>Search Hubs</mat-label>
+                        <input matInput [(ngModel)]="hubSearchText" placeholder="Search by name, ID, or ZIP" />
+                        <mat-icon matPrefix>search</mat-icon>
+                    </mat-form-field>
+                    <div class="list-items">
+                        <div *ngFor="let hub of filteredHubs" class="list-item"
+                            [class.assigned]="orderTracking.nearestHub?.deliveryHubId === hub.deliveryHubId"
+                            (click)="assignHub(hub)">
+                            <div class="item-info">
+                                <div class="item-title">{{ hub.deliveryHubName }}</div>
+                                <div class="item-subtitle">
+                                    ID: {{ hub.deliveryHubId }} | ZIP: {{ hub.deliveryHubAddress?.zip || 'N/A' }}
+                                </div>
+                            </div>
+                            <mat-icon *ngIf="orderTracking.nearestHub?.deliveryHubId === hub.deliveryHubId">
+                                check_circle
+                            </mat-icon>
+                        </div>
+                        <div *ngIf="filteredHubs.length === 0" class="no-results">
+                            No hubs found
+                        </div>
+                    </div>
+                </div>
+            </mat-card-content>
+        </mat-card>
+
+        <!-- Order Status -->
+        <mat-card class="info-card status-card">
+            <mat-card-header class="card-header">
+                <mat-icon>track_changes</mat-icon>
+                <mat-card-title>Order Status</mat-card-title>
+                <button mat-icon-button (click)="toggleStatusEdit()" class="edit-button" [matTooltip]="'Update Status'">
+                    <mat-icon>{{ isEditingStatus ? 'close' : 'update' }}</mat-icon>
+                </button>
+            </mat-card-header>
+            <mat-card-content>
+                <div *ngIf="!isEditingStatus" class="info-row">
+                    <div class="info-label">
+                        <mat-icon>info</mat-icon>
+                        <span>Current Status</span>
+                    </div>
+                    <div class="info-content">
+                        <mat-chip [ngClass]="getOrderStatusClass(orderTracking.orderTrackingStatusId)">
+                            {{ getStatusLabel(orderTracking.orderTrackingStatusId) }}
+                        </mat-chip>
+                    </div>
+                </div>
+                <div *ngIf="isEditingStatus" class="edit-section">
+                    <mat-form-field appearance="outline" style="width: 100%;">
+                        <mat-label>Select Status</mat-label>
+                        <mat-select [(ngModel)]="selectedStatus">
+                            <mat-option *ngFor="let status of statusList" [value]="status.id">
+                                {{ status.name }}
+                            </mat-option>
+                        </mat-select>
+                    </mat-form-field>
+                    <div class="action-buttons">
+                        <button mat-flat-button (click)="toggleStatusEdit()" class="cancel-button">Cancel</button>
+                        <button mat-flat-button (click)="saveStatus()" class="save-button">Save Status</button>
+                    </div>
+                </div>
+            </mat-card-content>
+        </mat-card>
+
+        <!-- Delivery Dates -->
+        <mat-card class="info-card dates-card">
+            <mat-card-header class="card-header">
+                <mat-icon>event</mat-icon>
+                <mat-card-title>Delivery Dates</mat-card-title>
+                <button mat-icon-button (click)="toggleDateEdit()" class="edit-button"
+                    [matTooltip]="'Update Delivery Date'">
+                    <mat-icon>{{ isEditingDate ? 'close' : 'update' }}</mat-icon>
+                </button>
+            </mat-card-header>
+            <mat-card-content>
+                <div *ngIf="!isEditingDate">
+                    <div class="info-row">
+                        <div class="info-label">
+                            <mat-icon>schedule</mat-icon>
+                            <span>Estimated Delivery</span>
+                        </div>
+                        <div class="info-content">{{ formatDate(orderTracking.estimatedDeliveryDate) }}</div>
+                    </div>
+                    <div class="info-row">
+                        <div class="info-label">
+                            <mat-icon>check_circle</mat-icon>
+                            <span>Actual Delivery</span>
+                        </div>
+                        <div class="info-content">
+                            {{ orderTracking.actualDeliveryDate ? formatDate(orderTracking.actualDeliveryDate) : 'N/A'
+                            }}
+                        </div>
+                    </div>
+                </div>
+                <div *ngIf="isEditingDate" class="edit-section">
+                    <mat-form-field appearance="outline" style="width: 100%;">
+                        <mat-label>Estimated Delivery Date</mat-label>
+                        <input matInput [matDatepicker]="picker" [(ngModel)]="selectedDate" />
+                        <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
+                        <mat-datepicker #picker></mat-datepicker>
+                    </mat-form-field>
+                    <div class="action-buttons">
+                        <button mat-flat-button (click)="toggleDateEdit()" class="cancel-button">Cancel</button>
+                        <button mat-flat-button (click)="saveDate()" class="save-button">Save Date</button>
+                    </div>
+                </div>
+            </mat-card-content>
+        </mat-card>
+
+        <!-- Customer Address -->
+        <mat-card class="info-card address-card">
+            <mat-card-header class="card-header">
+                <mat-icon>location_on</mat-icon>
+                <mat-card-title>Customer Address</mat-card-title>
+            </mat-card-header>
+            <mat-card-content>
+                <div *ngIf="orderTracking.customerAddress; else noAddress">
+                    <div class="info-row">
+                        <div class="info-label">
+                            <mat-icon>person</mat-icon>
+                            <span>Name</span>
+                        </div>
+                        <div class="info-content">{{ orderTracking.customerAddress.name }}</div>
+                    </div>
+                    <div class="info-row">
+                        <div class="info-label">
+                            <mat-icon>phone</mat-icon>
+                            <span>Contact</span>
+                        </div>
+                        <div class="info-content">{{ orderTracking.customerAddress.contact }}</div>
+                    </div>
+                    <div class="info-row">
+                        <div class="info-label">
+                            <mat-icon>home</mat-icon>
+                            <span>Street</span>
+                        </div>
+                        <div class="info-content">{{ orderTracking.customerAddress.street }}</div>
+                    </div>
+                    <div class="info-row">
+                        <div class="info-label">
+                            <mat-icon>location_city</mat-icon>
+                            <span>City</span>
+                        </div>
+                        <div class="info-content">{{ orderTracking.customerAddress.city }}</div>
+                    </div>
+                    <div class="info-row">
+                        <div class="info-label">
+                            <mat-icon>map</mat-icon>
+                            <span>State</span>
+                        </div>
+                        <div class="info-content">{{ orderTracking.customerAddress.state }}</div>
+                    </div>
+                    <div class="info-row">
+                        <div class="info-label">
+                            <mat-icon>public</mat-icon>
+                            <span>Country</span>
+                        </div>
+                        <div class="info-content">{{ orderTracking.customerAddress.country }}</div>
+                    </div>
+                    <div class="info-row">
+                        <div class="info-label">
+                            <mat-icon>mail</mat-icon>
+                            <span>ZIP Code</span>
+                        </div>
+                        <div class="info-content">{{ orderTracking.customerAddress.zip }}</div>
+                    </div>
+                    <div class="info-row">
+                        <div class="info-label">
+                            <mat-icon>place</mat-icon>
+                            <span>Map Location</span>
+                        </div>
+                        <div class="info-content">
+                            <span class="placeholder-text">Map integration coming soon</span>
+                        </div>
+                    </div>
+                </div>
+                <ng-template #noAddress>
+                    <div class="no-data">
+                        <mat-icon>location_off</mat-icon>
+                        <p>No address information available</p>
+                    </div>
+                </ng-template>
+            </mat-card-content>
+        </mat-card>
+
+        <!-- Customer Instructions -->
+        <mat-card class="info-card instructions-card">
+            <mat-card-header class="card-header">
+                <mat-icon>note</mat-icon>
+                <mat-card-title>Customer Details</mat-card-title>
+            </mat-card-header>
+            <mat-card-content>
+                <div class="info-row">
+                    <div class="info-label">
+                        <mat-icon>person</mat-icon>
+                        <span>Customer Name</span>
+                    </div>
+                    <div class="info-content">{{ customerDetails?.customerName }}</div>
+                </div>
+                <div class="info-row">
+                    <div class="info-label">
+                        <mat-icon>person</mat-icon>
+                        <span>Contact</span>
+                    </div>
+                    <div class="info-content">+1 {{ customerDetails?.phone }}</div>
+                </div>
+                <div class="info-row">
+                    <div class="info-label">
+                        <mat-icon>notes</mat-icon>
+                        <span>Instructions</span>
+                    </div>
+                    <div class="info-content">
+                        <div *ngIf="orderTracking.customerInstructions; else noInstructions" class="instructions-text">
+                            {{ orderTracking.customerInstructions }}
+                        </div>
+                        <ng-template #noInstructions>
+                            <div class="no-data">
+                                <p>No special instructions provided</p>
+                            </div>
+                        </ng-template>
+                    </div>
+                </div>
+
+            </mat-card-content>
+        </mat-card>
+    </div>
+</div>

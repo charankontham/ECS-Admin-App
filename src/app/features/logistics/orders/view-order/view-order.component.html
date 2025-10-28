@@ -163,7 +163,9 @@
                         <div class="item-header">
                             <div class="item-number">Order Item {{ i + 1 }}</div>
                             <mat-chip [class]="getStatusClass(item.orderItemStatus)" class="item-status">
-                                {{ getStatusLabel(item.orderItemStatus) }}
+                                {{ getOrderTrackingByOrderItemId(item.orderItemId).orderTrackingType == 1 ?
+                                getStatusLabel(item.orderItemStatus) : getReturnOrderStatusLabel(item.orderItemStatus)
+                                }}
                             </mat-chip>
                         </div>
 
@@ -201,7 +203,8 @@
                                         <mat-icon>qr_code</mat-icon>
                                         <div class="tracking-info">
                                             <span class="tracking-label">Tracking Number</span>
-                                            <span class="tracking-value">{{ ordersTracking[i].orderTrackingId}}</span>
+                                            <span class="tracking-value">{{
+                                                getOrderTrackingByOrderItemId(item.orderItemId)!.orderTrackingId}}</span>
                                         </div>
                                     </div>
                                     <div class="tracking-item">
@@ -209,9 +212,13 @@
                                         <div class="tracking-info">
                                             <span class="tracking-label">Delivery Agent</span>
                                             <span class="tracking-value"
-                                                [ngClass]="ordersTracking[i].deliveryAgent == null ? 'not-available-value':''">
-                                                {{ ordersTracking[i].deliveryAgent ??
-                                                ordersTracking[i].deliveryAgent?.deliveryAgentName ?? "N/A"}}</span>
+                                                [ngClass]="getOrderTrackingByOrderItemId(item.orderItemId)!.deliveryAgent == null ? 'not-available-value' : '' ">
+                                                {{ getOrderTrackingByOrderItemId(item.orderItemId)!.deliveryAgent !=
+                                                null ?
+                                                getOrderTrackingByOrderItemId(item.orderItemId)!.deliveryAgent?.deliveryAgentName
+                                                +" : #"+
+                                                getOrderTrackingByOrderItemId(item.orderItemId)!.deliveryAgent?.deliveryAgentId
+                                                : "N/A" }}</span>
                                         </div>
                                     </div>
                                     <div class="tracking-item">
@@ -219,9 +226,12 @@
                                         <div class="tracking-info">
                                             <span class="tracking-label">Delivery Hub</span>
                                             <span class="tracking-value"
-                                                [ngClass]="ordersTracking[i].nearestHub == null ? 'not-available-value':''">{{
-                                                ordersTracking[i].nearestHub??
-                                                ordersTracking[i].nearestHub?.deliveryHubName ?? "N/A" }}
+                                                [ngClass]="getOrderTrackingByOrderItemId(item.orderItemId)!.nearestHub == null ? 'not-available-value':''">{{
+                                                getOrderTrackingByOrderItemId(item.orderItemId)!.nearestHub ?
+                                                getOrderTrackingByOrderItemId(item.orderItemId)!.nearestHub?.deliveryHubName
+                                                + " : #"
+                                                +getOrderTrackingByOrderItemId(item.orderItemId)!.nearestHub?.deliveryHubId
+                                                : "N/A" }}
                                             </span>
                                         </div>
                                     </div>
@@ -230,9 +240,11 @@
                                         <div class="tracking-info">
                                             <span class="tracking-label">Expected Delivery</span>
                                             <span class="tracking-value"
-                                                [ngClass]="ordersTracking[i].estimatedDeliveryDate == null ? 'not-available-value':''">
-                                                {{ ordersTracking[i].estimatedDeliveryDate ?
-                                                formatDate(ordersTracking[i].estimatedDeliveryDate) : "N/A"
+                                                [ngClass]="getOrderTrackingByOrderItemId(item.orderItemId)!.estimatedDeliveryDate == null ? 'not-available-value':''">
+                                                {{
+                                                getOrderTrackingByOrderItemId(item.orderItemId)!.estimatedDeliveryDate ?
+                                                formatDate(getOrderTrackingByOrderItemId(item.orderItemId)!.estimatedDeliveryDate)
+                                                : "N/A"
                                                 }}
                                             </span>
                                         </div>
@@ -242,8 +254,8 @@
                                         <div class="tracking-info">
                                             <span class="tracking-label">Delivery Instructions</span>
                                             <span class="tracking-value"
-                                                [ngClass]="ordersTracking[i].customerInstructions==null ? 'not-available-value':''">{{
-                                                ordersTracking[i].customerInstructions ??
+                                                [ngClass]="getOrderTrackingByOrderItemId(item.orderItemId)!.customerInstructions==null ? 'not-available-value':''">{{
+                                                getOrderTrackingByOrderItemId(item.orderItemId)!.customerInstructions ??
                                                 "N/A"}}</span>
                                         </div>
                                     </div>

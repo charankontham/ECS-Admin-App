@@ -216,16 +216,12 @@
 }
 
 mat-chip {
-  background-color: #f1f5f9 !important;
-  color: #64748b !important;
-  border: 1px solid #e2e8f0 !important;
-  font-size: 12px;
-  font-weight: 500;
-  padding: 4px 12px;
-  height: auto;
-  min-height: 24px;
   display: inline-flex !important;
   width: fit-content !important;
+}
+
+::ng-deep .order-type-mat-chip .mdc-evolution-chip__text-label {
+  color: #1e293b !important;
 }
 
 .password-section {
@@ -293,6 +289,7 @@ mat-chip {
 .table-container {
   overflow-x: auto;
   padding: 0 24px 24px 24px;
+  margin-top: 1%;
 }
 
 .deliveries-table {
@@ -364,31 +361,15 @@ mat-select {
   color: grey;
 }
 
-.info-item ::ng-deep .status-1 .mdc-evolution-chip__text-label {
+.info-content ::ng-deep .status-available .mdc-evolution-chip__text-label {
   color: #1e4617 !important;
 }
-.info-content ::ng-deep .status-2 .mdc-evolution-chip__text-label {
+.info-content ::ng-deep .status-busy .mdc-evolution-chip__text-label {
   color: #5e130c !important;
 }
-.info-item ::ng-deep .status-3 .mdc-evolution-chip__text-label {
+.info-content ::ng-deep .status-on-leave .mdc-evolution-chip__text-label {
   color: #09325c !important;
 }
-.info-content ::ng-deep .status-4 .mdc-evolution-chip__text-label {
+.info-content ::ng-deep .status-unavailable .mdc-evolution-chip__text-label {
   color: #444343 !important;
-}
-
-.status-1 {
-  background-color: #96d490c1 !important;
-}
-
-.status-2 {
-  background-color: #e57a75 !important;
-}
-
-.status-3 {
-  background-color: #9aabee !important;
-}
-
-.status-4 {
-  background-color: #bcbbbb !important;
 }

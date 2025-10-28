@@ -63,7 +63,7 @@
   justify-content: space-between;
   align-items: center;
   margin-bottom: 24px;
-  background: linear-gradient(135deg, #e4ecf2 0%, #a5b6c4 100%);
+  background: linear-gradient(135deg, #f0f3f5 0%, #b6c7d4 100%);
   padding: 20px 24px;
   border-radius: 12px;
 }
@@ -95,7 +95,7 @@
   align-items: center;
   gap: 6px;
   margin: 8px 0 0 0;
-  color: #64748b;
+  color: #596b84;
   font-size: 14px;
   font-weight: bold;
 }
@@ -454,9 +454,9 @@ mat-card-content {
   align-items: flex-start;
   gap: 12px;
   padding: 16px;
-  background: linear-gradient(135deg, #fdfcf3 0%, #fcf7e0 100%);
+  background: linear-gradient(135deg, #fdfcf3 0%, #faf7e9 100%);
   border-radius: 8px;
-  border: 1px solid #fcd34d;
+  border: 1px solid #f6da7c;
 }
 
 .seller-item mat-icon {
@@ -475,7 +475,7 @@ mat-card-content {
 }
 
 .seller-label {
-  color: #92400e;
+  color: #b0551d;
   font-size: 12px;
   font-weight: 500;
   text-transform: uppercase;
@@ -493,64 +493,32 @@ mat-card-content {
   color: #484747 !important;
 }
 
-.status-order-placed {
-  background: linear-gradient(270deg, #ffffff 0%, #cfe1f2 100%) !important;
-}
-
 .status-shipment-in-transit ::ng-deep .mdc-evolution-chip__text-label {
   color: #0e5f74 !important;
-}
-
-.status-shipment-in-transit {
-  background: linear-gradient(270deg, #e0f8fc 0%, #a6eefa 100%) !important;
 }
 
 .status-shipped ::ng-deep .mdc-evolution-chip__text-label {
   color: #5b0b58 !important;
 }
 
-.status-shipped {
-  background: linear-gradient(270deg, #f7e7f8 0%, #fddafd 100%) !important;
-}
-
 .status-waiting-for-delivery-agent ::ng-deep .mdc-evolution-chip__text-label {
   color: #9a3412 !important;
-}
-
-.status-waiting-for-delivery-agent {
-  background: linear-gradient(270deg, #fdf2e5 0%, #fbd4aa 100%) !important;
 }
 
 .status-out-for-delivery ::ng-deep .mdc-evolution-chip__text-label {
   color: #92400e !important;
 }
 
-.status-out-for-delivery {
-  background: linear-gradient(270deg, #fcf5d6 0%, #f5dc8c 100%) !important;
-}
-
 .status-delivered ::ng-deep .mdc-evolution-chip__text-label {
   color: #065f46 !important;
-}
-
-.status-delivered {
-  background: linear-gradient(270deg, #e9fcf2 0%, #b9f9db 100%) !important;
 }
 
 .status-returned-to-delivery-hub ::ng-deep .mdc-evolution-chip__text-label {
   color: #3730a3 !important;
 }
 
-.status-returned-to-delivery-hub {
-  background: linear-gradient(270deg, #e6ebfc 0%, #acb1d1 100%) !important;
-}
-
 .status-cancelled ::ng-deep .mdc-evolution-chip__text-label {
   color: #991b1b !important;
-}
-
-.status-cancelled {
-  background: linear-gradient(270deg, #fecaca 0%, #fca5a5 100%) !important;
 }
 
 /* Responsive Design */

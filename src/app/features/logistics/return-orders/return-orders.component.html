@@ -1,1 +1,153 @@
-<p>return-orders works!</p>
+<div class="return-orders-container">
+    <div class="header">
+        <div class="header-content">
+            <h1>Return Orders</h1>
+            <p class="subtitle">Manage and track all return orders</p>
+        </div>
+    </div>
+
+    <!-- Filters -->
+    <mat-card class="filter-card">
+        <mat-card-content>
+            <form [formGroup]="filterForm" class="filter-form">
+                <div class="filter-row">
+                    <mat-form-field appearance="outline" class="search-field">
+                        <mat-label>Search</mat-label>
+                        <input matInput formControlName="search" placeholder="Search by Return Order ID, Customer ID" />
+                        <mat-icon matPrefix>search</mat-icon>
+                    </mat-form-field>
+
+                    <mat-form-field appearance="outline">
+                        <mat-label>Status</mat-label>
+                        <mat-select formControlName="status">
+                            <mat-option [value]="null">All Statuses</mat-option>
+                            <mat-option *ngFor="let status of statusList" [value]="status.value">
+                                {{ status.label }}
+                            </mat-option>
+                        </mat-select>
+                    </mat-form-field>
+
+                    <mat-form-field appearance="outline">
+                        <mat-label>Delivery Agent</mat-label>
+                        <mat-select formControlName="deliveryAgent">
+                            <mat-option [value]="null">All Agents</mat-option>
+                            <mat-option *ngFor="let agent of deliveryAgents" [value]="agent.deliveryAgentId">
+                                {{ agent.deliveryAgentName }} (ID: {{ agent.deliveryAgentId }})
+                            </mat-option>
+                        </mat-select>
+                    </mat-form-field>
+
+                    <mat-form-field appearance="outline">
+                        <mat-label>Delivery Hub</mat-label>
+                        <mat-select formControlName="deliveryHub">
+                            <mat-option [value]="null">All Hubs</mat-option>
+                            <mat-option *ngFor="let hub of deliveryHubs" [value]="hub.deliveryHubId">
+                                {{ hub.deliveryHubName }} (ID: {{ hub.deliveryHubId }})
+                            </mat-option>
+                        </mat-select>
+                    </mat-form-field>
+                </div>
+
+                <div class="filter-actions">
+                    <mat-chip-listbox>
+                        <mat-chip *ngIf="filterForm.get('search')?.value">
+                            Search: {{ filterForm.get('search')?.value }}
+                            <button matChipRemove (click)="clearFilter('search')">
+                                <mat-icon>cancel</mat-icon>
+                            </button>
+                        </mat-chip>
+                        <mat-chip *ngIf="filterForm.get('status')?.value">
+                            Status: {{ getStatusLabel(filterForm.get('status')?.value) }}
+                            <button matChipRemove (click)="clearFilter('status')">
+                                <mat-icon>cancel</mat-icon>
+                            </button>
+                        </mat-chip>
+                        <mat-chip *ngIf="filterForm.get('deliveryAgent')?.value">
+                            Agent: {{ getDeliveryAgentName(filterForm.get('deliveryAgent')?.value) }}
+                            <button matChipRemove (click)="clearFilter('deliveryAgent')">
+                                <mat-icon>cancel</mat-icon>
+                            </button>
+                        </mat-chip>
+                        <mat-chip *ngIf="filterForm.get('deliveryHub')?.value">
+                            Hub: {{ getDeliveryHubName(filterForm.get('deliveryHub')?.value) }}
+                            <button matChipRemove (click)="clearFilter('deliveryHub')">
+                                <mat-icon>cancel</mat-icon>
+                            </button>
+                        </mat-chip>
+                    </mat-chip-listbox>
+
+                    <button mat-stroked-button id="clear-all-filters-button" (click)="clearAllFilters()"
+                        [disabled]="checkIsDefaultFilterForm()">
+                        Clear All
+                    </button>
+                </div>
+            </form>
+        </mat-card-content>
+    </mat-card>
+
+    <div *ngIf="isLoading" class="loading-container">
+        <mat-spinner diameter="50"></mat-spinner>
+        <p>Loading return orders...</p>
+    </div>
+
+    <mat-card class="table-card">
+        <mat-card-content>
+            <div class="table-container">
+                <table *ngIf="!isLoading" mat-table [dataSource]="dataSource" matSort class="return-orders-table"
+                    (matSortChange)="sortData($event)">
+                    <ng-container matColumnDef="returnOrderId">
+                        <th mat-header-cell *matHeaderCellDef mat-sort-header>Return Order ID</th>
+                        <td mat-cell *matCellDef="let returnOrder">
+                            Return #{{ returnOrder.orderReturnId }}
+                        </td>
+                    </ng-container>
+
+                    <ng-container matColumnDef="customerId">
+                        <th mat-header-cell *matHeaderCellDef mat-sort-header>Customer ID</th>
+                        <td mat-cell *matCellDef="let returnOrder">
+                            Customer #{{ returnOrder.customerId }}
+                        </td>
+                    </ng-container>
+
+                    <ng-container matColumnDef="productName">
+                        <th mat-header-cell *matHeaderCellDef mat-sort-header>Product Name</th>
+                        <td mat-cell *matCellDef="let returnOrder">
+                            {{ returnOrder.orderTracking?.product?.productName || 'N/A' }}
+                        </td>
+                    </ng-container>
+
+                    <ng-container matColumnDef="status">
+                        <th mat-header-cell *matHeaderCellDef mat-sort-header>Status</th>
+                        <td mat-cell *matCellDef="let returnOrder">
+                            <mat-chip [class]="getStatusClass(returnOrder.orderTracking.orderTrackingStatusId)">
+                                {{ getStatusLabel(returnOrder.orderTracking.orderTrackingStatusId) }}
+                            </mat-chip>
+                            <span *ngIf="!returnOrder.orderTracking?.orderTrackingStatusId">N/A</span>
+                        </td>
+                    </ng-container>
+
+                    <ng-container matColumnDef="returnedDate">
+                        <th mat-header-cell *matHeaderCellDef mat-sort-header>Returned Date</th>
+                        <td mat-cell *matCellDef="let returnOrder">
+                            {{ formatDate(returnOrder.dateAdded.toString() + 'Z') }}
+                        </td>
+                    </ng-container>
+
+                    <tr mat-header-row *matHeaderRowDef="displayedColumns; sticky: true"></tr>
+                    <tr mat-row *matRowDef="let returnOrder; columns: displayedColumns" class="clickable-row"
+                        (click)="onReturnOrderClick($event, returnOrder)"
+                        (auxclick)="onReturnOrderClick($event, returnOrder)"></tr>
+                    <tr class="mat-row" *matNoDataRow>
+                        <td class="mat-cell no-data" [attr.colspan]="displayedColumns.length">
+                            No return orders found matching the filters!
+                        </td>
+                    </tr>
+                </table>
+
+                <mat-paginator [length]="totalReturnOrders" [pageSize]="filters.offset"
+                    [pageSizeOptions]="[5, 10, 25, 50]" (page)="pageChanged($event)" showFirstLastButtons>
+                </mat-paginator>
+            </div>
+        </mat-card-content>
+    </mat-card>
+</div>

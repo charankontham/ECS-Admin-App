@@ -27,8 +27,10 @@ import { OrderTracking } from '../../../../core/models/order.model';
 import {
   AVAILABILITY_STATUS_MAP,
   AvailabilityStatus,
+  AvailabilityStatusClassMap,
   ORDER_TRACKING_STATUS_MAP,
   ORDER_TRACKING_TYPE_MAP,
+  OrderStatusClassMap,
 } from '../../../../core/util/util';
 import { MatSnackBar } from '@angular/material/snack-bar';
 
@@ -88,7 +90,6 @@ export class ViewDeliveryAgentComponent implements OnInit {
 
   displayedColumns: string[] = [
     'orderTrackingId',
-    'orderItemId',
     'productName',
     'customerAddress',
     'status',
@@ -469,20 +470,24 @@ export class ViewDeliveryAgentComponent implements OnInit {
     });
   }
 
-  getStatusClass(status: number): string {
-    return `status-${status}`;
+  getAgentStatusClass(status: number): string {
+    return AvailabilityStatusClassMap[status];
   }
 
-  getStatusLabel(statusId: number): string {
+  getOrderStatusClass(status: number): string {
+    return OrderStatusClassMap[status];
+  }
+
+  getOrderStatusLabel(statusId: number): string {
     return ORDER_TRACKING_STATUS_MAP[statusId] || 'Unknown';
-  }
-
-  getTrackingTypeLabel(typeId: number): string {
-    return ORDER_TRACKING_TYPE_MAP[typeId] || 'Unknown';
   }
 
   getAvailabilityStatusLabel(statusId: number): string {
     return AVAILABILITY_STATUS_MAP[statusId] || 'Unknown';
+  }
+
+  getTrackingTypeLabel(typeId: number): string {
+    return ORDER_TRACKING_TYPE_MAP[typeId] || 'Unknown';
   }
 
   getCustomerAddress(delivery: OrderTracking): string {

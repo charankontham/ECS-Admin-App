@@ -272,20 +272,17 @@ mat-label {
 }
 
 /* Material Paginator Button Colors */
+::ng-deep svg.mat-mdc-paginator-icon,
 ::ng-deep .mat-mdc-paginator .mat-mdc-icon-button {
-  color: #475569 !important;
+  fill: #48494b !important;
 }
 
-::ng-deep .mat-mdc-paginator .mat-mdc-icon-button[disabled] {
-  color: #cbd5e1 !important;
+::ng-deep .mat-mdc-paginator .mat-mdc-icon-button {
+  background-color: #f7f5f5 !important;
 }
 
-::ng-deep .mat-mdc-paginator .mat-mdc-paginator-icon {
-  fill: #475569 !important;
-}
-
-::ng-deep .mat-mdc-paginator .mat-mdc-button:disabled .mat-mdc-paginator-icon {
-  fill: #cbd5e1 !important;
+::ng-deep .mat-mdc-icon-button[aria-disabled] .mat-mdc-paginator-icon {
+  fill: #c8c7c7 !important;
 }
 
 /* Paginator text color */
@@ -295,12 +292,6 @@ mat-label {
 
 .mat-mdc-paginator-page-size {
   color: black;
-}
-
-.clear-all-filters-button .mat-mdc-unelevated-button[disabled],
-.mat-mdc-unelevated-button.mat-mdc-button-disabled {
-  color: #949494;
-  background-color: #ededed;
 }
 
 .add-delivery-hub-container {

@@ -1,1 +1,518 @@
-<p>view-return-order works!</p>
+<div class="view-return-order-container">
+    <mat-progress-bar *ngIf="loading" mode="indeterminate"></mat-progress-bar>
+
+    <div class="header">
+        <button mat-icon-button class="back-button" (click)="goBack()">
+            <mat-icon>arrow_back</mat-icon>
+        </button>
+        <div class="header-content">
+            <h1>Return Order #{{ returnOrder?.orderReturnId || 'Loading...' }}</h1>
+            <p class="subtitle">View and manage return order details</p>
+        </div>
+        <div class="header-actions">
+            <button *ngIf="!isEditMode" mat-flat-button class="edit-button" (click)="toggleEditMode()">
+                <mat-icon>edit</mat-icon>
+                Edit Return Order
+            </button>
+            <button *ngIf="isEditMode" mat-flat-button class="save-button" (click)="saveChanges()">
+                <mat-icon>save</mat-icon>
+                Save Changes
+            </button>
+            <button *ngIf="isEditMode" mat-stroked-button class="cancel-button" (click)="cancelEdit()">
+                <mat-icon>close</mat-icon>
+                Cancel
+            </button>
+        </div>
+    </div>
+
+    <div *ngIf="error" class="error-message">
+        <mat-icon>error</mat-icon>
+        <p>{{ error }}</p>
+    </div>
+
+    <div *ngIf="!loading && !error && returnOrder" class="content">
+        <!-- Return Order Information -->
+        <mat-card class="info-card">
+            <mat-card-header class="card-header">
+                <mat-icon class="header-icon">assignment_return</mat-icon>
+                <mat-card-title>Return Order Information</mat-card-title>
+            </mat-card-header>
+            <mat-divider></mat-divider>
+            <mat-card-content>
+                <div class="info-grid">
+                    <div class="info-row">
+                        <mat-icon class="info-icon">tag</mat-icon>
+                        <div class="info-content">
+                            <span class="info-label">Return Order ID</span>
+                            <span class="info-value">{{ returnOrder.orderReturnId }}</span>
+                        </div>
+                    </div>
+
+                    <div class="info-row">
+                        <mat-icon class="info-icon">category</mat-icon>
+                        <div class="info-content">
+                            <span class="info-label">Return Reason Category</span>
+                            <span class="info-value">{{ getReturnCategoryLabel(returnOrder.returnReasonCategoryId) +
+                                " : " + returnOrder.returnReasonCategoryId
+                                }}</span>
+                        </div>
+                    </div>
+
+                    <div class="info-row">
+                        <mat-icon class="info-icon">description</mat-icon>
+                        <div class="info-content">
+                            <span class="info-label">Return Reason</span>
+                            <span class="info-value">{{ returnOrder.returnReason || 'N/A' }}</span>
+                        </div>
+                    </div>
+
+                    <div class="info-row">
+                        <mat-icon class="info-icon">event</mat-icon>
+                        <div class="info-content">
+                            <span class="info-label">Returned Date</span>
+                            <span class="info-value">{{ formatDate(returnOrder.dateAdded) }}</span>
+                        </div>
+                    </div>
+
+                    <div class="info-row">
+                        <mat-icon class="info-icon">payment</mat-icon>
+                        <div class="info-content">
+                            <span class="info-label">Return Payment Source</span>
+                            <span class="info-value">{{ getPaymentSourceLabel(returnOrder.returnPaymentSourceId)
+                                }}</span>
+                        </div>
+                    </div>
+
+                    <div class="info-row">
+                        <mat-icon class="info-icon">update</mat-icon>
+                        <div class="info-content">
+                            <span class="info-label">Date Modified</span>
+                            <span class="info-value">{{ formatDate(returnOrder.dateModified) }}</span>
+                        </div>
+                    </div>
+                </div>
+            </mat-card-content>
+        </mat-card>
+
+        <!-- Order Tracking Information -->
+        <mat-card class="info-card" *ngIf="orderTracking">
+            <mat-card-header class="card-header">
+                <mat-icon class="header-icon">local_shipping</mat-icon>
+                <mat-card-title>Order Tracking Information</mat-card-title>
+            </mat-card-header>
+            <mat-divider></mat-divider>
+            <mat-card-content>
+                <form [formGroup]="returnOrderForm">
+                    <div class="info-grid">
+                        <div class="info-row">
+                            <mat-icon class="info-icon">confirmation_number</mat-icon>
+                            <div class="info-content">
+                                <span class="info-label">Tracking ID</span>
+                                <span class="info-value">{{ orderTracking.orderTrackingId }}</span>
+                            </div>
+                        </div>
+
+                        <div class="info-row">
+                            <mat-icon class="info-icon">info</mat-icon>
+                            <div class="info-content">
+                                <span class="info-label">Order Status</span>
+                                <mat-form-field *ngIf="isEditMode" appearance="outline" class="status-field">
+                                    <mat-select formControlName="orderTrackingStatusId">
+                                        <mat-option *ngFor="let status of statusOptions" [value]="status.value">
+                                            {{ status.label }}
+                                        </mat-option>
+                                    </mat-select>
+                                </mat-form-field>
+                                <mat-chip *ngIf="!isEditMode"
+                                    [ngClass]="getOrderStatusClass(orderTracking.orderTrackingStatusId)">
+                                    {{ getStatusLabel(orderTracking.orderTrackingStatusId) }}
+                                </mat-chip>
+                            </div>
+                        </div>
+
+                        <div class="info-row">
+                            <mat-icon class="info-icon">schedule</mat-icon>
+                            <div class="info-content">
+                                <span class="info-label">Estimated Pickup Date</span>
+                                <mat-form-field *ngIf="isEditMode" appearance="outline" class="date-field">
+                                    <input matInput [matDatepicker]="picker" formControlName="estimatedDeliveryDate"
+                                        placeholder="Select date" />
+                                    <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
+                                    <mat-datepicker #picker></mat-datepicker>
+                                </mat-form-field>
+                                <span *ngIf="!isEditMode" class="info-value">
+                                    {{ formatDate(orderTracking.estimatedDeliveryDate) }}
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </mat-card-content>
+        </mat-card>
+
+        <!-- Delivery Hub Information -->
+        <mat-card class="info-card">
+            <mat-card-header class="card-header">
+                <mat-icon class="header-icon">store</mat-icon>
+                <mat-card-title>Delivery Hub Information</mat-card-title>
+                <button mat-stroked-button class="assign-button" (click)="toggleHubList()" *ngIf="isEditMode">
+                    <mat-icon>{{ orderTracking?.nearestHub ? 'swap_horiz' : 'add' }}</mat-icon>
+                    {{ orderTracking?.nearestHub ? 'Change Hub' : 'Assign Hub' }}
+                </button>
+            </mat-card-header>
+            <mat-divider></mat-divider>
+            <mat-card-content>
+                <div *ngIf="orderTracking && orderTracking.nearestHub; else noHub" class="info-grid">
+                    <div class="info-row">
+                        <mat-icon class="info-icon">tag</mat-icon>
+                        <div class="info-content">
+                            <span class="info-label">Hub ID</span>
+                            <span class="info-value">{{ orderTracking.nearestHub.deliveryHubId }}</span>
+                        </div>
+                    </div>
+
+                    <div class="info-row">
+                        <mat-icon class="info-icon">business</mat-icon>
+                        <div class="info-content">
+                            <span class="info-label">Hub Name</span>
+                            <span class="info-value">
+                                <a [href]="getElementUrl('hub', orderTracking.nearestHub.deliveryHubId!)"
+                                    (click)="onElementClick($event, 'hub', orderTracking.nearestHub.deliveryHubId!)"
+                                    style="cursor: pointer; color: #1976d2; text-decoration: none;">
+                                    {{ orderTracking.nearestHub.deliveryHubName }}
+                                </a>
+                            </span>
+                        </div>
+                    </div>
+
+                    <div class="info-row">
+                        <mat-icon class="info-icon">location_city</mat-icon>
+                        <div class="info-content">
+                            <span class="info-label">Location</span>
+                            <span class="info-value">
+                                {{ orderTracking.nearestHub.deliveryHubAddress?.city || 'N/A' }},
+                                {{ orderTracking.nearestHub.deliveryHubAddress?.zip || 'N/A' }}
+                            </span>
+                        </div>
+                    </div>
+                </div>
+
+                <ng-template #noHub>
+                    <div class="no-data">
+                        <mat-icon>info</mat-icon>
+                        <p>No delivery hub assigned</p>
+                    </div>
+                </ng-template>
+
+                <!-- Hub Selection List -->
+                <mat-expansion-panel *ngIf="showHubList && isEditMode" class="selection-panel">
+                    <mat-expansion-panel-header>
+                        <mat-panel-title>
+                            <mat-icon>list</mat-icon>
+                            Select Delivery Hub
+                        </mat-panel-title>
+                    </mat-expansion-panel-header>
+
+                    <div class="selection-list">
+                        <div *ngFor="let hub of availableHubs" class="selection-item"
+                            [class.selected]="isHubAssigned(hub)" (click)="assignHub(hub)">
+                            <div class="selection-info">
+                                <div class="selection-name">
+                                    <mat-icon *ngIf="isHubAssigned(hub)" class="check-icon">check_circle</mat-icon>
+                                    {{ hub.deliveryHubName }}
+                                </div>
+                                <div class="selection-details">
+                                    ID: {{ hub.deliveryHubId }} |
+                                    {{ hub.deliveryHubAddress?.city || 'N/A' }},
+                                    {{ hub.deliveryHubAddress?.zip || 'N/A' }}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </mat-expansion-panel>
+            </mat-card-content>
+        </mat-card>
+
+        <!-- Delivery Agent Information -->
+        <mat-card class="info-card">
+            <mat-card-header class="card-header">
+                <mat-icon class="header-icon">person</mat-icon>
+                <mat-card-title>Delivery Agent Information</mat-card-title>
+                <button mat-stroked-button class="assign-button" (click)="toggleAgentList()" *ngIf="isEditMode">
+                    <mat-icon>{{ orderTracking?.deliveryAgent ? 'swap_horiz' : 'add' }}</mat-icon>
+                    {{ orderTracking?.deliveryAgent ? 'Change Agent' : 'Assign Agent' }}
+                </button>
+            </mat-card-header>
+            <mat-divider></mat-divider>
+            <mat-card-content>
+                <div *ngIf="orderTracking && orderTracking.deliveryAgent; else noAgent" class="info-grid">
+                    <div class="info-row">
+                        <mat-icon class="info-icon">badge</mat-icon>
+                        <div class="info-content">
+                            <span class="info-label">Agent ID</span>
+                            <span class="info-value">{{ orderTracking.deliveryAgent.deliveryAgentId }}</span>
+                        </div>
+                    </div>
+
+                    <div class="info-row">
+                        <mat-icon class="info-icon">person</mat-icon>
+                        <div class="info-content">
+                            <span class="info-label">Agent Name</span>
+                            <span class="info-value">
+                                <a [href]="getElementUrl('agent', orderTracking.deliveryAgent.deliveryAgentId!)"
+                                    (click)="onElementClick($event, 'agent', orderTracking.deliveryAgent.deliveryAgentId!)"
+                                    style="cursor: pointer; color: #1976d2; text-decoration: none;">
+                                    {{ orderTracking.deliveryAgent.deliveryAgentName }}
+                                </a>
+                            </span>
+                        </div>
+                    </div>
+
+                    <div class="info-row">
+                        <mat-icon class="info-icon">circle</mat-icon>
+                        <div class="info-content">
+                            <span class="info-label">Availability Status</span>
+                            <mat-chip
+                                [ngClass]="getAvailabilityStatusClass(orderTracking.deliveryAgent.availabilityStatus)">
+                                {{ getAvailabilityStatusLabel(orderTracking.deliveryAgent.availabilityStatus) }}
+                            </mat-chip>
+                        </div>
+                    </div>
+
+                    <div class="info-row">
+                        <mat-icon class="info-icon">map</mat-icon>
+                        <div class="info-content">
+                            <span class="info-label">Serving Area</span>
+                            <span class="info-value">{{ orderTracking.deliveryAgent.servingArea }}</span>
+                        </div>
+                    </div>
+
+                    <div class="info-row">
+                        <mat-icon class="info-icon">phone</mat-icon>
+                        <div class="info-content">
+                            <span class="info-label">Contact</span>
+                            <span class="info-value">{{ orderTracking.deliveryAgent.contactNumber }}</span>
+                        </div>
+                    </div>
+                </div>
+
+                <ng-template #noAgent>
+                    <div class="no-data">
+                        <mat-icon>info</mat-icon>
+                        <p>No delivery agent assigned</p>
+                    </div>
+                </ng-template>
+
+                <!-- Agent Selection List -->
+                <mat-expansion-panel *ngIf="showAgentList && isEditMode" class="selection-panel">
+                    <mat-expansion-panel-header>
+                        <mat-panel-title>
+                            <mat-icon>list</mat-icon>
+                            Select Delivery Agent
+                        </mat-panel-title>
+                    </mat-expansion-panel-header>
+
+                    <div class="selection-list">
+                        <div *ngFor="let agent of availableAgents" class="selection-item"
+                            [class.selected]="isAgentAssigned(agent)" (click)="assignAgent(agent)">
+                            <div class="selection-info">
+                                <div class="selection-name">
+                                    <mat-icon *ngIf="isAgentAssigned(agent)" class="check-icon">check_circle</mat-icon>
+                                    {{ agent.deliveryAgentName }}
+                                </div>
+                                <div class="selection-details">
+                                    ID: {{ agent.deliveryAgentId }} |
+                                    {{ getAvailabilityStatusLabel(agent.availabilityStatus) }}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </mat-expansion-panel>
+            </mat-card-content>
+        </mat-card>
+
+        <!-- Product Details -->
+        <mat-card class="info-card" *ngIf="orderTracking && orderTracking.product">
+            <mat-card-header class="card-header">
+                <mat-icon class="header-icon">inventory_2</mat-icon>
+                <mat-card-title>Product Details</mat-card-title>
+            </mat-card-header>
+            <mat-divider></mat-divider>
+            <mat-card-content>
+                <div class="product-image-container">
+                    <img [src]="getProductImageUrl(orderTracking.product.productImage)"
+                        [alt]="orderTracking.product.productName" class="product-image"
+                        (error)="$any($event.target).src='/placeholder.svg?height=150&width=150&text=No+Image'" />
+                </div>
+
+                <div class="info-grid">
+                    <div class="info-row">
+                        <mat-icon class="info-icon">tag</mat-icon>
+                        <div class="info-content">
+                            <span class="info-label">Order Item ID</span>
+                            <span class="info-value">{{ returnOrder.orderItemId }}</span>
+                        </div>
+                    </div>
+
+                    <div class="info-row">
+                        <mat-icon class="info-icon">inventory</mat-icon>
+                        <div class="info-content">
+                            <span class="info-label">Product ID</span>
+                            <span class="info-value">{{ orderTracking.product.productId }}</span>
+                        </div>
+                    </div>
+
+                    <div class="info-row">
+                        <mat-icon class="info-icon">label</mat-icon>
+                        <div class="info-content">
+                            <span class="info-label">Product Name</span>
+                            <span class="info-value">{{ orderTracking.product.productName }}</span>
+                        </div>
+                    </div>
+
+                    <div class="info-row">
+                        <mat-icon class="info-icon">attach_money</mat-icon>
+                        <div class="info-content">
+                            <span class="info-label">Price</span>
+                            <span class="info-value">${{ orderTracking.product.productPrice }}</span>
+                        </div>
+                    </div>
+
+                    <div class="info-row">
+                        <mat-icon class="info-icon">format_list_numbered</mat-icon>
+                        <div class="info-content">
+                            <span class="info-label">Quantity</span>
+                            <span class="info-value">{{ returnOrder.productQuantity }}</span>
+                        </div>
+                    </div>
+
+                    <div class="info-row">
+                        <mat-icon class="info-icon">category</mat-icon>
+                        <div class="info-content">
+                            <span class="info-label">Category</span>
+                            <span class="info-value">
+                                {{ orderTracking.product.productSubCategory.productCategory.categoryName || 'N/A' }}
+                            </span>
+                        </div>
+                    </div>
+
+                    <div class="info-row">
+                        <mat-icon class="info-icon">subdirectory_arrow_right</mat-icon>
+                        <div class="info-content">
+                            <span class="info-label">Sub Category</span>
+                            <span class="info-value">
+                                {{ orderTracking.product.productSubCategory.subCategoryName || 'N/A' }}
+                            </span>
+                        </div>
+                    </div>
+
+                    <div class="info-row">
+                        <mat-icon class="info-icon">business</mat-icon>
+                        <div class="info-content">
+                            <span class="info-label">Brand</span>
+                            <span class="info-value">
+                                {{ orderTracking.product.brand.brandName || 'N/A' }}
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            </mat-card-content>
+        </mat-card>
+
+        <!-- Customer Information -->
+        <mat-card class="info-card">
+            <mat-card-header class="card-header">
+                <mat-icon class="header-icon">person_outline</mat-icon>
+                <mat-card-title>Customer Information</mat-card-title>
+            </mat-card-header>
+            <mat-divider></mat-divider>
+            <mat-card-content>
+                <div class="info-grid">
+                    <div class="info-row">
+                        <mat-icon class="info-icon">badge</mat-icon>
+                        <div class="info-content">
+                            <span class="info-label">Customer ID</span>
+                            <span class="info-value">{{ returnOrder.customerId }}</span>
+                        </div>
+                    </div>
+
+                    <div class="info-row">
+                        <mat-icon class="info-icon">person</mat-icon>
+                        <div class="info-content">
+                            <span class="info-label">Customer Name</span>
+                            <span class="info-value">{{ orderTracking?.customerAddress?.name || 'N/A' }}</span>
+                        </div>
+                    </div>
+
+                    <div class="info-row">
+                        <mat-icon class="info-icon">phone</mat-icon>
+                        <div class="info-content">
+                            <span class="info-label">Contact</span>
+                            <span class="info-value">{{ orderTracking?.customerAddress?.contact || 'N/A' }}</span>
+                        </div>
+                    </div>
+                </div>
+            </mat-card-content>
+        </mat-card>
+
+        <!-- Pickup Address -->
+        <mat-card class="info-card" *ngIf="orderTracking && orderTracking.customerAddress">
+            <mat-card-header class="card-header">
+                <mat-icon class="header-icon">location_on</mat-icon>
+                <mat-card-title>Pickup Address</mat-card-title>
+            </mat-card-header>
+            <mat-divider></mat-divider>
+            <mat-card-content>
+                <div class="info-grid">
+                    <div class="info-row">
+                        <mat-icon class="info-icon">home</mat-icon>
+                        <div class="info-content">
+                            <span class="info-label">Street</span>
+                            <span class="info-value">{{ orderTracking.customerAddress.street }}</span>
+                        </div>
+                    </div>
+
+                    <div class="info-row">
+                        <mat-icon class="info-icon">location_city</mat-icon>
+                        <div class="info-content">
+                            <span class="info-label">City</span>
+                            <span class="info-value">{{ orderTracking.customerAddress.city }}</span>
+                        </div>
+                    </div>
+
+                    <div class="info-row">
+                        <mat-icon class="info-icon">map</mat-icon>
+                        <div class="info-content">
+                            <span class="info-label">State</span>
+                            <span class="info-value">{{ orderTracking.customerAddress.state }}</span>
+                        </div>
+                    </div>
+
+                    <div class="info-row">
+                        <mat-icon class="info-icon">pin_drop</mat-icon>
+                        <div class="info-content">
+                            <span class="info-label">ZIP Code</span>
+                            <span class="info-value">{{ orderTracking.customerAddress.zip }}</span>
+                        </div>
+                    </div>
+
+                    <div class="info-row">
+                        <mat-icon class="info-icon">public</mat-icon>
+                        <div class="info-content">
+                            <span class="info-label">Country</span>
+                            <span class="info-value">{{ orderTracking.customerAddress.country }}</span>
+                        </div>
+                    </div>
+
+                    <div class="info-row full-width">
+                        <mat-icon class="info-icon">place</mat-icon>
+                        <div class="info-content">
+                            <span class="info-label">Map Location</span>
+                            <span class="info-value coming-soon">Coming Soon</span>
+                        </div>
+                    </div>
+                </div>
+            </mat-card-content>
+        </mat-card>
+    </div>
+</div>

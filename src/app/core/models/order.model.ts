@@ -3,8 +3,11 @@ import { DeliveryAgent, DeliveryHub } from './delivery.model';
 import { Product } from './product.model';
 
 export interface OrderItemEnriched {
+  orderItemId: number;
+  orderId: number;
   product: Product;
   orderItemStatus: number;
+  invoiceId: number;
 }
 
 export interface CustomerDto {
@@ -40,6 +43,7 @@ export interface Order {
   orderStatus: number;
   paymentType: number;
   paymentStatus: number;
+  invoiceId: number;
 }
 
 export interface OrderReturnRequest {
@@ -83,14 +87,6 @@ export interface OrderTrackingRequest {
   orderTrackingType: number;
 }
 
-export interface OrderItem {
-  orderItemId: number;
-  orderId: number;
-  productId: number;
-  quantity: number;
-  productPrice: number;
-}
-
 export interface OrderTracking {
   orderTrackingId: string;
   orderItem?: OrderItem;
@@ -103,6 +99,15 @@ export interface OrderTracking {
   customerAddress?: AddressDto;
   customerInstructions?: string;
   orderTrackingType: number;
+}
+
+export interface OrderItem {
+  orderItemId: number;
+  orderId: number;
+  productId: number;
+  quantity: number;
+  productPrice: number;
+  invoiceId: number;
 }
 
 export interface OrderFilters extends BaseFilters {
@@ -134,7 +139,7 @@ export interface OrderItemFilters extends BaseFilters {
 
 export interface OrderTrackingFilters extends BaseFilters {
   type: 'orderTracking';
-  deliveryAgentId?: number | null;
+  deliveryAgents?: number[] | null;
   estimatedDeliveryDate?: Date | null;
   orderTrackingStatusId?: number | null;
   orderTrackingType?: number | null;
@@ -142,11 +147,11 @@ export interface OrderTrackingFilters extends BaseFilters {
 
 export interface OrderReturnFilters extends BaseFilters {
   type: 'orderReturn';
-  fromDate?: Date | null;
-  toDate?: Date | null;
-  productId?: number | null;
   categoryId?: number | null;
   subCategoryId?: number | null;
   brandId?: number | null;
+  deliveryAgentId?: number | null;
+  deliveryHubId?: number | null;
+  orderStatusId?: number | null;
   returnReasonCategoryId?: number | null;
 }

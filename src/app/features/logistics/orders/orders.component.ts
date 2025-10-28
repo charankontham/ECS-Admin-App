@@ -451,6 +451,23 @@ export class OrdersComponent implements OnInit, AfterViewInit {
     );
   }
 
+  formatDate(date: string | Date): string {
+    if (date.toString().indexOf('T') < 0) {
+      date =
+        date.toString().indexOf('Z') > 0
+          ? date.toString().replace(' ', 'T')
+          : date.toString().replace(' ', 'T') + 'Z';
+    }
+    const newDate = new Date(date);
+    return newDate.toLocaleDateString('en-US', {
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit',
+    });
+  }
+
   compareBrands = compareBrands;
   compareCategories = compareCategories;
   compareSubCategories = compareCategories;

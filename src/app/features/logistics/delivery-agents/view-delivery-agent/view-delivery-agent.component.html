@@ -110,7 +110,7 @@
                                         </mat-option>
                                     </mat-select>
                                 </mat-form-field>
-                                <mat-chip *ngIf="!isEditMode" [class]="getStatusClass(agent.availabilityStatus)">
+                                <mat-chip *ngIf="!isEditMode" [class]="getAgentStatusClass(agent.availabilityStatus)">
                                     {{ getAvailabilityStatusLabel(agent.availabilityStatus) }}
                                 </mat-chip>
                             </div>
@@ -292,11 +292,6 @@
                             <td mat-cell *matCellDef="let delivery">{{ delivery.orderTrackingId }}</td>
                         </ng-container>
 
-                        <ng-container matColumnDef="orderItemId">
-                            <th mat-header-cell *matHeaderCellDef>Order Item ID</th>
-                            <td mat-cell *matCellDef="let delivery">{{ delivery.orderItem?.orderItemId || 'N/A' }}</td>
-                        </ng-container>
-
                         <ng-container matColumnDef="productName">
                             <th mat-header-cell *matHeaderCellDef>Product</th>
                             <td mat-cell *matCellDef="let delivery">{{ delivery.product?.productName || 'N/A' }}</td>
@@ -310,8 +305,8 @@
                         <ng-container matColumnDef="status">
                             <th mat-header-cell *matHeaderCellDef>Status</th>
                             <td mat-cell *matCellDef="let delivery">
-                                <mat-chip [class]="getStatusClass(delivery.orderTrackingStatusId)">
-                                    {{ getStatusLabel(delivery.orderTrackingStatusId) }}
+                                <mat-chip [class]="this.getOrderStatusClass(delivery.orderTrackingStatusId)">
+                                    {{ this.getOrderStatusLabel(delivery.orderTrackingStatusId) }}
                                 </mat-chip>
                             </td>
                         </ng-container>
@@ -319,7 +314,8 @@
                         <ng-container matColumnDef="trackingType">
                             <th mat-header-cell *matHeaderCellDef>Type</th>
                             <td mat-cell *matCellDef="let delivery">
-                                <mat-chip>{{ getTrackingTypeLabel(delivery.orderTrackingType) }}</mat-chip>
+                                <mat-chip [ngClass]="'order-type-mat-chip'">{{
+                                    this.getTrackingTypeLabel(delivery.orderTrackingType) }}</mat-chip>
                             </td>
                         </ng-container>
 

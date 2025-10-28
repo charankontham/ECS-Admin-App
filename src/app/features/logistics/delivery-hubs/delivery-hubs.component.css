@@ -247,12 +247,17 @@ mat-label {
   color: #475569 !important;
 }
 
+::ng-deep svg.mat-mdc-paginator-icon,
 ::ng-deep .mat-mdc-paginator .mat-mdc-icon-button {
-  color: #475569;
+  fill: #48494b !important;
 }
 
-::ng-deep .mat-mdc-paginator .mat-mdc-icon-button[disabled] {
-  color: #cbd5e1;
+::ng-deep .mat-mdc-paginator .mat-mdc-icon-button {
+  background-color: #f7f5f5 !important;
+}
+
+::ng-deep .mat-mdc-icon-button[aria-disabled] .mat-mdc-paginator-icon {
+  fill: #c8c7c7 !important;
 }
 
 ::ng-deep .mat-mdc-table {

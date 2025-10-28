@@ -21,6 +21,12 @@ export class DeliveryAgentService extends BaseService<DeliveryAgent> {
     super(inject(HttpClient), 'ecs-logistics/api/deliveryAgents', ngZone);
   }
 
+  getAllDeliveryAgents(
+    filters: DeliveryAgentFilters | null = null
+  ): Observable<DeliveryAgent[]> {
+    return this.getAll();
+  }
+
   getAllDeliveryAgentsBypagination(
     filters: DeliveryAgentFilters
   ): Observable<any> {

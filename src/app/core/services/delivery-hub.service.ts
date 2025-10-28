@@ -19,6 +19,9 @@ export class DeliveryHubService extends BaseService<DeliveryHub> {
   constructor(ngZone: NgZone, private authService: AuthService) {
     super(inject(HttpClient), 'ecs-logistics/api/deliveryHubs', ngZone);
   }
+  getAllDeliveryHubs(): Observable<DeliveryHub[]> {
+    return this.getAll();
+  }
 
   getAllDeliveryHubsBypagination(filters: DeliveryHubFilters): Observable<any> {
     return this.getAllByPagination(filters, 'getAllByPagination');
