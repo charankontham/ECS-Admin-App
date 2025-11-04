@@ -116,10 +116,7 @@
                             <div class="form-row">
                                 <mat-form-field appearance="outline">
                                     <mat-label>Description</mat-label>
-                                    <textarea matInput formControlName="brandDescription" rows="5" required></textarea>
-                                    <mat-error *ngIf="brandForm.get('brandDescription')?.hasError('required')">
-                                        Description is required
-                                    </mat-error>
+                                    <textarea matInput formControlName="brandDescription" rows="5"></textarea>
                                 </mat-form-field>
                             </div>
                         </mat-card-content>

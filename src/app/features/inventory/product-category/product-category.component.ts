@@ -42,7 +42,6 @@ import {
   NavigationStateService,
   CategoriesPageState,
 } from '../../../core/services/navigation-state.service';
-import { HttpResponse } from '@angular/common/http';
 
 @Component({
   selector: 'app-product-category',

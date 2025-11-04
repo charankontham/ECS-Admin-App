@@ -373,7 +373,7 @@ export class ViewProductComponent {
             horizontalPosition: 'end',
             verticalPosition: 'top',
           });
-          window.location.reload();
+          // window.location.reload();
         },
         error: (error) => {
           console.error('Error updating product', error);
@@ -494,8 +494,8 @@ export class ViewProductComponent {
     ) {
       this.location.back();
     } else {
-      // this.router.navigate(['/inventory/products']);
-      this.location.back();
+      this.router.navigate(['/inventory/products']);
+      // this.location.back();
     }
   }
 
@@ -546,5 +546,16 @@ export class ViewProductComponent {
       }
       this.product.productDimensions = dimensions;
     }
+  }
+
+  formatDate(date: string): string {
+    const newDate = new Date(date);
+    return newDate.toLocaleDateString('en-US', {
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit',
+    });
   }
 }

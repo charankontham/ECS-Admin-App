@@ -3,6 +3,7 @@
   display: flex;
   flex-direction: column;
   gap: 20px;
+  width: fit-content;
 }
 
 .loading-container {
@@ -99,6 +100,10 @@
   height: 100%;
 }
 
+.image-card {
+  display: flex;
+}
+
 .mat-mdc-tab-group {
   color: white;
 }
@@ -108,7 +113,7 @@
   justify-content: center;
   align-items: center;
   padding: 20px;
-  background-color: #f5f5f5;
+  background-color: white;
   border-radius: 8px;
   margin-bottom: 16px;
 }
@@ -170,7 +175,7 @@
   justify-content: center;
   padding: 40px;
   text-align: center;
-  color: white;
+  color: #aeacac;
   gap: 16px;
 }
 

@@ -49,7 +49,7 @@ export class InventoryDashboardComponent implements OnInit {
   highSellingDataSource = new MatTableDataSource<HighSellingProduct>([]);
 
   // Table Columns
-  outOfStockColumns: string[] = ['name', 'category', 'quantity', 'price'];
+  outOfStockColumns: string[] = ['name', 'category', 'dateModified', 'price'];
   highSellingColumns: string[] = ['name', 'unitsSold', 'category', 'revenue'];
 
   // Pagination
@@ -228,5 +228,16 @@ export class InventoryDashboardComponent implements OnInit {
 
   onProductClick(product: Product): void {
     this.router.navigate(['/inventory/products', product.productId]);
+  }
+
+  formatDate(date: string): string {
+    const newDate = new Date(date);
+    return newDate.toLocaleDateString('en-US', {
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit',
+    });
   }
 }

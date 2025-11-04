@@ -201,7 +201,7 @@ export class ViewBrandComponent {
             verticalPosition: 'top',
             panelClass: ['success-snackbar'],
           });
-          window.location.reload();
+          // window.location.reload();
         },
         error: (error) => {
           console.error('Error updating brand', error);

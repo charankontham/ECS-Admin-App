@@ -124,6 +124,7 @@ export class ViewProductSubCategoryComponent {
       next: (subCategory) => {
         this.subCategory = subCategory;
         // this.initializeForm();
+        this.currentImageUrl = subCategory.subCategoryImage;
         this.loading = false;
       },
       error: (error) => {
@@ -138,7 +139,7 @@ export class ViewProductSubCategoryComponent {
   createSubCategoryForm(): FormGroup {
     return this.fb.group({
       subCategoryName: ['', Validators.required],
-      subCategoryDescription: ['', Validators.required],
+      subCategoryDescription: [''],
       categoryId: ['', Validators.required],
       subCategoryImage: [''],
     });
@@ -241,7 +242,7 @@ export class ViewProductSubCategoryComponent {
           this.subCategory = updatedSubCategory;
           this.isEditMode = false;
           this.handleSnackBarAction('Sub Category updated successfully', true);
-          window.location.reload();
+          // window.location.reload();
           this.loading = false;
         },
         error: (error) => {

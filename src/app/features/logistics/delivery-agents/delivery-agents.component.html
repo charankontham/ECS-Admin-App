@@ -27,7 +27,7 @@
                     <mat-form-field appearance="outline">
                         <mat-label>Serving Area</mat-label>
                         <mat-select formControlName="servingArea">
-                            <mat-option [value]="null">Any</mat-option>
+                            <mat-option [value]="null">All</mat-option>
                             <mat-option *ngFor="let city of cityList" [value]="city">
                                 {{ city.toString() }}
                             </mat-option>
@@ -37,7 +37,7 @@
                     <mat-form-field appearance="outline">
                         <mat-label>Status</mat-label>
                         <mat-select formControlName="availabilityStatus">
-                            <mat-option [value]="null">Any</mat-option>
+                            <mat-option [value]="null">All</mat-option>
                             <mat-option *ngFor="let status of getAvailabilityStatusArray()" [value]="status">
                                 {{ getStatusValue(status) }}
                             </mat-option>
@@ -47,7 +47,7 @@
                     <mat-form-field appearance="outline">
                         <mat-label>Rating</mat-label>
                         <mat-select formControlName="agentRating">
-                            <mat-option [value]="null">Any</mat-option>
+                            <mat-option [value]="null">All</mat-option>
                             <mat-option *ngFor="let rating of getRatingArray()" [value]="rating">
                                 {{ rating }}
                             </mat-option>
@@ -83,7 +83,7 @@
                         </mat-chip>
                     </mat-chip-listbox>
 
-                    <button mat-flat-button id="clear-all-filters-button" color="primary" (click)="clearAllFilters()"
+                    <button mat-stroked-button id="clear-all-filters-button" (click)="clearAllFilters()"
                         [disabled]="checkIsDefaultFilterForm()">
                         Clear All
                     </button>

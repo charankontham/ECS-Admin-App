@@ -62,14 +62,14 @@
         <ng-container *ngIf="!isEditMode">
             <div class="details-grid">
                 <!-- Category Image Card -->
-                <mat-card class="image-card">
-                    <mat-card-content>
-                        <div class="category-image-container">
-                            <img [src]="currentImageUrl || '/assets/images/image-placeholder.jpg'"
-                                [alt]="category.categoryName" class="category-image">
-                        </div>
-                    </mat-card-content>
-                </mat-card>
+                <div class="image-card">
+                    <!-- <mat-card-content> -->
+                    <div class="category-image-container">
+                        <img [src]="currentImageUrl || '/assets/images/image-placeholder.jpg'"
+                            [alt]="category.categoryName" class="category-image">
+                    </div>
+                    <!-- </mat-card-content> -->
+                </div>
 
                 <!-- Category Info Card -->
                 <mat-card class="info-card">
@@ -99,9 +99,8 @@
                 <mat-card-header>
                     <mat-card-title>
                         <mat-icon>category</mat-icon>
-                        Sub Categories
+                        Sub Categories # {{ subCategories.length > 0 ? subCategories.length : '' }}
                     </mat-card-title>
-                    <mat-card-subtitle>{{ subCategories.length }} subcategories in this category</mat-card-subtitle>
                 </mat-card-header>
                 <mat-card-content>
                     <div *ngIf="subCategories.length === 0" class="no-subcategories">
@@ -157,6 +156,7 @@
                         <mat-card-header>
                             <mat-card-title>Category Information</mat-card-title>
                         </mat-card-header>
+                        <hr />
                         <mat-card-content>
                             <div class="form-row">
                                 <mat-form-field appearance="outline">

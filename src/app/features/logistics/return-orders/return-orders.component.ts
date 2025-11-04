@@ -309,14 +309,14 @@ export class ReturnOrdersComponent implements OnInit, AfterViewInit {
             return compare(a.customerId, b.customerId, isAsc);
           case 'productName':
             return compare(
-              a.orderTracking?.product?.productName ?? '',
-              b.orderTracking?.product?.productName ?? '',
+              a.orderTracking?.product?.productName,
+              b.orderTracking?.product?.productName,
               isAsc
             );
           case 'status':
             return compare(
-              a.orderTracking?.orderTrackingStatusId ?? 0,
-              b.orderTracking?.orderTrackingStatusId ?? 0,
+              a.orderTracking?.orderTrackingStatusId!,
+              b.orderTracking?.orderTrackingStatusId!,
               isAsc
             );
           case 'returnedDate':

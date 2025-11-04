@@ -69,8 +69,13 @@ mat-paginator {
   font-weight: bold;
 }
 
+#out-of-stock .dashboard-table tr:last-child {
+  border-bottom: 1px solid #ddd;
+  border-width: 0.1rem !important;
+}
+
 .mat-mdc-row:hover {
-  background-color: rgba(0, 0, 0, 0.04);
+  background-color: #ededed;
 }
 
 .no-data {
@@ -80,12 +85,12 @@ mat-paginator {
   color: #666;
 }
 
-.out-of-stock-badge {
-  background-color: #ffebee;
-  color: #c62828;
-  padding: 4px 8px;
+.date-time-badge {
+  background-color: #ebefff;
+  color: #17599c;
+  padding: 8px 10px;
   border-radius: 12px;
-  font-size: 12px;
+  font-size: 13px;
   font-weight: 500;
 }
 
@@ -98,12 +103,10 @@ mat-paginator {
   font-weight: 500;
 }
 
-/* Material Design Form Field Subscript Fix */
 ::ng-deep .mat-mdc-form-field-subscript-wrapper {
   display: none;
 }
 
-/* Responsive Design */
 @media (max-width: 768px) {
   .dashboard-section {
     margin: 16px 0;
@@ -116,4 +119,61 @@ mat-paginator {
   .dashboard-table {
     min-width: 600px;
   }
+}
+#recent-products th:nth-child(1) {
+  width: 60%;
+}
+#recent-products th:nth-child(2) {
+  width: 20%;
+}
+#recent-products th:nth-child(3) {
+  width: 20%;
+}
+
+.product-name {
+  -webkit-line-clamp: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  padding: 2px;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  text-rendering: optimizeLegibility;
+  text-decoration: none;
+}
+
+::ng-deep .dashboard-section .mat-mdc-paginator {
+  color: #334155 !important;
+}
+
+::ng-deep .dashboard-section .mat-mdc-paginator .mat-mdc-select-value,
+::ng-deep .dashboard-section .mat-mdc-paginator .mat-mdc-select-arrow {
+  color: #475569 !important;
+}
+
+::ng-deep .dashboard-section svg.mat-mdc-paginator-icon,
+::ng-deep .dashboard-section .mat-mdc-paginator .mat-mdc-icon-button {
+  fill: #48494b !important;
+}
+
+::ng-deep .dashboard-section .mat-mdc-paginator .mat-mdc-icon-button {
+  background-color: #f7f5f5 !important;
+}
+
+::ng-deep
+  .dashboard-section
+  .mat-mdc-icon-button[aria-disabled]
+  .mat-mdc-paginator-icon {
+  fill: #c8c7c7 !important;
+}
+
+#high-selling .table-container {
+  padding-top: 15px;
+}
+
+#high-selling .dashboard-table {
+  border-bottom: 1px solid lightgrey;
+}
+
+#high-selling mat-card-subtitle {
+  color: #adadad;
 }

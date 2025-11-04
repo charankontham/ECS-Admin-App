@@ -219,11 +219,11 @@ export class ViewProductCategory {
     } else {
       this.categoryService.updateCategory(categoryData).subscribe({
         next: (updatedCategory) => {
-          this.handleSuccessSnackBar('Category updated successfully!');
           this.category = updatedCategory;
           this.isEditMode = false;
           this.loading = false;
-          window.location.reload();
+          this.handleSuccessSnackBar('Category updated successfully!');
+          // window.location.reload();
         },
         error: (error) => {
           console.error('Error updating category', error);
@@ -251,16 +251,22 @@ export class ViewProductCategory {
     dialogRef.afterClosed().subscribe((result) => {
       if (result) {
         this.loading = true;
-        setTimeout(() => {
-          this.snackBar.open('Category deleted successfully!', 'Close', {
-            duration: 3000,
-            horizontalPosition: 'end',
-            verticalPosition: 'top',
-            panelClass: ['success-snackbar'],
+        this.categoryService
+          .deleteCategory(this.category!.categoryId!)
+          .subscribe({
+            next: () => {
+              this.handleSuccessSnackBar('Category deleted successfully!');
+              this.loading = false;
+              this.router.navigate(['/inventory/categories']);
+            },
+            error: (error) => {
+              console.error('Error deleting category', error);
+              this.handleFailureSnackBar(
+                'Failed to delete category. Please try again.'
+              );
+              this.loading = false;
+            },
           });
-          this.loading = false;
-          this.router.navigate(['/inventory/categories']);
-        }, 1000);
       }
     });
   }

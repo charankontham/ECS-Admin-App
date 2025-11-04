@@ -254,7 +254,10 @@ export class ProductBrandComponent implements OnInit, AfterViewInit {
     }, 300);
   }
 
-  onBrandClick(event: Event, brand: ProductBrand): void {
+  onBrandClick(event: MouseEvent, brand: ProductBrand): void {
+    if (event.ctrlKey || event.metaKey || event.button === 1) {
+      return;
+    }
     this.saveCurrentState();
     this.router.navigate(['/inventory/brands', brand.brandId]);
     event.preventDefault();
@@ -262,5 +265,11 @@ export class ProductBrandComponent implements OnInit, AfterViewInit {
 
   checkIsDefaultFilterForm(): boolean {
     return !this.filterForm.get('search')?.value;
+  }
+
+  getBrandUrl(brand: ProductBrand): string {
+    return this.router.serializeUrl(
+      this.router.createUrlTree(['/inventory/brands', brand.brandId])
+    );
   }
 }

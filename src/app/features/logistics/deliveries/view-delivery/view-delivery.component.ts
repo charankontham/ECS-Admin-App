@@ -29,6 +29,7 @@ import {
 import {
   AVAILABILITY_STATUS_MAP,
   AvailabilityStatusClassMap,
+  ORDER_RETURN_STATUS_MAP,
   ORDER_TRACKING_STATUS_MAP,
   OrderStatusClassMap,
 } from '../../../../core/util/util';
@@ -67,12 +68,14 @@ export class ViewDeliveryComponent implements OnInit {
   deliveryHubs: DeliveryHub[] = [];
   loading = true;
   error: string | null = null;
-  statusList = Object.entries(ORDER_TRACKING_STATUS_MAP).map(
-    ([key, value]) => ({
-      id: Number(key),
-      name: value,
-    })
-  );
+  statusList = Object.entries(
+    this.orderTracking?.orderTrackingType == 1
+      ? ORDER_TRACKING_STATUS_MAP
+      : ORDER_RETURN_STATUS_MAP
+  ).map(([key, value]) => ({
+    id: Number(key),
+    name: value,
+  }));
   isEditingStatus = false;
   isEditingDate = false;
   selectedStatus: number | null = null;
@@ -119,6 +122,14 @@ export class ViewDeliveryComponent implements OnInit {
           Number(data?.customerAddress?.userId.substring(9))
         );
         this.loading = false;
+        this.statusList = Object.entries(
+          this.orderTracking?.orderTrackingType == 1
+            ? ORDER_TRACKING_STATUS_MAP
+            : ORDER_RETURN_STATUS_MAP
+        ).map(([key, value]) => ({
+          id: Number(key),
+          name: value,
+        }));
       },
       error: (error) => {
         console.error('Error loading order tracking:', error);
@@ -161,8 +172,12 @@ export class ViewDeliveryComponent implements OnInit {
     });
   }
 
-  getStatusLabel(statusId: number): string {
-    return ORDER_TRACKING_STATUS_MAP[statusId] || 'Unknown';
+  getStatusLabel(statusId: number, type: number): string {
+    return (
+      (type == 1
+        ? ORDER_TRACKING_STATUS_MAP[statusId]
+        : ORDER_RETURN_STATUS_MAP[statusId]) || 'Unknown'
+    );
   }
 
   getOrderStatusClass(statusId: number): string {

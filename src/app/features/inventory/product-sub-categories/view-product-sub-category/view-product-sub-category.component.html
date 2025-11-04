@@ -65,7 +65,7 @@
                 <mat-card class="image-card">
                     <mat-card-content>
                         <div class="subcategory-image-container">
-                            <img [src]="currentImageUrl || '/assets/images/image-placeholder.jpg'"
+                            <img [src]="currentImageUrl ? 'http://localhost:8080/ecs-inventory-admin/api/public/images/view/getImageById/'+currentImageUrl : '/assets/images/image-placeholder.jpg'"
                                 [alt]="subCategory.subCategoryName" class="subcategory-image">
                         </div>
                     </mat-card-content>
@@ -114,41 +114,41 @@
                         <mat-card-header>
                             <mat-card-title>Sub Category Information</mat-card-title>
                         </mat-card-header>
+                        <hr />
                         <mat-card-content>
-                            <div class="form-row">
-                                <mat-form-field appearance="outline">
-                                    <mat-label>Sub Category Name</mat-label>
-                                    <input matInput formControlName="subCategoryName" required>
-                                    <mat-error *ngIf="subCategoryForm.get('subCategoryName')?.hasError('required')">
-                                        Sub category name is required
-                                    </mat-error>
-                                </mat-form-field>
-                            </div>
+                            <div class="form-first-row">
+                                <div class="form-row">
+                                    <mat-form-field appearance="outline">
+                                        <mat-label>Sub Category Name</mat-label>
+                                        <input matInput formControlName="subCategoryName" required>
+                                        <mat-error *ngIf="subCategoryForm.get('subCategoryName')?.hasError('required')">
+                                            Sub category name is required
+                                        </mat-error>
+                                    </mat-form-field>
+                                </div>
 
-                            <div class="form-row">
-                                <mat-form-field appearance="outline">
-                                    <mat-label>Category</mat-label>
-                                    <mat-select formControlName="categoryId" [compareWith]="compareCategories" required>
-                                        <mat-option [value]="">Select Category</mat-option>
-                                        <mat-option *ngFor="let category of categories" [value]="category.categoryId">
-                                            {{ category.categoryName }}
-                                        </mat-option>
-                                    </mat-select>
-                                    <mat-error *ngIf="subCategoryForm.get('categoryId')?.hasError('required')">
-                                        Category is required
-                                    </mat-error>
-                                </mat-form-field>
+                                <div class="form-row">
+                                    <mat-form-field appearance="outline">
+                                        <mat-label>Category</mat-label>
+                                        <mat-select formControlName="categoryId" [compareWith]="compareCategories"
+                                            required>
+                                            <mat-option [value]="">Select Category</mat-option>
+                                            <mat-option *ngFor="let category of categories"
+                                                [value]="category.categoryId">
+                                                {{ category.categoryName }}
+                                            </mat-option>
+                                        </mat-select>
+                                        <mat-error *ngIf="subCategoryForm.get('categoryId')?.hasError('required')">
+                                            Category is required
+                                        </mat-error>
+                                    </mat-form-field>
+                                </div>
                             </div>
 
                             <div class="form-row">
                                 <mat-form-field appearance="outline">
                                     <mat-label>Description</mat-label>
-                                    <textarea matInput formControlName="subCategoryDescription" rows="5"
-                                        required></textarea>
-                                    <mat-error
-                                        *ngIf="subCategoryForm.get('subCategoryDescription')?.hasError('required')">
-                                        Description is required
-                                    </mat-error>
+                                    <textarea matInput formControlName="subCategoryDescription" rows="5"></textarea>
                                 </mat-form-field>
                             </div>
 

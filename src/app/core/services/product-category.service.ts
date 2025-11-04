@@ -39,7 +39,7 @@ export class ProductCategoryService extends BaseService<ProductCategory> {
     return this.update(category);
   }
 
-  deleteCategory(id: string): Observable<HttpResponse<string>> {
+  deleteCategory(id: number): Observable<HttpResponse<string>> {
     return this.deleteWithStringResponse(id);
   }
 }

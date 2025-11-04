@@ -346,7 +346,7 @@ export class ViewDeliveryHubComponent implements OnInit {
     const formValues = this.addressForm.value;
     this.isLoading = true;
     const addressData: AddressDto = {
-      userId: 'admin_' + this.hub?.deliveryHubId,
+      userId: 'hub_' + this.hub?.deliveryHubId,
       addressId: this.hubAddress?.addressId,
       ...formValues,
     };

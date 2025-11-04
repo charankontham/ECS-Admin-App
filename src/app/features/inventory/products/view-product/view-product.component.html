@@ -138,11 +138,11 @@
                                         </div>
                                         <div class="info-item">
                                             <div class="info-label">Created At</div>
-                                            <div class="info-value">{{ product.dateAdded | date:'medium' }}</div>
+                                            <div class="info-value">{{ product.dateAdded+"Z" | date:'medium' }}</div>
                                         </div>
                                         <div class="info-item">
                                             <div class="info-label">Last Updated</div>
-                                            <div class="info-value">{{ product.dateModified | date:'medium' }}</div>
+                                            <div class="info-value">{{ product.dateModified+"Z" | date:'medium' }}</div>
                                         </div>
                                     </div>
                                 </div>

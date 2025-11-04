@@ -322,6 +322,28 @@ mat-label {
   color: rgb(232, 237, 246);
 }
 
+#clear-all-filters-button {
+  background-color: #00dddd;
+  color: #000;
+}
+
+#clear-all-filters-button:hover:not([disabled]) {
+  background-color: #f8fafc;
+}
+
+#clear-all-filters-button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+#clear-all-filters-button .mat-mdc-unelevated-button[disabled],
+#clear-all-filters-button .mat-mdc-unelevated-button.mat-mdc-button-disabled,
+.filter-actions
+  #clear-all-filters-button.mat-mdc-outlined-button.mat-mdc-button-disabled {
+  color: #949494 !important;
+  background-color: #ededed !important;
+}
+
 @media (max-width: 768px) {
   .delivery-hubs-container {
     padding: 16px;

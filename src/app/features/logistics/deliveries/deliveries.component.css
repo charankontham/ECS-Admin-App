@@ -245,33 +245,8 @@ mat-label {
   --mat-mdc-form-field-label-offset-x: 0px !important;
 }
 
-::ng-deep div.mat-mdc-select-panel,
-::ng-deep .mat-mdc-option {
-  background-color: white !important;
-  color: black !important;
-}
-
-::ng-deep .mat-mdc-option span {
-  background-color: white;
-  color: black;
-}
-
-::ng-deep .mat-mdc-option:hover {
-  background-color: #edf4f7 !important;
-}
-
-::ng-deep .mat-mdc-option:hover .mdc-list-item__primary-text {
-  background-color: #edf4f7;
-  color: #303030;
-}
-
 ::ng-deep .mat-mdc-option .mat-pseudo-checkbox {
   border-color: #484747 !important;
-}
-
-.mat-mdc-option:hover mdc-list-item__primary-text {
-  background-color: #f2efef !important;
-  color: #252424 !important;
 }
 
 .agent-search {
